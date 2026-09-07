@@ -3,6 +3,7 @@ import {
   ArrowRight, 
   Terminal, 
   CheckCircle2, 
+  XCircle,
   Play, 
   Shield, 
   Database, 
@@ -29,7 +30,12 @@ import {
   FileCode2,
   Sliders,
   CheckCheck,
-  AlertTriangle
+  AlertTriangle,
+  Network,
+  Binary,
+  Layers2,
+  Share2,
+  Workflow
 } from 'lucide-react';
 import { Challenge } from '../types';
 import { DifficultyBadge } from './DifficultyBadge';
@@ -63,7 +69,12 @@ export const LandingPageView: React.FC<Props> = ({
       status: 201,
       statusText: 'CREATED',
       latency: '12.4ms',
-      attackScenario: 'Boundary RFC-5322 & In-Memory Persistence',
+      attackScenario: 'RFC-5322 Email Boundary & In-Memory Lock Collision',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Request-Id': 'req_7f901c82e',
+        'X-Runtime-Ms': '12.4'
+      },
       requestBody: JSON.stringify({
         email: 'mayank@backendrank.io',
         role: 'staff_engineer',
@@ -78,11 +89,11 @@ export const LandingPageView: React.FC<Props> = ({
         status: 'active'
       }, null, 2),
       tests: [
-        { name: 'Schema & payload type contract', time: '1.8ms', status: 'PASSED' },
+        { name: 'Schema & payload type contract validation', time: '1.8ms', status: 'PASSED' },
         { name: 'Status code RFC-9110 (201 Created)', time: '1.2ms', status: 'PASSED' },
         { name: 'Unique constraint collision -> 409 Conflict', time: '2.9ms', status: 'PASSED' },
         { name: 'Malformed email boundary -> 422 Unprocessable [Hidden]', time: '2.1ms', status: 'PASSED' },
-        { name: 'High concurrency lock on email registration [Hidden]', time: '6.8ms', status: 'PASSED' },
+        { name: 'High concurrency lock on simultaneous registration [Hidden]', time: '6.8ms', status: 'PASSED' },
         { name: 'Response headers compliance (Content-Type: application/json)', time: '0.9ms', status: 'PASSED' }
       ]
     },
@@ -93,6 +104,12 @@ export const LandingPageView: React.FC<Props> = ({
       statusText: 'TOO MANY REQUESTS',
       latency: '3.8ms',
       attackScenario: 'Redis Sliding-Window 61st Burst Injection',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-RateLimit-Limit': '60',
+        'X-RateLimit-Remaining': '0',
+        'Retry-After': '18'
+      },
       requestBody: null,
       responseBody: JSON.stringify({
         error: 'rate_limit_exceeded',
@@ -114,7 +131,12 @@ export const LandingPageView: React.FC<Props> = ({
       status: 200,
       statusText: 'OK',
       latency: '9.4ms',
-      attackScenario: 'HMAC-SHA256 & Duplicate Event Deduplication',
+      attackScenario: 'HMAC-SHA256 & Duplicate Event Deduplication Window',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Idempotency-Status': 'PROCESSED_ONCE',
+        'X-Signature-Verified': 'true'
+      },
       requestBody: JSON.stringify({
         id: 'evt_3MjjkwLkdIwHu7ix',
         type: 'payment_intent.succeeded',
@@ -141,7 +163,12 @@ export const LandingPageView: React.FC<Props> = ({
       status: 409,
       statusText: 'CONFLICT',
       latency: '15.1ms',
-      attackScenario: 'Simultaneous Inventory Mutex Contention',
+      attackScenario: 'Simultaneous 50-Thread Inventory Mutex Contention',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Mutex-Acquired': 'false',
+        'X-Lock-Strategy': 'Distributed Redis Redlock'
+      },
       requestBody: JSON.stringify({
         sku: 'item_gpu_rtx4090',
         quantity: 1,
@@ -157,7 +184,7 @@ export const LandingPageView: React.FC<Props> = ({
         { name: 'Rejects overlapping concurrent checkout with 409', time: '3.1ms', status: 'PASSED' },
         { name: 'Releases lock on unexpected transaction error', time: '2.8ms', status: 'PASSED' },
         { name: 'Zero phantom inventory deductions across 50 threads [Hidden]', time: '8.6ms', status: 'PASSED' },
-        { name: 'Deadlock timeout prevention threshold', time: '1.4ms', status: 'PASSED' },
+        { name: 'Deadlock timeout prevention threshold (<500ms)', time: '1.4ms', status: 'PASSED' },
         { name: 'State consistency verified across replica nodes', time: '5.0ms', status: 'PASSED' }
       ]
     }
@@ -179,11 +206,11 @@ export const LandingPageView: React.FC<Props> = ({
         }
         return prev + 1;
       });
-    }, 240);
+    }, 220);
   };
 
   const handleCopyCli = () => {
-    navigator.clipboard.writeText('npx apirun start create-user-api');
+    navigator.clipboard.writeText('npx apirun test --target http://localhost:8000 --challenge create-user-api');
     setCopiedCli(true);
     setTimeout(() => setCopiedCli(false), 2000);
   };
@@ -191,14 +218,99 @@ export const LandingPageView: React.FC<Props> = ({
   const previewChallenges = challenges.slice(0, 4);
 
   const conceptTags = [
-    'HTTP/REST', 'REDIS CACHING', 'CONCURRENCY LOCKS', 'RATE LIMITING', 'IDEMPOTENCY', 'JWT AUTH', 'JOB WORKERS', 'WEBHOOKS'
+    'HTTP/REST RFC-9110', 'REDIS DISTRIBUTED LOCKS', 'SLIDING WINDOW RATE LIMITER', 
+    'IDEMPOTENCY KEYS', 'JWT REFRESH ROTATION', 'ASYNCHRONOUS JOB WORKERS', 'STRIPE WEBHOOK HMAC'
   ];
 
   const recentActivity = [
-    { user: 'alex_v', action: 'passed', challenge: 'Sliding Window Rate Limiter', lang: 'Go', time: '2m ago', latency: '4.2ms' },
-    { user: 'sophia_k', action: 'passed', challenge: 'Idempotent Payment Webhook', lang: 'Node.js', time: '5m ago', latency: '9.8ms' },
-    { user: 'dev_raj', action: 'solved', challenge: 'Distributed Job Queue Worker', lang: 'Python', time: '8m ago', latency: '12.1ms' },
-    { user: 'elena_m', action: 'passed', challenge: 'JWT Authentication & Refresh', lang: 'Rust', time: '12m ago', latency: '2.4ms' }
+    { user: 'alex_v', action: 'passed', challenge: 'Sliding Window Rate Limiter', lang: 'Go 1.22', time: '2m ago', latency: '4.2ms' },
+    { user: 'sophia_k', action: 'passed', challenge: 'Idempotent Payment Webhook', lang: 'Node.js 20', time: '5m ago', latency: '9.8ms' },
+    { user: 'dev_raj', action: 'solved', challenge: 'Distributed Job Queue Worker', lang: 'Python 3.11', time: '8m ago', latency: '12.1ms' },
+    { user: 'elena_m', action: 'passed', challenge: 'JWT Authentication & Refresh', lang: 'Rust 1.77', time: '12m ago', latency: '2.4ms' }
+  ];
+
+  const comparisonRows = [
+    {
+      feature: 'Problem Definition',
+      traditional: 'Invert a binary tree, synthetic array index manipulation, Two Sum',
+      apirun: 'Implement real HTTP/1.1 REST endpoints, JSON schemas, headers & route mutations',
+      highlight: true
+    },
+    {
+      feature: 'Edge Case Verification',
+      traditional: 'Null array inputs, large string lengths, Time Limit Exceeded',
+      apirun: '50-thread concurrent race conditions, Redis rate limit bursts, idempotency replays',
+      highlight: true
+    },
+    {
+      feature: 'Protocol Semantics',
+      traditional: 'Single stdout string match (`"true" == "true"`)',
+      apirun: 'Strict RFC-9110 status codes (201, 400, 404, 409, 422, 429) & Content-Type validation',
+      highlight: false
+    },
+    {
+      feature: 'Infrastructure Integration',
+      traditional: 'None (monolithic scratchpad in browser)',
+      apirun: 'Real Redis keys, distributed locks, database transactions, background worker queues',
+      highlight: true
+    },
+    {
+      feature: 'Development Workflow',
+      traditional: 'Coding exclusively in a constrained browser text box',
+      apirun: 'In-browser Monaco Editor or your real local IDE via CLI (`npx apirun test`)',
+      highlight: false
+    },
+    {
+      feature: 'Production Relevance',
+      traditional: 'Rarely encountered in day-to-day backend microservices',
+      apirun: 'Directly mirrors real-world backend engineering and system design interviews',
+      highlight: true
+    }
+  ];
+
+  const engineeringTracks = [
+    {
+      number: '01',
+      title: 'Concurrency & Distributed Mutexes',
+      badge: 'High Concurrency',
+      description: 'Defend against race conditions, phantom reads, and double spend errors using distributed locks, Redis Redlock, and optimistic locking strategies.',
+      skills: ['Mutex Locks', 'Redis Redlock', 'Optimistic Locking', 'Deadlock Detection']
+    },
+    {
+      number: '02',
+      title: 'Traffic Shaping & Rate Limiting',
+      badge: 'Traffic Architecture',
+      description: 'Implement atomic sliding-window counters, token buckets, and leaky bucket algorithms tested under 1,000 req/sec burst attacks.',
+      skills: ['Sliding Window', 'Redis Lua Scripts', 'HTTP 429 Retry-After', 'Token Bucket']
+    },
+    {
+      number: '03',
+      title: 'Financial Idempotency & Webhooks',
+      badge: 'Payment Reliability',
+      description: 'Handle Stripe and payment webhook replays safely with HMAC-SHA256 signature verification and atomic database deduplication keys.',
+      skills: ['HMAC-SHA256', 'Idempotency-Key Header', 'Atomic Deduplication', 'At-Least-Once Delivery']
+    },
+    {
+      number: '04',
+      title: 'RFC HTTP & Schema Contract Design',
+      badge: 'API Architecture',
+      description: 'Master strict RFC-9110 HTTP semantics, status code precision (201 Created vs 200, 422 Unprocessable vs 400), and payload contracts.',
+      skills: ['RFC-9110 Semantics', 'JSON Schema Validation', 'Header Negotiation', 'RFC-5322 Boundaries']
+    },
+    {
+      number: '05',
+      title: 'Asynchronous Job Queues & Workers',
+      badge: 'Distributed Systems',
+      description: 'Build reliable background job workers with delayed retry queues, dead-letter exchanges (DLX), and worker heartbeat coordination.',
+      skills: ['Dead Letter Queues', 'Exponential Backoff', 'Worker Ack/Nack', 'Job Deduplication']
+    },
+    {
+      number: '06',
+      title: 'Auth, JWT & Session Security',
+      badge: 'Authentication',
+      description: 'Implement dual-token rotating authentication, asymmetric RS256 signing, refresh token rotation, and distributed revocation blacklists.',
+      skills: ['RS256 JWT Signing', 'Refresh Token Rotation', 'Token Blacklisting', 'Role-Based Access (RBAC)']
+    }
   ];
 
   return (
@@ -227,19 +339,19 @@ export const LandingPageView: React.FC<Props> = ({
           {/* Main Hero Headings */}
           <div className="space-y-1 sm:space-y-1.5 max-w-4xl mx-auto">
             <h1 className="text-[clamp(42px,5.6vw,84px)] font-extrabold tracking-tight text-white leading-[0.98]">
-              Build APIs.
+              Build Real APIs.
             </h1>
             <h1 className="text-[clamp(42px,5.6vw,84px)] font-extrabold tracking-tight text-[#cbd5e1] leading-[0.98]">
-              Break Edge Cases.
+              Defend Edge Cases.
             </h1>
             <h1 className="text-[clamp(42px,5.6vw,84px)] font-extrabold tracking-tight text-[#00f2a9] leading-[0.98]">
-              Ship With Proof.
+              Ship With Verification.
             </h1>
           </div>
 
           {/* Product Identity Subtitle */}
           <p className="text-sm sm:text-base md:text-lg text-[#94a3b8] max-w-2xl mx-auto font-normal leading-relaxed">
-            The hands-on practice platform for backend engineers. Stop solving abstract array puzzles — build real REST endpoints, Redis rate limiters, idempotency keys, and survive automated attack test suites.
+            Stop writing synthetic two-sum loops. Practice building production REST APIs, Redis rate limiters, distributed mutex locks, and idempotent payment webhooks against automated adversarial test harnesses.
           </p>
 
           {/* Primary CTA Action Row */}
@@ -248,7 +360,7 @@ export const LandingPageView: React.FC<Props> = ({
               onClick={() => onSelectChallenge(challenges[0] || challenges[1])}
               className="w-full sm:w-auto flex items-center justify-center space-x-2.5 px-7 py-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-sm transition-all active:scale-[0.98]"
             >
-              <span>Start Coding Free</span>
+              <span>Launch Free Arena</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </button>
 
@@ -256,13 +368,13 @@ export const LandingPageView: React.FC<Props> = ({
               onClick={onExploreChallenges}
               className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-[#f8fafc] border border-white/[0.15] hover:border-white/[0.25] font-semibold text-sm transition-all backdrop-blur-xl active:scale-[0.98]"
             >
-              <span>Explore 8 Challenges</span>
-              <ChevronRight className="w-4 h-4 text-[#94a3b8]" />
+              <Terminal className="w-4 h-4 text-emerald-400" />
+              <span>Browse 8 Production Tracks</span>
             </button>
           </div>
 
-          {/* Tech Badges */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 max-w-3xl mx-auto font-sans text-xs">
+          {/* Technical Value Badges */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto font-sans text-xs">
             {conceptTags.map((tag) => (
               <span
                 key={tag}
@@ -309,9 +421,14 @@ export const LandingPageView: React.FC<Props> = ({
                   <span className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
                   <span className="w-3 h-3 rounded-full bg-[#27c93f]" />
                 </div>
-                <span className="font-sans text-[#94a3b8] text-xs font-semibold tracking-wider uppercase">
-                  ATTACK INJECTOR // LIVE HARNESS
-                </span>
+                <div className="flex items-center space-x-2">
+                  <span className="font-sans text-[#94a3b8] text-xs font-semibold tracking-wider uppercase">
+                    ADVERSARIAL ATTACK HARNESS
+                  </span>
+                  <span className="hidden md:inline text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    HTTP/1.1 RFC-9110
+                  </span>
+                </div>
               </div>
 
               {/* Attack Vector Tabs */}
@@ -363,10 +480,10 @@ export const LandingPageView: React.FC<Props> = ({
                 <button
                   onClick={handleRerunDemo}
                   disabled={isDemoRunning}
-                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold font-sans text-xs transition-all disabled:opacity-50 active:scale-[0.97]"
+                  className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold font-sans text-xs transition-all disabled:opacity-50 active:scale-[0.97]"
                 >
                   {isDemoRunning ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Flame className="w-3.5 h-3.5 fill-current" />}
-                  <span>{isDemoRunning ? 'Fuzzing...' : 'Inject Attack'}</span>
+                  <span>{isDemoRunning ? 'Fuzzing...' : 'Inject Chaos'}</span>
                 </button>
               </div>
             </div>
@@ -394,17 +511,17 @@ export const LandingPageView: React.FC<Props> = ({
                   </span>
                 </div>
 
-                <div className="text-[11px] font-mono text-emerald-400/90 bg-emerald-950/20 border border-emerald-800/40 px-3 py-1.5 rounded-lg flex items-center space-x-2">
-                  <Sliders className="w-3.5 h-3.5" />
-                  <span>Target Vector: <strong>{currentDemo.attackScenario}</strong></span>
+                <div className="text-[11px] font-sans text-emerald-400/90 bg-emerald-950/20 border border-emerald-800/40 px-3 py-1.5 rounded-lg flex items-center space-x-2 font-medium">
+                  <Sliders className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Target Vector: <strong className="text-white">{currentDemo.attackScenario}</strong></span>
                 </div>
 
                 {/* Inbound Payload */}
                 {currentDemo.requestBody && (
                   <div className="space-y-1.5">
-                    <div className="flex justify-between font-mono text-[10px] text-[#94a3b8]">
+                    <div className="flex justify-between font-sans text-[10px] text-[#94a3b8] font-medium">
                       <span>INBOUND ATTACK PAYLOAD</span>
-                      <span>application/json</span>
+                      <span className="font-mono">application/json</span>
                     </div>
                     <pre className="p-3.5 rounded-xl bg-black/50 border border-white/[0.08] text-[#e2e8f0] font-mono text-[11px] overflow-x-auto leading-relaxed">
                       {currentDemo.requestBody}
@@ -414,9 +531,9 @@ export const LandingPageView: React.FC<Props> = ({
 
                 {/* Response Payload */}
                 <div className="space-y-1.5">
-                  <div className="flex justify-between font-mono text-[10px] text-[#94a3b8]">
+                  <div className="flex justify-between font-sans text-[10px] text-[#94a3b8] font-medium">
                     <span>DEFENSIVE RESPONSE BODY</span>
-                    <span className="text-[#00f2a9] font-semibold">{currentDemo.latency}</span>
+                    <span className="text-[#00f2a9] font-semibold font-mono">{currentDemo.latency}</span>
                   </div>
                   <pre className="p-3.5 rounded-xl bg-black/50 border border-white/[0.08] text-emerald-300 font-mono text-[11px] overflow-x-auto leading-relaxed">
                     {currentDemo.responseBody}
@@ -431,7 +548,7 @@ export const LandingPageView: React.FC<Props> = ({
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                     <span className="font-bold text-white text-xs tracking-wide">AUTOMATED ASSERTION SUITE</span>
                   </div>
-                  <span className="font-mono text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                  <span className="font-sans text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
                     {demoProgress}/6 ASSERTIONS PASSED
                   </span>
                 </div>
@@ -485,6 +602,121 @@ export const LandingPageView: React.FC<Props> = ({
         </section>
 
         {/* ========================================================= */}
+        {/* THE LEETCODE VS APIRUN COMPARISON MATRIX */}
+        {/* ========================================================= */}
+        <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-10 font-sans">
+          <div className="text-center space-y-3">
+            <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
+              PARADIGM SHIFT
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+              Why LeetCode doesn't prepare you for real backend outages
+            </h2>
+            <p className="text-sm sm:text-base text-[#94a3b8] max-w-3xl mx-auto font-normal leading-relaxed">
+              Algorithms test whether you memorized dynamic programming. APIRun tests whether your API can survive 50 concurrent double-spend requests, Redis rate limits, and database rollback locks.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/[0.12] bg-[#0c1017]/90 backdrop-blur-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs sm:text-sm">
+                <thead>
+                  <tr className="border-b border-white/[0.1] bg-white/[0.03]">
+                    <th className="p-4 sm:p-5 font-bold text-[#8b949e] w-1/4">Engineering Vector</th>
+                    <th className="p-4 sm:p-5 font-bold text-[#94a3b8] w-3/8">
+                      <span className="flex items-center space-x-2">
+                        <XCircle className="w-4 h-4 text-red-400/80" />
+                        <span>Traditional DSA Platforms</span>
+                      </span>
+                    </th>
+                    <th className="p-4 sm:p-5 font-bold text-emerald-400 w-3/8 bg-emerald-500/[0.06]">
+                      <span className="flex items-center space-x-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <span>APIRun Backend Arena</span>
+                      </span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.08]">
+                  {comparisonRows.map((row, idx) => (
+                    <tr 
+                      key={idx} 
+                      className={`hover:bg-white/[0.02] transition-colors ${row.highlight ? 'bg-white/[0.01]' : ''}`}
+                    >
+                      <td className="p-4 sm:p-5 font-semibold text-white">
+                        {row.feature}
+                      </td>
+                      <td className="p-4 sm:p-5 text-[#94a3b8] leading-relaxed">
+                        {row.traditional}
+                      </td>
+                      <td className="p-4 sm:p-5 text-[#e2e8f0] font-medium bg-emerald-500/[0.04] leading-relaxed">
+                        <span className="text-emerald-400 font-semibold mr-1.5">✓</span>
+                        {row.apirun}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* 6 PRODUCTION ENGINEERING TRACKS */}
+        {/* ========================================================= */}
+        <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans">
+          <div className="text-center space-y-3">
+            <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
+              CURRICULUM & DOMAIN MASTERY
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+              6 Core Backend Engineering Domains
+            </h2>
+            <p className="text-sm sm:text-base text-[#94a3b8] max-w-2xl mx-auto leading-relaxed">
+              Every track simulates real production architecture patterns required at Staff & Senior levels.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {engineeringTracks.map((track, i) => (
+              <div
+                key={i}
+                className="p-6 rounded-2xl bg-white/[0.03] border border-white/[0.1] hover:border-emerald-400/40 transition-all space-y-4 backdrop-blur-xl group hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                    TRACK {track.number}
+                  </span>
+                  <span className="text-[11px] text-[#94a3b8] font-medium">
+                    {track.badge}
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors">
+                    {track.title}
+                  </h3>
+                  <p className="text-xs text-[#94a3b8] leading-relaxed">
+                    {track.description}
+                  </p>
+                </div>
+
+                <div className="pt-2 flex flex-wrap gap-1.5 border-t border-white/[0.08]">
+                  {track.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="text-[10px] px-2 py-0.5 rounded bg-white/[0.04] text-[#cbd5e1] border border-white/[0.08]"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ========================================================= */}
         {/* HOW WE EVALUATE (PRODUCTION TEST PIPELINE) */}
         {/* ========================================================= */}
         <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans">
@@ -496,7 +728,7 @@ export const LandingPageView: React.FC<Props> = ({
               Production evaluation, zero mock fluff
             </h2>
             <p className="text-sm sm:text-base text-[#94a3b8] max-w-2xl mx-auto font-normal leading-relaxed">
-              Every submission goes through our automated adversarial test engine.
+              Every submission runs in an isolated ephemeral execution sandbox tested by our automated adversarial harness.
             </p>
           </div>
 
@@ -642,13 +874,17 @@ export const LandingPageView: React.FC<Props> = ({
         {/* ========================================================= */}
         {/* FINAL CALL TO ACTION */}
         {/* ========================================================= */}
-        <section className="py-24 px-4 sm:px-6 max-w-4xl mx-auto text-center space-y-8">
+        <section className="py-24 px-4 sm:px-6 max-w-4xl mx-auto text-center space-y-8 font-sans">
           <div className="p-10 rounded-3xl bg-white/[0.04] border border-white/[0.15] backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] space-y-6">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>ZERO MOCKS // REAL INFRASTRUCTURE</span>
+            </div>
             <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-              Ready to level up your backend skills?
+              Ready to master production backend engineering?
             </h2>
-            <p className="text-sm sm:text-base text-[#94a3b8] max-w-xl mx-auto">
-              Join thousands of developers mastering real-world REST APIs, microservices, and distributed architecture.
+            <p className="text-sm sm:text-base text-[#94a3b8] max-w-xl mx-auto leading-relaxed">
+              Join thousands of backend engineers practicing distributed locking, rate limiting, and RFC-strict APIs.
             </p>
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
