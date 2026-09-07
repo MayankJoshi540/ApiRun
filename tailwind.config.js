@@ -31,6 +31,9 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'sans-serif'],
+        heading: ['"Plus Jakarta Sans"', 'Outfit', 'sans-serif'],
+        grotesk: ['"Space Grotesk"', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SFMono-Regular', 'Menlo', 'monospace']
       }
     },
