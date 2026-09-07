@@ -93,7 +93,7 @@ export const ChallengeHeader: React.FC<Props> = ({
           <button
             disabled={isRunning || isSubmitting}
             onClick={onSubmitSolution}
-            className="flex items-center space-x-1.5 px-4 py-1.5 rounded-md bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-semibold transition-all hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] disabled:opacity-50 active:scale-[0.98]"
+            className="flex items-center space-x-1.5 px-4 py-1.5 rounded-md bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-semibold transition-all disabled:opacity-50 active:scale-[0.98]"
           >
             {isSubmitting ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />

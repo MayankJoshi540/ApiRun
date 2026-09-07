@@ -32,42 +32,42 @@ export const ChallengeCard: React.FC<Props> = ({
             <h3 className="text-base font-semibold text-[#e6edf3] group-hover:text-emerald-400 transition-colors flex items-center">
               {challenge.title}
             </h3>
-            <span className="text-[11px] font-mono text-[#8b949e] py-0.5 px-2 rounded bg-[#171c26] border border-[#272e3a]">
+            <span className="text-[11px] font-sans font-medium text-[#94a3b8] py-0.5 px-2 rounded bg-[#171c26] border border-[#272e3a]">
               {challenge.category}
             </span>
             <DifficultyBadge difficulty={challenge.difficulty} />
             
             {isSolved && (
-              <span className="inline-flex items-center space-x-1 font-mono text-[11px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/70 px-2 py-0.5 rounded">
+              <span className="inline-flex items-center space-x-1 font-sans text-[11px] font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/70 px-2 py-0.5 rounded">
                 <CheckCircle2 className="w-3 h-3" />
                 <span>PASSED</span>
               </span>
             )}
             {isInProgress && (
-              <span className="inline-flex items-center font-mono text-[11px] text-amber-400 bg-amber-950/60 border border-amber-800/70 px-2 py-0.5 rounded">
+              <span className="inline-flex items-center font-sans font-medium text-[11px] text-amber-400 bg-amber-950/60 border border-amber-800/70 px-2 py-0.5 rounded">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mr-1.5" />
                 IN_PROGRESS
               </span>
             )}
           </div>
 
-          <p className="text-sm text-[#8b949e] line-clamp-2 max-w-3xl font-normal">
+          <p className="text-sm text-[#8b949e] line-clamp-2 max-w-3xl font-normal leading-relaxed">
             {challenge.summary}
           </p>
 
           {/* Routes Preview & Concepts */}
           <div className="flex flex-wrap items-center gap-2 pt-1">
-            <div className="flex items-center rounded bg-[#090b0e] border border-[#262d3a] px-2 py-0.5 font-mono text-[11px]">
-              <span className={`font-bold mr-1.5 ${
+            <div className="flex items-center rounded bg-[#090b0e] border border-[#262d3a] px-2 py-0.5 text-[11px]">
+              <span className={`font-mono font-bold mr-1.5 ${
                 challenge.endpoints[0]?.method === 'POST' ? 'text-emerald-400' :
                 challenge.endpoints[0]?.method === 'GET' ? 'text-sky-400' :
                 challenge.endpoints[0]?.method === 'DELETE' ? 'text-red-400' : 'text-amber-400'
               }`}>
                 {challenge.endpoints[0]?.method}
               </span>
-              <span className="text-[#e6edf3]">{challenge.endpoints[0]?.path}</span>
+              <span className="font-mono text-[#e6edf3]">{challenge.endpoints[0]?.path}</span>
               {challenge.endpoints.length > 1 && (
-                <span className="text-[#8b949e] ml-1.5">+{challenge.endpoints.length - 1} more</span>
+                <span className="text-[#8b949e] ml-1.5 font-sans font-medium">+{challenge.endpoints.length - 1} more</span>
               )}
             </div>
 
@@ -85,13 +85,13 @@ export const ChallengeCard: React.FC<Props> = ({
         </div>
 
         {/* Right Actions & Test Metrics */}
-        <div className="flex items-center justify-between lg:flex-col lg:items-end gap-3 font-mono">
+        <div className="flex items-center justify-between lg:flex-col lg:items-end gap-3 font-sans">
           <div className="flex items-center space-x-3 text-xs text-[#8b949e]">
-            <span className="flex items-center space-x-1">
+            <span className="flex items-center space-x-1 font-medium">
               <Clock className="w-3.5 h-3.5" />
               <span>{challenge.estimatedMinutes}m</span>
             </span>
-            <span className="flex items-center space-x-1">
+            <span className="flex items-center space-x-1 font-medium">
               <Terminal className="w-3.5 h-3.5" />
               <span>{challenge.testCases.length} tests</span>
             </span>
@@ -99,10 +99,10 @@ export const ChallengeCard: React.FC<Props> = ({
 
           <button
             onClick={(e) => { e.stopPropagation(); onSelect(challenge); }}
-            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded text-xs font-medium font-mono transition-colors ${
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold font-sans transition-all active:scale-[0.98] ${
               isSolved
                 ? 'bg-[#171c26] text-emerald-400 border border-emerald-800/60 hover:bg-emerald-500/10'
-                : 'bg-emerald-500 text-black font-semibold hover:bg-emerald-400'
+                : 'bg-emerald-500 text-black hover:bg-emerald-400'
             }`}
           >
             <span>{isSolved ? 'View Solution' : isInProgress ? 'Continue' : 'Start Challenge'}</span>

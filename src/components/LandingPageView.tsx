@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   ArrowRight, 
   Terminal, 
@@ -18,11 +18,23 @@ import {
   GitBranch,
   RefreshCw,
   Sparkles,
-  ArrowUpRight
+  ArrowUpRight,
+  Code2,
+  Boxes,
+  Gauge,
+  TerminalSquare,
+  Copy,
+  Flame,
+  Radio,
+  FileCode2,
+  Sliders,
+  CheckCheck,
+  AlertTriangle
 } from 'lucide-react';
 import { Challenge } from '../types';
 import { DifficultyBadge } from './DifficultyBadge';
 import { ConceptBadge } from './ConceptBadge';
+import { ApiNeuralBackground } from './ApiNeuralBackground';
 
 interface Props {
   challenges: Challenge[];
@@ -38,9 +50,11 @@ export const LandingPageView: React.FC<Props> = ({
   onNavigateProgress
 }) => {
   // Hero Interactive API Tester Mock State
-  const [activeDemoTab, setActiveDemoTab] = useState<'user' | 'rateLimit' | 'webhook'>('user');
+  const [activeDemoTab, setActiveDemoTab] = useState<'user' | 'rateLimit' | 'webhook' | 'concurrency'>('user');
   const [isDemoRunning, setIsDemoRunning] = useState(false);
   const [demoProgress, setDemoProgress] = useState(6);
+  const [copiedCli, setCopiedCli] = useState(false);
+  const [selectedCliLang, setSelectedCliLang] = useState<'nodejs' | 'go' | 'python'>('nodejs');
 
   const demoData = {
     user: {
@@ -48,27 +62,28 @@ export const LandingPageView: React.FC<Props> = ({
       path: '/api/v1/users',
       status: 201,
       statusText: 'CREATED',
-      latency: '14ms',
+      latency: '12.4ms',
+      attackScenario: 'Boundary RFC-5322 & In-Memory Persistence',
       requestBody: JSON.stringify({
-        email: 'dev@backendrank.io',
-        role: 'engineer',
+        email: 'mayank@backendrank.io',
+        role: 'staff_engineer',
         tier: 'production'
       }, null, 2),
       responseBody: JSON.stringify({
         id: 'usr_8f319a',
-        email: 'dev@backendrank.io',
-        role: 'engineer',
+        email: 'mayank@backendrank.io',
+        role: 'staff_engineer',
         tier: 'production',
-        created_at: '2026-09-02T14:30:00Z',
+        created_at: '2026-09-07T10:00:00Z',
         status: 'active'
       }, null, 2),
       tests: [
-        { name: 'Schema & payload type contract', time: '2.1ms', status: 'PASSED' },
-        { name: 'Status code RFC-9110 (201 Created)', time: '1.4ms', status: 'PASSED' },
-        { name: 'Unique constraint collision -> 409 Conflict', time: '3.6ms', status: 'PASSED' },
-        { name: 'Malformed email boundary -> 422 Unprocessable [Hidden]', time: '2.8ms', status: 'PASSED' },
-        { name: 'High concurrency lock on email registration [Hidden]', time: '8.4ms', status: 'PASSED' },
-        { name: 'Response headers compliance (Content-Type: application/json)', time: '1.1ms', status: 'PASSED' }
+        { name: 'Schema & payload type contract', time: '1.8ms', status: 'PASSED' },
+        { name: 'Status code RFC-9110 (201 Created)', time: '1.2ms', status: 'PASSED' },
+        { name: 'Unique constraint collision -> 409 Conflict', time: '2.9ms', status: 'PASSED' },
+        { name: 'Malformed email boundary -> 422 Unprocessable [Hidden]', time: '2.1ms', status: 'PASSED' },
+        { name: 'High concurrency lock on email registration [Hidden]', time: '6.8ms', status: 'PASSED' },
+        { name: 'Response headers compliance (Content-Type: application/json)', time: '0.9ms', status: 'PASSED' }
       ]
     },
     rateLimit: {
@@ -76,7 +91,8 @@ export const LandingPageView: React.FC<Props> = ({
       path: '/api/v1/resource',
       status: 429,
       statusText: 'TOO MANY REQUESTS',
-      latency: '4ms',
+      latency: '3.8ms',
+      attackScenario: 'Redis Sliding-Window 61st Burst Injection',
       requestBody: null,
       responseBody: JSON.stringify({
         error: 'rate_limit_exceeded',
@@ -84,12 +100,12 @@ export const LandingPageView: React.FC<Props> = ({
         retry_after_seconds: 18
       }, null, 2),
       tests: [
-        { name: 'Permits requests within 60 req/min window', time: '1.9ms', status: 'PASSED' },
-        { name: 'HTTP 429 returned when window quota breached', time: '2.2ms', status: 'PASSED' },
-        { name: 'Header compliance: X-RateLimit-Limit & Reset', time: '1.2ms', status: 'PASSED' },
-        { name: 'Header compliance: Retry-After integer format', time: '0.9ms', status: 'PASSED' },
-        { name: 'Atomic Redis ZSET Lua evaluation under 100 concurrent bursts [Hidden]', time: '9.8ms', status: 'PASSED' },
-        { name: 'Sliding timestamp cleanup memory purge [Hidden]', time: '4.1ms', status: 'PASSED' }
+        { name: 'Permits requests within 60 req/min window', time: '1.4ms', status: 'PASSED' },
+        { name: 'HTTP 429 returned when window quota breached', time: '1.9ms', status: 'PASSED' },
+        { name: 'Header compliance: X-RateLimit-Limit & Reset', time: '1.1ms', status: 'PASSED' },
+        { name: 'Header compliance: Retry-After integer format', time: '0.8ms', status: 'PASSED' },
+        { name: 'Atomic Redis ZSET Lua evaluation under 100 concurrent bursts [Hidden]', time: '7.4ms', status: 'PASSED' },
+        { name: 'Sliding timestamp cleanup memory purge [Hidden]', time: '3.2ms', status: 'PASSED' }
       ]
     },
     webhook: {
@@ -97,7 +113,8 @@ export const LandingPageView: React.FC<Props> = ({
       path: '/webhooks/stripe',
       status: 200,
       statusText: 'OK',
-      latency: '11ms',
+      latency: '9.4ms',
+      attackScenario: 'HMAC-SHA256 & Duplicate Event Deduplication',
       requestBody: JSON.stringify({
         id: 'evt_3MjjkwLkdIwHu7ix',
         type: 'payment_intent.succeeded',
@@ -110,12 +127,38 @@ export const LandingPageView: React.FC<Props> = ({
         status: 'processed'
       }, null, 2),
       tests: [
-        { name: 'HMAC-SHA256 signature verification in Stripe-Signature', time: '3.1ms', status: 'PASSED' },
-        { name: 'Invalid signature dispatch rejected with 401 Unauthorized', time: '2.0ms', status: 'PASSED' },
-        { name: 'First arrival credits user balance atomically', time: '4.8ms', status: 'PASSED' },
-        { name: 'Duplicate event_id replay returns 200 without double-crediting [Hidden]', time: '3.2ms', status: 'PASSED' },
-        { name: 'Parallel webhook delivery race condition lock [Hidden]', time: '8.9ms', status: 'PASSED' },
-        { name: 'Acknowledges within 200ms latency envelope', time: '11.0ms', status: 'PASSED' }
+        { name: 'HMAC-SHA256 signature verification in Stripe-Signature', time: '2.4ms', status: 'PASSED' },
+        { name: 'Invalid signature dispatch rejected with 401 Unauthorized', time: '1.7ms', status: 'PASSED' },
+        { name: 'First arrival credits user balance atomically', time: '3.9ms', status: 'PASSED' },
+        { name: 'Duplicate event_id replay returns 200 without double-crediting [Hidden]', time: '2.6ms', status: 'PASSED' },
+        { name: 'Parallel webhook delivery race condition lock [Hidden]', time: '7.1ms', status: 'PASSED' },
+        { name: 'Acknowledges within 200ms latency envelope', time: '9.2ms', status: 'PASSED' }
+      ]
+    },
+    concurrency: {
+      method: 'POST',
+      path: '/api/v1/orders/checkout',
+      status: 409,
+      statusText: 'CONFLICT',
+      latency: '15.1ms',
+      attackScenario: 'Simultaneous Inventory Mutex Contention',
+      requestBody: JSON.stringify({
+        sku: 'item_gpu_rtx4090',
+        quantity: 1,
+        user_id: 'usr_772a'
+      }, null, 2),
+      responseBody: JSON.stringify({
+        error: 'inventory_exhausted',
+        message: 'Item reserved by concurrent transaction.',
+        retryable: false
+      }, null, 2),
+      tests: [
+        { name: 'Acquires distributed lock before database transaction', time: '4.2ms', status: 'PASSED' },
+        { name: 'Rejects overlapping concurrent checkout with 409', time: '3.1ms', status: 'PASSED' },
+        { name: 'Releases lock on unexpected transaction error', time: '2.8ms', status: 'PASSED' },
+        { name: 'Zero phantom inventory deductions across 50 threads [Hidden]', time: '8.6ms', status: 'PASSED' },
+        { name: 'Deadlock timeout prevention threshold', time: '1.4ms', status: 'PASSED' },
+        { name: 'State consistency verified across replica nodes', time: '5.0ms', status: 'PASSED' }
       ]
     }
   };
@@ -136,78 +179,94 @@ export const LandingPageView: React.FC<Props> = ({
         }
         return prev + 1;
       });
-    }, 280);
+    }, 240);
   };
 
-  // Preview Challenges (First 4 realistic problems)
+  const handleCopyCli = () => {
+    navigator.clipboard.writeText('npx apirun start create-user-api');
+    setCopiedCli(true);
+    setTimeout(() => setCopiedCli(false), 2000);
+  };
+
   const previewChallenges = challenges.slice(0, 4);
 
   const conceptTags = [
-    'HTTP', 'REST', 'DATABASE', 'REDIS', 'AUTH', 'CACHE', 'CONCURRENCY', 'QUEUES', 'WEBHOOKS', 'IDEMPOTENCY'
+    'HTTP/REST', 'REDIS CACHING', 'CONCURRENCY LOCKS', 'RATE LIMITING', 'IDEMPOTENCY', 'JWT AUTH', 'JOB WORKERS', 'WEBHOOKS'
+  ];
+
+  const recentActivity = [
+    { user: 'alex_v', action: 'passed', challenge: 'Sliding Window Rate Limiter', lang: 'Go', time: '2m ago', latency: '4.2ms' },
+    { user: 'sophia_k', action: 'passed', challenge: 'Idempotent Payment Webhook', lang: 'Node.js', time: '5m ago', latency: '9.8ms' },
+    { user: 'dev_raj', action: 'solved', challenge: 'Distributed Job Queue Worker', lang: 'Python', time: '8m ago', latency: '12.1ms' },
+    { user: 'elena_m', action: 'passed', challenge: 'JWT Authentication & Refresh', lang: 'Rust', time: '12m ago', latency: '2.4ms' }
   ];
 
   return (
-    <div className="min-h-screen bg-[#050608] text-[#e6edf3] font-sans selection:bg-emerald-500 selection:text-black">
-      {/* Background Technical Grid Effect */}
-      <div className="absolute inset-0 bg-tech-grid opacity-30 pointer-events-none" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-emerald-500/5 via-transparent to-transparent pointer-events-none" />
+    <div className="min-h-screen bg-transparent text-[#f8fafc] font-sans selection:bg-emerald-400 selection:text-black relative">
+      {/* High-Contrast Technical Neural Background */}
+      <ApiNeuralBackground />
 
       <div className="relative z-10">
+        {/* ========================================================= */}
         {/* HERO SECTION */}
-        <section className="pt-16 pb-14 px-4 sm:px-6 max-w-6xl mx-auto text-center space-y-8">
-          {/* Technical Eyebrow Badge */}
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#12161f] border border-[#262d3a] text-xs text-[#8b949e]">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-mono text-emerald-400 font-semibold tracking-wider uppercase text-[11px]">
-              BACKEND ENGINEERING PRACTICE
+        {/* ========================================================= */}
+        <section className="pt-14 sm:pt-16 pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center space-y-6">
+          {/* Eyebrow Pill */}
+          <div className="inline-flex items-center space-x-2.5 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.12] text-xs text-[#94a3b8] backdrop-blur-xl shadow-sm hover:border-emerald-400/40 transition-all cursor-default">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
             </span>
-            <span className="text-[#484f58]">|</span>
-            <span className="text-[#c9d1d9] font-sans text-xs">Automated Contract & Edge Testing</span>
+            <span className="font-sans text-emerald-400 font-bold tracking-wider uppercase text-[11px]">
+              THE LEETCODE FOR BACKEND ENGINEERS
+            </span>
+            <span className="text-white/20">|</span>
+            <span className="text-[#f1f5f9] font-medium text-xs">Hands-on API Practice Arena</span>
           </div>
 
           {/* Main Hero Headings */}
-          <div className="space-y-1.5 max-w-4xl mx-auto">
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#e6edf3] leading-[1.08]">
-              Build Backends.
+          <div className="space-y-1 sm:space-y-1.5 max-w-4xl mx-auto">
+            <h1 className="text-[clamp(42px,5.6vw,84px)] font-extrabold tracking-tight text-white leading-[0.98]">
+              Build APIs.
             </h1>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#e6edf3] leading-[1.08]">
-              Break Them.
+            <h1 className="text-[clamp(42px,5.6vw,84px)] font-extrabold tracking-tight text-[#cbd5e1] leading-[0.98]">
+              Break Edge Cases.
             </h1>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-emerald-400 leading-[1.08]">
-              Get Better.
+            <h1 className="text-[clamp(42px,5.6vw,84px)] font-extrabold tracking-tight text-[#00f2a9] leading-[0.98]">
+              Ship With Proof.
             </h1>
           </div>
 
-          {/* Supporting Text */}
-          <p className="text-base sm:text-lg md:text-xl text-[#94a3b8] max-w-2xl mx-auto font-normal leading-relaxed">
-            Build real backend APIs and prove they work against automated tests, hidden edge cases, and production-style requirements.
+          {/* Product Identity Subtitle */}
+          <p className="text-sm sm:text-base md:text-lg text-[#94a3b8] max-w-2xl mx-auto font-normal leading-relaxed">
+            The hands-on practice platform for backend engineers. Stop solving abstract array puzzles — build real REST endpoints, Redis rate limiters, idempotency keys, and survive automated attack test suites.
           </p>
 
-          {/* CTAs */}
+          {/* Primary CTA Action Row */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
             <button
               onClick={() => onSelectChallenge(challenges[0] || challenges[1])}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 rounded bg-emerald-500 hover:bg-emerald-400 text-black font-medium text-sm transition-all hover:shadow-[0_0_20px_rgba(16,185,129,0.35)] active:scale-[0.98]"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2.5 px-7 py-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-sm transition-all active:scale-[0.98]"
             >
-              <span>Start a Challenge</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Start Coding Free</span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </button>
 
             <button
               onClick={onExploreChallenges}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 rounded bg-[#12161f] hover:bg-[#171c26] text-[#e6edf3] hover:text-white border border-[#262d3a] hover:border-[#374151] font-medium text-sm transition-all active:scale-[0.98]"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-[#f8fafc] border border-white/[0.15] hover:border-white/[0.25] font-semibold text-sm transition-all backdrop-blur-xl active:scale-[0.98]"
             >
-              <span>Explore Challenges</span>
-              <ChevronRight className="w-4 h-4 text-[#8b949e]" />
+              <span>Explore 8 Challenges</span>
+              <ChevronRight className="w-4 h-4 text-[#94a3b8]" />
             </button>
           </div>
 
-          {/* Under-CTA Technical Metadata Chips */}
-          <div className="pt-4 flex flex-wrap items-center justify-center gap-2 max-w-3xl mx-auto font-mono text-[11px]">
+          {/* Tech Badges */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 max-w-3xl mx-auto font-sans text-xs">
             {conceptTags.map((tag) => (
               <span
                 key={tag}
-                className="px-2.5 py-0.5 rounded bg-[#0d0f14] border border-[#262d3a] text-[#8b949e] hover:text-emerald-400 hover:border-emerald-800/60 transition-colors cursor-default font-medium"
+                className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.1] text-[#cbd5e1] hover:text-[#00f2a9] hover:border-emerald-400/40 transition-colors cursor-default font-medium backdrop-blur-md"
               >
                 {tag}
               </span>
@@ -215,123 +274,170 @@ export const LandingPageView: React.FC<Props> = ({
           </div>
         </section>
 
-        {/* HERO VISUAL: DEVELOPER-ORIENTED API TESTER PANEL */}
-        <section className="px-4 sm:px-6 max-w-5xl mx-auto pb-16">
-          <div className="rounded-lg border border-[#262d3a] bg-[#090b0e] shadow-2xl overflow-hidden text-xs glow-emerald">
-            {/* Panel Top Header Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 py-3 bg-[#0d0f14] border-b border-[#262d3a] gap-3">
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+        {/* ========================================================= */}
+        {/* LIVE EVALUATION TICKER (REAL-TIME ACTIVITY PROOF) */}
+        {/* ========================================================= */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
+          <div className="flex items-center space-x-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl overflow-x-auto text-xs font-sans scrollbar-none">
+            <div className="flex items-center space-x-1.5 text-emerald-400 font-bold shrink-0">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>LIVE EVALUATION:</span>
+            </div>
+            <div className="flex items-center space-x-6 text-[#94a3b8] shrink-0">
+              {recentActivity.map((act, i) => (
+                <div key={i} className="flex items-center space-x-2">
+                  <span className="text-white font-semibold">{act.user}</span>
+                  <span className="text-emerald-400 font-medium">✓ {act.challenge}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/[0.06] text-[#cbd5e1] font-medium">{act.lang}</span>
+                  <span className="text-[11px] font-mono text-[#64748b]">({act.latency})</span>
                 </div>
-                <span className="font-mono text-[#8b949e] text-[11px] hidden sm:inline">// APIRUN CONTRACT RUNNER v0.9.4</span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* HERO VISUAL: LIVE INTERACTIVE TEST RUNNER & ATTACK MATRIX */}
+        {/* ========================================================= */}
+        <section className="px-4 sm:px-6 max-w-5xl mx-auto pb-20">
+          <div className="rounded-2xl border border-white/[0.15] bg-[#0c1017]/90 shadow-[0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden text-xs backdrop-blur-2xl font-sans">
+            {/* Terminal Window Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-5 py-3.5 bg-white/[0.04] border-b border-white/[0.1] gap-3">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
+                  <span className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+                  <span className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                  <span className="w-3 h-3 rounded-full bg-[#27c93f]" />
+                </div>
+                <span className="font-sans text-[#94a3b8] text-xs font-semibold tracking-wider uppercase">
+                  ATTACK INJECTOR // LIVE HARNESS
+                </span>
               </div>
 
-              {/* Route Tabs Selector */}
-              <div className="flex items-center space-x-1 bg-[#050608] p-1 rounded border border-[#262d3a] font-mono">
+              {/* Attack Vector Tabs */}
+              <div className="flex items-center space-x-1.5 p-1 rounded-xl bg-black/40 border border-white/[0.1] font-sans overflow-x-auto">
                 <button
                   onClick={() => { setActiveDemoTab('user'); setDemoProgress(6); }}
-                  className={`px-2.5 py-1 rounded text-[11px] transition-colors ${
-                    activeDemoTab === 'user' ? 'bg-[#171c26] text-emerald-400 border border-[#374151]' : 'text-[#8b949e] hover:text-[#e6edf3]'
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                    activeDemoTab === 'user' 
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
+                      : 'text-[#94a3b8] hover:text-white'
                   }`}
                 >
                   POST /users
                 </button>
                 <button
                   onClick={() => { setActiveDemoTab('rateLimit'); setDemoProgress(6); }}
-                  className={`px-2.5 py-1 rounded text-[11px] transition-colors ${
-                    activeDemoTab === 'rateLimit' ? 'bg-[#171c26] text-emerald-400 border border-[#374151]' : 'text-[#8b949e] hover:text-[#e6edf3]'
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                    activeDemoTab === 'rateLimit' 
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
+                      : 'text-[#94a3b8] hover:text-white'
                   }`}
                 >
-                  GET /resource
+                  GET /resource (429)
                 </button>
                 <button
                   onClick={() => { setActiveDemoTab('webhook'); setDemoProgress(6); }}
-                  className={`px-2.5 py-1 rounded text-[11px] transition-colors ${
-                    activeDemoTab === 'webhook' ? 'bg-[#171c26] text-emerald-400 border border-[#374151]' : 'text-[#8b949e] hover:text-[#e6edf3]'
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                    activeDemoTab === 'webhook' 
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
+                      : 'text-[#94a3b8] hover:text-white'
                   }`}
                 >
-                  POST /webhooks
+                  POST /webhooks (Idempotent)
+                </button>
+                <button
+                  onClick={() => { setActiveDemoTab('concurrency'); setDemoProgress(6); }}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                    activeDemoTab === 'concurrency' 
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
+                      : 'text-[#94a3b8] hover:text-white'
+                  }`}
+                >
+                  POST /checkout (Mutex)
                 </button>
               </div>
 
+              {/* Action Trigger */}
               <div className="flex items-center space-x-2">
                 <button
                   onClick={handleRerunDemo}
                   disabled={isDemoRunning}
-                  className="flex items-center space-x-1 px-2.5 py-1 rounded bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800/70 text-emerald-400 font-medium font-sans text-xs transition-colors disabled:opacity-50"
-                  title="Run interactive contract test suite"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold font-sans text-xs transition-all disabled:opacity-50 active:scale-[0.97]"
                 >
-                  {isDemoRunning ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 fill-current" />}
-                  <span>{isDemoRunning ? 'Testing...' : 'Rerun Suite'}</span>
+                  {isDemoRunning ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Flame className="w-3.5 h-3.5 fill-current" />}
+                  <span>{isDemoRunning ? 'Fuzzing...' : 'Inject Attack'}</span>
                 </button>
               </div>
             </div>
 
-            {/* Panel Body: Two Columns */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-[#262d3a]">
-              {/* Left Column: Request & Live Response Payload */}
-              <div className="lg:col-span-6 p-4 space-y-4">
-                {/* Method & URL */}
-                <div className="flex items-center justify-between bg-[#12161f] border border-[#262d3a] px-3 py-2 rounded font-mono">
+            {/* Split Screen Execution Panel */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-white/[0.1]">
+              {/* Left Side: Attack Scenario & Payloads */}
+              <div className="lg:col-span-6 p-5 space-y-4">
+                {/* Method & Scenario Banner */}
+                <div className="flex items-center justify-between bg-black/40 border border-white/[0.1] px-3.5 py-2.5 rounded-xl font-mono">
                   <div className="flex items-center space-x-2.5">
-                    <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${
-                      currentDemo.method === 'POST' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/60' : 'bg-sky-950 text-sky-400 border border-sky-800/60'
+                    <span className={`font-black px-2 py-0.5 rounded text-[11px] ${
+                      currentDemo.method === 'POST' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
                     }`}>
                       {currentDemo.method}
                     </span>
-                    <span className="text-[#e6edf3] font-medium">{currentDemo.path}</span>
+                    <span className="text-white font-semibold text-xs">{currentDemo.path}</span>
                   </div>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
                     currentDemo.status === 201 || currentDemo.status === 200
-                      ? 'bg-emerald-950/70 text-emerald-400 border-emerald-800/70'
-                      : 'bg-amber-950/70 text-amber-400 border-amber-800/70'
+                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                      : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
                   }`}>
                     HTTP {currentDemo.status} {currentDemo.statusText}
                   </span>
                 </div>
 
-                {/* Request Payload (if any) */}
+                <div className="text-[11px] font-mono text-emerald-400/90 bg-emerald-950/20 border border-emerald-800/40 px-3 py-1.5 rounded-lg flex items-center space-x-2">
+                  <Sliders className="w-3.5 h-3.5" />
+                  <span>Target Vector: <strong>{currentDemo.attackScenario}</strong></span>
+                </div>
+
+                {/* Inbound Payload */}
                 {currentDemo.requestBody && (
-                  <div className="space-y-1">
-                    <div className="flex justify-between font-mono text-[10px] text-[#8b949e]">
-                      <span>REQUEST PAYLOAD</span>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between font-mono text-[10px] text-[#94a3b8]">
+                      <span>INBOUND ATTACK PAYLOAD</span>
                       <span>application/json</span>
                     </div>
-                    <pre className="p-3 rounded bg-[#050608] border border-[#262d3a] text-[#c9d1d9] font-mono text-[11px] overflow-x-auto leading-relaxed">
+                    <pre className="p-3.5 rounded-xl bg-black/50 border border-white/[0.08] text-[#e2e8f0] font-mono text-[11px] overflow-x-auto leading-relaxed">
                       {currentDemo.requestBody}
                     </pre>
                   </div>
                 )}
 
                 {/* Response Payload */}
-                <div className="space-y-1">
-                  <div className="flex justify-between font-mono text-[10px] text-[#8b949e]">
-                    <span>RESPONSE BODY</span>
-                    <span className="text-emerald-400">{currentDemo.latency}</span>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between font-mono text-[10px] text-[#94a3b8]">
+                    <span>DEFENSIVE RESPONSE BODY</span>
+                    <span className="text-[#00f2a9] font-semibold">{currentDemo.latency}</span>
                   </div>
-                  <pre className="p-3 rounded bg-[#050608] border border-[#262d3a] text-emerald-300/90 font-mono text-[11px] overflow-x-auto leading-relaxed">
+                  <pre className="p-3.5 rounded-xl bg-black/50 border border-white/[0.08] text-emerald-300 font-mono text-[11px] overflow-x-auto leading-relaxed">
                     {currentDemo.responseBody}
                   </pre>
                 </div>
               </div>
 
-              {/* Right Column: Automated Test Suite Runner */}
-              <div className="lg:col-span-6 p-4 space-y-3.5 bg-[#08090c]/50">
-                <div className="flex items-center justify-between pb-1 border-b border-[#262d3a]/60">
+              {/* Right Side: Automated Test Assertions */}
+              <div className="lg:col-span-6 p-5 space-y-4 bg-white/[0.02]">
+                <div className="flex items-center justify-between pb-2 border-b border-white/[0.1]">
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="font-semibold text-[#e6edf3] text-xs">AUTOMATED ASSERTION SUITE</span>
+                    <span className="font-bold text-white text-xs tracking-wide">AUTOMATED ASSERTION SUITE</span>
                   </div>
-                  <span className="font-mono text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded">
-                    {demoProgress}/6 TESTS PASSED
+                  <span className="font-mono text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                    {demoProgress}/6 ASSERTIONS PASSED
                   </span>
                 </div>
 
                 {/* Test items */}
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {currentDemo.tests.map((test, idx) => {
                     const isPassed = idx < demoProgress;
                     const isRunningCurrent = idx === demoProgress && isDemoRunning;
@@ -339,362 +445,227 @@ export const LandingPageView: React.FC<Props> = ({
                     return (
                       <div
                         key={idx}
-                        className={`flex items-center justify-between p-2.5 rounded border transition-all ${
+                        className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                           isPassed
-                            ? 'bg-[#12161f] border-[#262d3a]'
+                            ? 'bg-white/[0.04] border-white/[0.1]'
                             : isRunningCurrent
-                            ? 'bg-[#171c26] border-emerald-700/80 animate-pulse'
-                            : 'bg-[#0d0f14]/60 border-[#1c212c] opacity-40'
+                            ? 'bg-emerald-500/10 border-emerald-500/50 animate-pulse'
+                            : 'bg-black/20 border-white/[0.05] opacity-40'
                         }`}
                       >
                         <div className="flex items-center space-x-2.5">
                           {isPassed ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-400 flex-no-shrink" />
+                            <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
                           ) : isRunningCurrent ? (
-                            <RefreshCw className="w-3.5 h-3.5 text-sky-400 animate-spin flex-no-shrink" />
+                            <RefreshCw className="w-4 h-4 text-sky-400 animate-spin" />
                           ) : (
-                            <Clock className="w-3.5 h-3.5 text-[#6e7681] flex-no-shrink" />
+                            <Clock className="w-4 h-4 text-[#64748b]" />
                           )}
-                          <span className={`text-[11px] font-sans ${isPassed ? 'text-[#e6edf3]' : 'text-[#8b949e]'}`}>
+                          <span className={`text-xs font-medium ${isPassed ? 'text-white' : 'text-[#94a3b8]'}`}>
                             {test.name}
                           </span>
                         </div>
-                        <span className="font-mono text-[10px] text-[#8b949e]">{test.time}</span>
+                        <span className="font-mono text-[11px] text-[#94a3b8] font-semibold">{test.time}</span>
                       </div>
                     );
                   })}
                 </div>
 
-                {/* Telemetry Summary Bar */}
-                <div className="pt-2 flex items-center justify-between text-[10px] text-[#8b949e] border-t border-[#262d3a]/60">
-                  <span className="flex items-center space-x-1 font-sans">
-                    <Activity className="w-3 h-3 text-emerald-400" />
-                    <span>Avg Latency: <strong className="font-mono text-[#e6edf3]">14.2ms</strong></span>
+                {/* Telemetry Summary */}
+                <div className="pt-2 flex items-center justify-between text-[11px] text-[#94a3b8] border-t border-white/[0.1]">
+                  <span className="flex items-center space-x-1.5 font-medium">
+                    <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Avg Execution: <strong className="font-mono text-white">12.4ms</strong></span>
                   </span>
-                  <span className="font-sans">Compliance: <strong className="font-mono text-emerald-400">100% RFC-9110</strong></span>
+                  <span>Compliance: <strong className="font-mono text-emerald-400">RFC-9110 STRICT</strong></span>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* STATS STRIP */}
-        <section className="border-y border-[#262d3a] bg-[#0a0c10] py-10 px-4 sm:px-6">
-          <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="space-y-1">
-              <div className="font-bold text-3xl sm:text-4xl text-[#e6edf3] font-mono">08</div>
-              <div className="text-[11px] sm:text-xs text-[#8b949e] uppercase tracking-wider font-medium font-sans">
-                API Challenges
-              </div>
+        {/* ========================================================= */}
+        {/* HOW WE EVALUATE (PRODUCTION TEST PIPELINE) */}
+        {/* ========================================================= */}
+        <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans">
+          <div className="text-center space-y-3">
+            <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
+              HOW APIRUN EVALUATES
             </div>
-
-            <div className="space-y-1">
-              <div className="font-bold text-3xl sm:text-4xl text-emerald-400 font-mono">40+</div>
-              <div className="text-[11px] sm:text-xs text-[#8b949e] uppercase tracking-wider font-medium font-sans">
-                Automated Tests
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="font-bold text-3xl sm:text-4xl text-[#e6edf3] font-mono">12+</div>
-              <div className="text-[11px] sm:text-xs text-[#8b949e] uppercase tracking-wider font-medium font-sans">
-                Backend Concepts
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="font-bold text-3xl sm:text-4xl text-emerald-400 font-mono">20+</div>
-              <div className="text-[11px] sm:text-xs text-[#8b949e] uppercase tracking-wider font-medium font-sans">
-                Hidden Edge Cases
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* HOW IT WORKS */}
-        <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12">
-          <div className="text-center space-y-2">
-            <div className="text-xs uppercase tracking-wider text-emerald-400 font-semibold font-sans">
-              WORKFLOW
-            </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#e6edf3] tracking-tight">
-              From idea → working API
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+              Production evaluation, zero mock fluff
             </h2>
-            <p className="text-xs sm:text-sm text-[#8b949e] max-w-xl mx-auto font-normal leading-relaxed">
-              A streamlined engineering cycle designed around precision contracts and strict assertion testing.
+            <p className="text-sm sm:text-base text-[#94a3b8] max-w-2xl mx-auto font-normal leading-relaxed">
+              Every submission goes through our automated adversarial test engine.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Step 1 */}
-            <div className="p-6 rounded bg-[#12161f] border border-[#262d3a] hover:border-[#374151] transition-all space-y-3 relative group">
-              <div className="font-mono text-2xl font-bold text-emerald-400/70 group-hover:text-emerald-400 transition-colors">
-                01
+            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] transition-all space-y-3 backdrop-blur-xl">
+              <div className="font-sans text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-md w-fit">
+                PHASE 01
               </div>
-              <div className="text-base font-semibold text-[#e6edf3]">BUILD</div>
-              <p className="text-xs text-[#8b949e] leading-relaxed font-normal">
-                Implement the API according to the challenge specification using your language of choice (Node.js, Go, Python, Java, Rust).
+              <h3 className="text-sm font-bold text-white">Ephemeral Sandbox</h3>
+              <p className="text-xs text-[#94a3b8] leading-relaxed">
+                Spins an isolated in-memory container running your Node.js, Go, or Python service in under 50ms.
               </p>
-              <div className="pt-2 text-[11px] text-[#6e7681]">
-                Specification checklist & starter code included
-              </div>
             </div>
 
             {/* Step 2 */}
-            <div className="p-6 rounded bg-[#12161f] border border-[#262d3a] hover:border-[#374151] transition-all space-y-3 relative group">
-              <div className="font-mono text-2xl font-bold text-emerald-400/70 group-hover:text-emerald-400 transition-colors">
-                02
+            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] transition-all space-y-3 backdrop-blur-xl">
+              <div className="font-sans text-xs font-bold text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-md w-fit">
+                PHASE 02
               </div>
-              <div className="text-base font-semibold text-[#e6edf3]">TEST</div>
-              <p className="text-xs text-[#8b949e] leading-relaxed font-normal">
-                Run your implementation against automated contract suites and hidden stress tests that evaluate RFC status codes, latency, and race conditions.
+              <h3 className="text-sm font-bold text-white">RFC Contract Verify</h3>
+              <p className="text-xs text-[#94a3b8] leading-relaxed">
+                Validates exact HTTP status semantics (201 Created, 400, 404, 409, 422, 429) and content-type headers.
               </p>
-              <div className="pt-2 text-[11px] text-[#6e7681]">
-                Live terminal wire logs & diff inspection
-              </div>
             </div>
 
             {/* Step 3 */}
-            <div className="p-6 rounded bg-[#12161f] border border-[#262d3a] hover:border-[#374151] transition-all space-y-3 relative group">
-              <div className="font-mono text-2xl font-bold text-emerald-400/70 group-hover:text-emerald-400 transition-colors">
-                03
+            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] transition-all space-y-3 backdrop-blur-xl">
+              <div className="font-sans text-xs font-bold text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-md w-fit">
+                PHASE 03
               </div>
-              <div className="text-base font-semibold text-[#e6edf3]">IMPROVE</div>
-              <p className="text-xs text-[#8b949e] leading-relaxed font-normal">
-                Understand failures, patch subtle edge cases, optimize throughput, and gain certified mastery in core backend infrastructure.
+              <h3 className="text-sm font-bold text-white">Concurrency Fuzzing</h3>
+              <p className="text-xs text-[#94a3b8] leading-relaxed">
+                Injects parallel concurrent requests to uncover race conditions, double charges, and deadlock bugs.
               </p>
-              <div className="pt-2 text-[11px] text-[#6e7681]">
-                Skill telemetry & concept progression tracking
+            </div>
+
+            {/* Step 4 */}
+            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] transition-all space-y-3 backdrop-blur-xl">
+              <div className="font-sans text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-md w-fit">
+                PHASE 04
               </div>
+              <h3 className="text-sm font-bold text-white">Microsecond Profiling</h3>
+              <p className="text-xs text-[#94a3b8] leading-relaxed">
+                Generates a detailed execution scorecard with latency p99 distributions and assertion diffs.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* CHALLENGE PREVIEW SECTION */}
-        <section className="py-16 px-4 sm:px-6 max-w-6xl mx-auto space-y-8">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-[#262d3a] pb-4">
-            <div className="space-y-1">
-              <div className="text-xs uppercase tracking-wider text-emerald-400 font-semibold">
-                CURATED CHALLENGES
+        {/* ========================================================= */}
+        {/* CLI QUICK-START TERMINAL WIDGET */}
+        {/* ========================================================= */}
+        <section className="px-4 sm:px-6 max-w-4xl mx-auto pb-20 font-sans">
+          <div className="p-6 sm:p-8 rounded-2xl bg-[#0d1117] border border-white/[0.12] space-y-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 font-sans text-xs text-white font-bold">
+                <TerminalSquare className="w-4 h-4 text-emerald-400" />
+                <span>CLI & LOCAL RUNNER COMPATIBLE</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#e6edf3] tracking-tight">
-                Real backend problems. Not toy questions.
-              </h2>
-              <p className="text-xs sm:text-sm text-[#8b949e] font-normal">
-                Practical backend architectures, middleware, caching layers, and distributed workers.
-              </p>
+              <div className="flex items-center space-x-1 bg-black/40 p-0.5 rounded-lg border border-white/[0.08] font-sans text-xs">
+                {(['nodejs', 'go', 'python'] as const).map(lang => (
+                  <button
+                    key={lang}
+                    onClick={() => setSelectedCliLang(lang)}
+                    className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                      selectedCliLang === lang ? 'bg-white/[0.1] text-emerald-400 font-semibold' : 'text-[#94a3b8]'
+                    }`}
+                  >
+                    {lang === 'nodejs' ? 'TypeScript' : lang === 'go' ? 'Go' : 'Python'}
+                  </button>
+                ))}
+              </div>
             </div>
 
+            <p className="text-xs text-[#94a3b8] leading-relaxed">
+              Prefer your local IDE? Test your local Express, FastAPI, or Gin server against our test suites using your custom endpoint:
+            </p>
+
+            <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/60 border border-white/[0.1] font-mono text-xs">
+              <span className="text-emerald-400 select-all">
+                $ npx apirun test --target http://localhost:8000 --challenge create-user-api
+              </span>
+              <button
+                onClick={handleCopyCli}
+                className="flex items-center space-x-1 px-2.5 py-1 rounded bg-white/[0.08] hover:bg-white/[0.14] text-white text-xs font-sans font-medium transition-colors"
+              >
+                {copiedCli ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedCli ? 'Copied' : 'Copy'}</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* POPULAR CHALLENGES SHOWCASE */}
+        {/* ========================================================= */}
+        <section className="py-16 px-4 sm:px-6 max-w-6xl mx-auto space-y-10 font-sans">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">CHALLENGE REPOSITORY</div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Popular API Challenges</h2>
+            </div>
             <button
               onClick={onExploreChallenges}
-              className="inline-flex items-center space-x-1.5 text-xs text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
+              className="flex items-center space-x-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors"
             >
-              <span>View all 8 challenges</span>
+              <span>View all challenges</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {previewChallenges.map((challenge) => (
               <div
                 key={challenge.id}
                 onClick={() => onSelectChallenge(challenge)}
-                className="group p-5 rounded bg-[#12161f] border border-[#262d3a] hover:border-[#374151] transition-all cursor-pointer flex flex-col justify-between space-y-4 hover:shadow-lg"
+                className="p-6 rounded-2xl bg-white/[0.04] border border-white/[0.1] hover:border-emerald-400/50 transition-all cursor-pointer space-y-4 backdrop-blur-xl group hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
               >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono text-[#8b949e] bg-[#171c26] px-2 py-0.5 rounded border border-[#272e3a]">
-                      {challenge.category}
-                    </span>
-                    <DifficultyBadge difficulty={challenge.difficulty} />
-                  </div>
-
-                  <h3 className="text-base font-semibold text-[#e6edf3] group-hover:text-emerald-400 transition-colors">
-                    {challenge.title}
+                <div className="flex items-center justify-between">
+                  <span className="font-sans text-xs text-[#94a3b8] uppercase tracking-wider font-semibold">{challenge.category}</span>
+                  <DifficultyBadge difficulty={challenge.difficulty} />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center space-x-2">
+                    <span>{challenge.title}</span>
+                    <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </h3>
-
-                  <p className="text-xs text-[#8b949e] line-clamp-2 leading-relaxed font-normal">
+                  <p className="text-xs text-[#94a3b8] leading-relaxed line-clamp-2">
                     {challenge.summary}
                   </p>
                 </div>
-
-                <div className="pt-2 border-t border-[#262d3a]/60 flex items-center justify-between text-xs">
-                  <div className="flex flex-wrap gap-1.5 font-mono">
-                    {challenge.concepts.slice(0, 3).map((c) => (
-                      <span key={c} className="text-[10px] px-1.5 py-0.5 rounded bg-[#090b0e] text-[#8b949e]">
-                        {c}
-                      </span>
-                    ))}
-                  </div>
-
-                  <span className="text-emerald-400 font-medium flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform text-xs">
-                    <span>Start</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </span>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {challenge.concepts.map((c) => (
+                    <ConceptBadge key={c} concept={c} size="sm" />
+                  ))}
                 </div>
               </div>
             ))}
           </div>
-
-          <div className="text-center pt-4">
-            <button
-              onClick={onExploreChallenges}
-              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded bg-[#12161f] border border-[#262d3a] text-xs font-medium text-[#e6edf3] hover:text-white hover:border-[#374151] transition-colors"
-            >
-              <span>Explore All Challenges</span>
-              <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
-            </button>
-          </div>
         </section>
 
-        {/* DEVELOPER-FOCUSED EVALUATION SECTION */}
-        <section className="py-20 px-4 sm:px-6 border-t border-[#262d3a] bg-[#07080b]">
-          <div className="max-w-6xl mx-auto space-y-12">
-            <div className="text-center space-y-3 max-w-3xl mx-auto">
-              <div className="text-xs uppercase tracking-wider text-emerald-400 font-semibold">
-                DEEP TEST COVERAGE
-              </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#e6edf3] tracking-tight">
-                Because working code isn't enough.
-              </h2>
-              <p className="text-sm text-[#8b949e] leading-relaxed font-normal">
-                API Run evaluates how your API behaves — including the cases your happy-path request never sees.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-5 rounded bg-[#12161f] border border-[#262d3a] space-y-2.5">
-                <div className="flex items-center space-x-2 text-emerald-400">
-                  <Server className="w-4 h-4" />
-                  <span className="text-sm font-semibold text-[#e6edf3]">HTTP Semantics & RFC</span>
-                </div>
-                <p className="text-xs text-[#8b949e] leading-relaxed font-normal">
-                  Accurate status code compliance (201, 200, 400, 404, 409, 422, 429), strict header parsing, and standard error envelopes.
-                </p>
-                <div className="text-[10px] font-mono text-emerald-400">#HTTP #REST #RFC_9110</div>
-              </div>
-
-              <div className="p-5 rounded bg-[#12161f] border border-[#262d3a] space-y-2.5">
-                <div className="flex items-center space-x-2 text-emerald-400">
-                  <Shield className="w-4 h-4" />
-                  <span className="text-sm font-semibold text-[#e6edf3]">Validation & Boundaries</span>
-                </div>
-                <p className="text-xs text-[#8b949e] leading-relaxed font-normal">
-                  Malformed payloads, missing fields, type boundary limits, and unexpected Unicode inputs tested rigorously.
-                </p>
-                <div className="text-[10px] font-mono text-emerald-400">#Validation #Schema #422</div>
-              </div>
-
-              <div className="p-5 rounded bg-[#12161f] border border-[#262d3a] space-y-2.5">
-                <div className="flex items-center space-x-2 text-emerald-400">
-                  <Lock className="w-4 h-4" />
-                  <span className="text-sm font-semibold text-[#e6edf3]">Auth & Security</span>
-                </div>
-                <p className="text-xs text-[#8b949e] leading-relaxed font-normal">
-                  JWT validation, bearer authentication headers, sliding refresh token rotation, and family reuse revocation.
-                </p>
-                <div className="text-[10px] font-mono text-emerald-400">#JWT #Auth #Rotation</div>
-              </div>
-
-              <div className="p-5 rounded bg-[#12161f] border border-[#262d3a] space-y-2.5">
-                <div className="flex items-center space-x-2 text-emerald-400">
-                  <Database className="w-4 h-4" />
-                  <span className="text-sm font-semibold text-[#e6edf3]">Redis & Memory Stores</span>
-                </div>
-                <p className="text-xs text-[#8b949e] leading-relaxed font-normal">
-                  ZSET sliding windows, millisecond TTL expirations, passive and active memory sweep evictions.
-                </p>
-                <div className="text-[10px] font-mono text-emerald-400">#Redis #ZSET #TTL</div>
-              </div>
-
-              <div className="p-5 rounded bg-[#12161f] border border-[#262d3a] space-y-2.5">
-                <div className="flex items-center space-x-2 text-emerald-400">
-                  <Cpu className="w-4 h-4" />
-                  <span className="text-sm font-semibold text-[#e6edf3]">Concurrency & Race Conditions</span>
-                </div>
-                <p className="text-xs text-[#8b949e] leading-relaxed font-normal">
-                  Multi-threaded parallel bursts to test double-spending, registration collisions, and atomic locking.
-                </p>
-                <div className="text-[10px] font-mono text-emerald-400">#Concurrency #Locks #ACID</div>
-              </div>
-
-              <div className="p-5 rounded bg-[#12161f] border border-[#262d3a] space-y-2.5">
-                <div className="flex items-center space-x-2 text-emerald-400">
-                  <Zap className="w-4 h-4" />
-                  <span className="text-sm font-semibold text-[#e6edf3]">Webhooks & Idempotency</span>
-                </div>
-                <p className="text-xs text-[#8b949e] leading-relaxed font-normal">
-                  HMAC-SHA256 signature verification, event deduplication, and exactly-once processing on network retries.
-                </p>
-                <div className="text-[10px] font-mono text-emerald-400">#Webhooks #HMAC #Idempotency</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+        {/* ========================================================= */}
         {/* FINAL CALL TO ACTION */}
-        <section className="py-24 px-4 sm:px-6 max-w-4xl mx-auto text-center space-y-6">
-          <div className="p-10 sm:p-14 rounded-xl bg-gradient-to-b from-[#12161f] to-[#090b0e] border border-[#262d3a] space-y-6 glow-emerald">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#e6edf3] tracking-tight">
-              Ready to build better backends?
+        {/* ========================================================= */}
+        <section className="py-24 px-4 sm:px-6 max-w-4xl mx-auto text-center space-y-8">
+          <div className="p-10 rounded-3xl bg-white/[0.04] border border-white/[0.15] backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] space-y-6">
+            <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+              Ready to level up your backend skills?
             </h2>
-            <p className="text-sm sm:text-base text-[#8b949e] max-w-xl mx-auto font-normal leading-relaxed">
-              Pick a challenge. Ship an API. Find the edge cases.
+            <p className="text-sm sm:text-base text-[#94a3b8] max-w-xl mx-auto">
+              Join thousands of developers mastering real-world REST APIs, microservices, and distributed architecture.
             </p>
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
                 onClick={() => onSelectChallenge(challenges[0] || challenges[1])}
-                className="w-full sm:w-auto flex items-center justify-center space-x-2 px-8 py-3.5 rounded bg-emerald-500 hover:bg-emerald-400 text-black font-medium text-sm transition-all hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] active:scale-[0.98]"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-sm transition-all active:scale-[0.98]"
               >
-                <span>Start Your First Challenge</span>
-                <ArrowRight className="w-4 h-4" />
+                Start Free Challenge
+              </button>
+              <button
+                onClick={onExploreChallenges}
+                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-white border border-white/[0.15] font-semibold text-sm transition-all"
+              >
+                Explore Problem Sets
               </button>
             </div>
           </div>
         </section>
-
-        {/* FOOTER */}
-        <footer className="border-t border-[#262d3a] bg-[#050608] py-12 px-4 sm:px-6 text-xs">
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="space-y-1 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start space-x-2">
-                <img src="/logo.png" alt="API Run" className="h-5 w-5 object-contain rounded" />
-                <span className="font-semibold text-[#e6edf3]">API Run</span>
-                <span className="text-[10px] font-mono text-[#6e7681]">v0.9.4</span>
-              </div>
-              <div className="text-[#8b949e] font-normal">Build. Test. Improve.</div>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-6 text-[#8b949e] font-medium">
-              <button
-                onClick={onExploreChallenges}
-                className="hover:text-emerald-400 transition-colors"
-              >
-                Challenges
-              </button>
-              <button
-                onClick={onNavigateProgress}
-                className="hover:text-emerald-400 transition-colors"
-              >
-                Progress
-              </button>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-emerald-400 transition-colors flex items-center space-x-1"
-              >
-                <span>GitHub</span>
-                <ArrowUpRight className="w-3 h-3" />
-              </a>
-              <span className="text-[#484f58]">|</span>
-              <span className="text-emerald-400/80 font-mono text-[11px]">API Contract Engine Online</span>
-            </div>
-          </div>
-          <div className="max-w-6xl mx-auto pt-6 text-center text-[#484f58] text-[11px] font-normal">
-            © {new Date().getFullYear()} API Run. Developer platform for backend engineering.
-          </div>
-        </footer>
       </div>
     </div>
   );

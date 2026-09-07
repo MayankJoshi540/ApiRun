@@ -276,7 +276,7 @@ declare module 'path';`,
           <button
             onClick={onRunTests}
             disabled={isRunning}
-            className="flex items-center space-x-1.5 px-3.5 py-1 rounded bg-emerald-500 hover:bg-emerald-400 text-black font-medium font-sans text-xs transition-all hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] disabled:opacity-50 active:scale-[0.98]"
+            className="flex items-center space-x-1.5 px-3.5 py-1 rounded bg-emerald-500 hover:bg-emerald-400 text-black font-medium font-sans text-xs transition-all disabled:opacity-50 active:scale-[0.98]"
             title="Run test suite against this code (Ctrl+Enter)"
           >
             <Play className="w-3 h-3 fill-current" />

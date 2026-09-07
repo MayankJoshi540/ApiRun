@@ -3,9 +3,10 @@
 @tailwind utilities;
 
 @layer base {
-  body {
+  html, body {
     background-color: #08090c;
     color: #e6edf3;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -46,10 +47,6 @@
 .bg-tech-dots {
   background-size: 24px 24px;
   background-image: radial-gradient(rgba(38, 45, 58, 0.7) 1px, transparent 1px);
-}
-
-.glow-emerald {
-  box-shadow: 0 0 40px -10px rgba(16, 185, 129, 0.15);
 }
 
 @keyframes blink {

@@ -27,10 +27,10 @@ export const Sidebar: React.FC<Props> = ({
   const difficulties = ['ALL', 'BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
 
   return (
-    <aside className="w-64 flex-no-shrink hidden lg:block font-mono">
+    <aside className="w-64 flex-no-shrink hidden lg:block font-sans">
       <div className="space-y-6 sticky top-20">
         <div className="space-y-1.5">
-          <div className="text-[10px] uppercase tracking-wider text-[#8b949e] px-2.5 py-1">
+          <div className="text-[10px] uppercase tracking-wider text-[#8b949e] px-2.5 py-1 font-semibold">
             NAVIGATION
           </div>
           <button

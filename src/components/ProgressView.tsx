@@ -29,7 +29,7 @@ export const ProgressView: React.FC<Props> = ({
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 font-mono">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 font-sans">
       {/* Top Profile Header */}
       <div className="p-6 rounded bg-[#12161f] border border-[#262d3a]">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
