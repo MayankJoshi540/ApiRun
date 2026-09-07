@@ -232,21 +232,214 @@ The API must allow clients to register new users, fetch user lists, and inspect 
       }
     ],
     starterCode: {
-      nodejs: `/js module
-// POST /users
-app.post('/users', (req, res) => {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  createdAt: string;
+}
+
+// In-memory data store
+const users: User[] = [];
+
+// Simple RFC email regex validator
+const isValidEmail = (email: string): boolean => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+// POST /users - Create a new user
+app.post('/users', (req: Request, res: Response) => {
   const { name, email } = req.body;
-  if (!name || !email) return res.status(400).json({ error: 'missing_required_field' });
-  return res.status(201).json({ id: 1, name: name.trim(), email });
-});`,
-      go: `// Go starter
-func usersHandler(w http.ResponseWriter, r *http.Request) {
-  // handle
+
+  // 1. Check required fields
+  if (!name || typeof name !== 'string' || !email || typeof email !== 'string') {
+    return res.status(400).json({ error: 'missing_required_field' });
+  }
+
+  const trimmedName = name.trim();
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // 2. Validate email format
+  if (!isValidEmail(normalizedEmail)) {
+    return res.status(422).json({ error: 'invalid_email_format' });
+  }
+
+  // 3. Check for duplicate email
+  const existingUser = users.find(u => u.email === normalizedEmail);
+  if (existingUser) {
+    return res.status(409).json({ error: 'email_already_exists' });
+  }
+
+  // 4. Save and return new user
+  const newUser: User = {
+    id: users.length + 1,
+    name: trimmedName,
+    email: normalizedEmail,
+    createdAt: new Date().toISOString(),
+  };
+
+  users.push(newUser);
+  return res.status(201).json(newUser);
+});
+
+// GET /users - List all users
+app.get('/users', (_req: Request, res: Response) => {
+  return res.status(200).json({ data: users, total: users.length });
+});
+
+// GET /users/:id - Fetch user by ID
+app.get('/users/:id', (req: Request, res: Response) => {
+  const id = parseInt(req.params.id, 10);
+  const user = users.find(u => u.id === id);
+
+  if (!user) {
+    return res.status(404).json({ error: 'user_not_found' });
+  }
+
+  return res.status(200).json(user);
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+)
+
+type User struct {
+	ID        int       \`json:"id"\`
+	Name      string    \`json:"name"\`
+	Email     string    \`json:"email"\`
+	CreatedAt time.Time \`json:"createdAt"\`
+}
+
+type Store struct {
+	sync.RWMutex
+	users []User
+}
+
+var store = &Store{}
+var emailRegex = regexp.MustCompile(\`^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$\`)
+
+func handleUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	switch r.Method {
+	case http.MethodPost:
+		var body struct {
+			Name  string \`json:"name"\`
+			Email string \`json:"email"\`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Name == "" || body.Email == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "missing_required_field"})
+			return
+		}
+
+		name := strings.TrimSpace(body.Name)
+		email := strings.ToLower(strings.TrimSpace(body.Email))
+
+		if !emailRegex.MatchString(email) {
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			json.NewEncoder(w).Encode(map[string]string{"error": "invalid_email_format"})
+			return
+		}
+
+		store.Lock()
+		defer store.Unlock()
+
+		for _, u := range store.users {
+			if u.Email == email {
+				w.WriteHeader(http.StatusConflict)
+				json.NewEncoder(w).Encode(map[string]string{"error": "email_already_exists"})
+				return
+			}
+		}
+
+		newUser := User{
+			ID:        len(store.users) + 1,
+			Name:      name,
+			Email:     email,
+			CreatedAt: time.Now().UTC(),
+		}
+		store.users = append(store.users, newUser)
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(newUser)
+
+	case http.MethodGet:
+		store.RLock()
+		defer store.RUnlock()
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"data": store.users, "total": len(store.users)})
+
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func main() {
+	http.HandleFunc("/users", handleUsers)
+	http.ListenAndServe(":8000", nil)
 }`,
-      python: `# Python starter
-@app.post("/users")
+      python: `from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
+from datetime import datetime
+import re
+
+app = FastAPI(title="User Management API")
+
+class UserCreate(BaseModel):
+    name: str
+    email: str
+
+EMAIL_REGEX = r"^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+users_db = []
+
+@app.post("/users", status_code=status.HTTP_201_CREATED)
 def create_user(payload: UserCreate):
-    return {"id": 1, "name": payload.name, "email": payload.email}`
+    name = payload.name.strip()
+    email = payload.email.strip().lower()
+
+    if not name or not email:
+        raise HTTPException(status_code=400, detail={"error": "missing_required_field"})
+
+    if not re.match(EMAIL_REGEX, email):
+        raise HTTPException(status_code=422, detail={"error": "invalid_email_format"})
+
+    if any(u["email"] == email for u in users_db):
+        raise HTTPException(status_code=409, detail={"error": "email_already_exists"})
+
+    new_user = {
+        "id": len(users_db) + 1,
+        "name": name,
+        "email": email,
+        "createdAt": datetime.utcnow().isoformat() + "Z"
+    }
+    users_db.append(new_user)
+    return new_user
+
+@app.get("/users")
+def get_users():
+    return {"data": users_db, "total": len(users_db)}
+
+@app.get("/users/{user_id}")
+def get_user_by_id(user_id: int):
+    user = next((u for u in users_db if u["id"] == user_id), None)
+    if not user:
+        raise HTTPException(status_code=404, detail={"error": "user_not_found"})
+    return user`
     }
   },
    {
@@ -305,7 +498,195 @@ def create_user(payload: UserCreate):
       { id: 'u-tc1', name: 'Creates short code for valid URL', category: 'Contract', description: 'POST /shorten returns 201 and shortCode.', endpoint: '/shorten', method: 'POST', requestPayload: JSON.stringify({ url: 'https://kernel.org' }), expectedStatus: 201 },
       { id: 'u-tc2', name: 'Redirects with HTTP 302', category: 'Contract', description: 'GET /:code yields 302 redirect.', endpoint: '/a1b2c3', method: 'GET', expectedStatus: 302 },
       { id: 'u-tc3', name: 'Rejects malformed URL protocols', category: 'Validation', description: 'Rejects non-http URLs with 400.', endpoint: '/shorten', method: 'POST', requestPayload: JSON.stringify({ url: 'javascript:alert(1)' }), expectedStatus: 400 }
-    ]
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+import crypto from 'crypto';
+
+const app = express();
+app.use(express.json());
+
+interface ShortLink {
+  code: string;
+  originalUrl: string;
+  clicks: number;
+  createdAt: string;
+}
+
+const urlStore = new Map<string, ShortLink>();
+
+const isValidUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
+// POST /shorten - Create shortened URL
+app.post('/shorten', (req: Request, res: Response) => {
+  const { url, customAlias } = req.body;
+
+  if (!url || typeof url !== 'string' || !isValidUrl(url)) {
+    return res.status(400).json({ error: 'invalid_url_protocol' });
+  }
+
+  const shortCode = customAlias || crypto.randomBytes(4).toString('base64url');
+
+  if (urlStore.has(shortCode)) {
+    return res.status(409).json({ error: 'alias_already_exists' });
+  }
+
+  const record: ShortLink = {
+    code: shortCode,
+    originalUrl: url,
+    clicks: 0,
+    createdAt: new Date().toISOString(),
+  };
+
+  urlStore.set(shortCode, record);
+  return res.status(201).json({ shortCode, shortUrl: \`http://rank.sh/\${shortCode}\` });
+});
+
+// GET /:code - Redirect to original URL
+app.get('/:code', (req: Request, res: Response) => {
+  const { code } = req.params;
+  const link = urlStore.get(code);
+
+  if (!link) {
+    return res.status(404).json({ error: 'shortcode_not_found' });
+  }
+
+  link.clicks += 1;
+  return res.redirect(302, link.originalUrl);
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"crypto/rand"
+	"encoding/base64"
+	"encoding/json"
+	"net/http"
+	"net/url"
+	"strings"
+	"sync"
+	"time"
+)
+
+type ShortLink struct {
+	Code        string    \`json:"shortCode"\`
+	OriginalURL string    \`json:"originalUrl"\`
+	Clicks      int       \`json:"clicks"\`
+	CreatedAt   time.Time \`json:"createdAt"\`
+}
+
+var (
+	store = make(map[string]*ShortLink)
+	mu    sync.RWMutex
+)
+
+func handleShorten(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var req struct {
+		URL         string \`json:"url"\`
+		CustomAlias string \`json:"customAlias"\`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid_payload"})
+		return
+	}
+
+	parsedURL, err := url.ParseRequestURI(req.URL)
+	if err != nil || (parsedURL.Scheme != "http" && parsedURL.Scheme != "https") {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid_url_protocol"})
+		return
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	code := req.CustomAlias
+	if code == "" {
+		b := make([]byte, 4)
+		rand.Read(b)
+		code = base64.RawURLEncoding.EncodeToString(b)
+	}
+
+	if _, exists := store[code]; exists {
+		w.WriteHeader(http.StatusConflict)
+		json.NewEncoder(w).Encode(map[string]string{"error": "alias_already_exists"})
+		return
+	}
+
+	link := &ShortLink{
+		Code:        code,
+		OriginalURL: req.URL,
+		Clicks:      0,
+		CreatedAt:   time.Now().UTC(),
+	}
+	store[code] = link
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]string{
+		"shortCode": code,
+		"shortUrl":  "http://rank.sh/" + code,
+	})
+}
+
+func main() {
+	http.HandleFunc("/shorten", handleShorten)
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, HTTPException, status
+from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+import secrets
+
+app = FastAPI(title="URL Shortener API")
+
+class ShortenRequest(BaseModel):
+    url: str
+    customAlias: Optional[str] = None
+
+url_db = {}
+
+@app.post("/shorten", status_code=status.HTTP_201_CREATED)
+def shorten_url(payload: ShortenRequest):
+    if not payload.url.startswith(("http://", "https://")):
+        raise HTTPException(status_code=400, detail={"error": "invalid_url_protocol"})
+
+    code = payload.customAlias or secrets.token_urlsafe(4)
+
+    if code in url_db:
+        raise HTTPException(status_code=409, detail={"error": "alias_already_exists"})
+
+    url_db[code] = {
+        "shortCode": code,
+        "originalUrl": payload.url,
+        "clicks": 0,
+        "createdAt": datetime.utcnow().isoformat() + "Z"
+    }
+
+    return {
+        "shortCode": code,
+        "shortUrl": f"http://rank.sh/{code}"
+    }
+
+@app.get("/{code}")
+def redirect_url(code: str):
+    link = url_db.get(code)
+    if not link:
+        raise HTTPException(status_code=404, detail={"error": "shortcode_not_found"})
+    link["clicks"] += 1
+    return RedirectResponse(url=link["originalUrl"], status_code=302)`
+    }
   },
   {
     id: 'request-logger',

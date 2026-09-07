@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Challenge, TestResultItem, TestSuiteSummary } from '../types';
 import { ChallengeHeader } from './ChallengeHeader';
 import { APIEndpoint } from './APIEndpoint';
@@ -30,13 +30,18 @@ export const ChallengeDetailView: React.FC<Props> = ({
 
   // Interactive In-Browser Code State per Language
   const [selectedEditorLang, setSelectedEditorLang] = useState<'nodejs' | 'go' | 'python'>('nodejs');
-  const [editorCodes, setEditorCodes] = useState<Record<'nodejs' | 'go' | 'python', string>>(() => {
-    return {
-      nodejs: challenge.starterCode?.nodejs || '// Express / TypeScript API\nimport express from "express";\nconst app = express();\napp.use(express.json());\n\n// TODO: Implement endpoints\n\napp.listen(8000);\n',
-      go: challenge.starterCode?.go || '// Go Gin / Standard library\npackage main\n\nimport "net/http"\n\nfunc main() {\n\t// TODO: Implement endpoints\n\thttp.ListenAndServe(":8000", nil)\n}\n',
-      python: challenge.starterCode?.python || '# Python FastAPI\nfrom fastapi import FastAPI\napp = FastAPI()\n\n# TODO: Implement endpoints\n'
-    };
+  
+  const getInitialEditorCodes = (c: Challenge) => ({
+    nodejs: c.starterCode?.nodejs || `import express, { Request, Response } from 'express';\n\nconst app = express();\napp.use(express.json());\n\n// TODO: Implement endpoints for ${c.title}\n\nexport default app;\n`,
+    go: c.starterCode?.go || `package main\n\nimport "net/http"\n\n// TODO: Implement endpoints for ${c.title}\nfunc main() {\n\thttp.ListenAndServe(":8000", nil)\n}\n`,
+    python: c.starterCode?.python || `from fastapi import FastAPI\n\napp = FastAPI(title="${c.title}")\n\n# TODO: Implement endpoints for ${c.title}\n`
   });
+
+  const [editorCodes, setEditorCodes] = useState<Record<'nodejs' | 'go' | 'python', string>>(() => getInitialEditorCodes(challenge));
+
+  useEffect(() => {
+    setEditorCodes(getInitialEditorCodes(challenge));
+  }, [challenge.id]);
 
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
