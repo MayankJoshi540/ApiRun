@@ -52,3 +52,96 @@
 @keyframes blink {
   50% { opacity: 0; }
 }
+
+/* =========================================================
+   API RUN — LANDING PAGE VISUAL PASS
+   Keeps the existing component structure, but gives the hero
+   a stronger product identity and makes the evaluator the star.
+   ========================================================= */
+
+.min-h-screen > .relative.z-10 > section:first-child {
+  padding-top: clamp(5.5rem, 9vw, 8rem) !important;
+  padding-bottom: clamp(2.5rem, 5vw, 4.5rem) !important;
+  max-width: 1100px !important;
+  position: relative;
+}
+
+.min-h-screen > .relative.z-10 > section:first-child::before {
+  content: 'REQUEST  →  ATTACK  →  ASSERT  →  SHIP';
+  display: block;
+  width: fit-content;
+  margin: 0 auto 1.25rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.045);
+  color: rgba(52, 211, 153, 0.72);
+  font: 700 9px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.18em;
+}
+
+.min-h-screen > .relative.z-10 > section:first-child h1 {
+  font-size: clamp(38px, 4.8vw, 70px) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.045em !important;
+}
+
+.min-h-screen > .relative.z-10 > section:first-child h1:last-child {
+  text-shadow: 0 0 34px rgba(0, 242, 169, 0.12);
+}
+
+/* Remove the generic comparison positioning from the eyebrow. */
+.min-h-screen > .relative.z-10 > section:first-child > div:first-of-type {
+  background: rgba(255,255,255,0.025) !important;
+  border-color: rgba(255,255,255,0.09) !important;
+}
+
+/* Make the product description quieter so the evaluator owns the page. */
+.min-h-screen > .relative.z-10 > section:first-child p {
+  max-width: 680px !important;
+  color: rgba(148,163,184,0.82) !important;
+}
+
+/* Stronger primary action, quieter secondary action. */
+.min-h-screen > .relative.z-10 > section:first-child button:first-child {
+  min-width: 178px;
+  box-shadow: 0 10px 35px rgba(16,185,129,0.13);
+}
+
+/* Tech tags become a compact capability strip rather than another card wall. */
+.min-h-screen > .relative.z-10 > section:first-child > div:last-child {
+  opacity: 0.82;
+  gap: 0.4rem !important;
+}
+
+.min-h-screen > .relative.z-10 > section:first-child > div:last-child span {
+  border-radius: 999px !important;
+  padding: 0.3rem 0.6rem !important;
+  font-size: 10px !important;
+  letter-spacing: 0.02em;
+}
+
+/* Pull the evaluation surface closer to the hero and give it a product-like edge. */
+.min-h-screen > .relative.z-10 > section:nth-child(3) {
+  padding-bottom: clamp(4rem, 8vw, 7rem) !important;
+}
+
+.min-h-screen > .relative.z-10 > section:nth-child(3) > div {
+  border-color: rgba(52,211,153,0.20) !important;
+  box-shadow: 0 30px 100px rgba(0,0,0,0.65), 0 0 70px rgba(16,185,129,0.055) !important;
+}
+
+@media (max-width: 640px) {
+  .min-h-screen > .relative.z-10 > section:first-child {
+    padding-top: 4.5rem !important;
+  }
+
+  .min-h-screen > .relative.z-10 > section:first-child::before {
+    font-size: 8px;
+    letter-spacing: 0.11em;
+  }
+
+  .min-h-screen > .relative.z-10 > section:first-child h1 {
+    font-size: clamp(36px, 11vw, 54px) !important;
+  }
+}
