@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 
 interface Props {
@@ -7,59 +7,72 @@ interface Props {
 }
 
 export const LandingNavbar: React.FC<Props> = ({ onNavigate, onStartBuilding }) => {
-  return (
-    <header className="sticky top-3 sm:top-4 z-50 w-full px-3 sm:px-6 pointer-events-none">
-      <div className="max-w-6xl mx-auto pointer-events-auto rounded-2xl bg-[#05070a]/80 backdrop-blur-xl border border-white/[0.10] shadow-[0_10px_30px_rgba(0,0,0,0.45)] px-3 sm:px-5 h-14 flex items-center justify-between font-sans transition-colors hover:border-white/[0.16]">
-        <button
-          onClick={() => onNavigate('landing')}
-          className="flex items-center group text-left shrink-0"
-          aria-label="API Run home"
-        >
-          <img
-            src="/logo.png"
-            alt="API Run"
-            className="h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-[1.03]"
-          />
-        </button>
+  const [isScrolled, setIsScrolled] = useState(false);
 
-        <nav className="hidden md:flex items-center gap-1 ml-8 mr-auto" aria-label="Primary navigation">
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <header className="fixed top-4 sm:top-6 left-0 right-0 z-50 w-full px-4 sm:px-6 pointer-events-none font-sans animate-navbar-drop">
+      <div 
+        className={`max-w-5xl mx-auto pointer-events-auto rounded-full px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between transition-all duration-300 ${
+          isScrolled 
+            ? 'bg-[#05070a]/90 border border-white/[0.16] shadow-[0_12px_40px_rgba(0,0,0,0.8)] backdrop-blur-2xl' 
+            : 'bg-[#05070a]/75 border border-white/[0.1] shadow-[0_10px_35px_rgba(0,0,0,0.6)] backdrop-blur-xl'
+        }`}
+      >
+        {/* Left: Brand Logo {•>} APIRun */}
+        <div className="flex items-center gap-6 sm:gap-8">
+          <button
+            onClick={() => onNavigate('landing')}
+            className="flex items-center space-x-2 text-left shrink-0 transition-transform duration-300 hover:scale-105 active:scale-95 group"
+            aria-label="API Run home"
+          >
+            {/* Custom Terminal Code Icon */}
+            <div className="flex items-center font-mono text-sm sm:text-base font-extrabold text-[#00f2a9] tracking-tighter">
+              &#123;&bull;&gt;&#125;
+            </div>
+            {/* Logo Text */}
+            <span className="font-extrabold text-base sm:text-lg tracking-tight font-sans">
+              <span className="text-white">API</span>
+              <span className="text-[#00f2a9]">Run</span>
+            </span>
+          </button>
+        </div>
+
+        {/* Center: Pill Navigation Group */}
+        <nav 
+          className="hidden sm:flex items-center p-1 rounded-full bg-[#0c1017]/90 border border-white/[0.08] shadow-inner" 
+          aria-label="Primary navigation"
+        >
           <button
             onClick={() => onNavigate('challenges')}
-            className="px-3.5 py-2 rounded-lg font-medium text-xs text-[#94a3b8] hover:text-white hover:bg-white/[0.06] transition-colors"
+            className="px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-white transition-all duration-200 hover:bg-white/[0.08]"
           >
             Challenges
           </button>
           <button
             onClick={() => onNavigate('progress')}
-            className="px-3.5 py-2 rounded-lg font-medium text-xs text-[#94a3b8] hover:text-white hover:bg-white/[0.06] transition-colors"
+            className="px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-white transition-all duration-200 hover:bg-white/[0.08]"
           >
             Progress
           </button>
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3 text-xs">
-          <div className="hidden lg:flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-white/[0.035] border border-white/[0.07] font-mono text-[10px]">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
-            </span>
-            <span className="text-[#64748b]">ENGINE</span>
-            <span className="text-emerald-400 font-semibold">ONLINE</span>
-          </div>
-
-          <button
-            onClick={() => onNavigate('challenges')}
-            className="hidden sm:block text-[#94a3b8] hover:text-white font-medium transition-colors px-2 py-1"
-          >
-            dev_user
-          </button>
-
+        {/* Right Section: Mint Green "Start Building ->" CTA Button */}
+        <div className="flex items-center">
           <button
             onClick={onStartBuilding}
-            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-xs transition-all active:scale-[0.98] shadow-[0_0_20px_rgba(0,242,169,0.10)]"
+            className="group relative inline-flex items-center space-x-1.5 px-4.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#00f2a9] hover:bg-[#20fbb7] text-black font-bold text-xs sm:text-sm tracking-tight transition-all duration-300 hover:scale-105 hover:shadow-[0_0_24px_rgba(0,242,169,0.4)] active:scale-95"
           >
             <span>Start Building</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5] transition-transform duration-300 group-hover:translate-x-0.5" />
           </button>
         </div>
       </div>

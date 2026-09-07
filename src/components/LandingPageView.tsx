@@ -18,7 +18,6 @@ import {
   ChevronRight,
   GitBranch,
   RefreshCw,
-  Sparkles,
   ArrowUpRight,
   Code2,
   Boxes,
@@ -40,7 +39,7 @@ import {
 import { Challenge } from '../types';
 import { DifficultyBadge } from './DifficultyBadge';
 import { ConceptBadge } from './ConceptBadge';
-import { ApiNeuralBackground } from './ApiNeuralBackground';
+import { Hero } from './hero/Hero';
 
 interface Props {
   challenges: Challenge[];
@@ -222,13 +221,6 @@ export const LandingPageView: React.FC<Props> = ({
     'IDEMPOTENCY KEYS', 'JWT REFRESH ROTATION', 'ASYNCHRONOUS JOB WORKERS', 'STRIPE WEBHOOK HMAC'
   ];
 
-  const recentActivity = [
-    { user: 'alex_v', action: 'passed', challenge: 'Sliding Window Rate Limiter', lang: 'Go 1.22', time: '2m ago', latency: '4.2ms' },
-    { user: 'sophia_k', action: 'passed', challenge: 'Idempotent Payment Webhook', lang: 'Node.js 20', time: '5m ago', latency: '9.8ms' },
-    { user: 'dev_raj', action: 'solved', challenge: 'Distributed Job Queue Worker', lang: 'Python 3.11', time: '8m ago', latency: '12.1ms' },
-    { user: 'elena_m', action: 'passed', challenge: 'JWT Authentication & Refresh', lang: 'Rust 1.77', time: '12m ago', latency: '2.4ms' }
-  ];
-
   const comparisonRows = [
     {
       feature: 'Problem Definition',
@@ -314,104 +306,76 @@ export const LandingPageView: React.FC<Props> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-transparent text-[#f8fafc] font-sans selection:bg-emerald-400 selection:text-black relative">
-      {/* High-Contrast Technical Neural Background */}
-      <ApiNeuralBackground />
+    <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans selection:bg-[#00f2a9] selection:text-black relative overflow-x-hidden">
+      {/* 1. Global Page Technical Background Atmosphere (Extends down the entire page) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        {/* Continuous Technical Dot Matrix */}
+        <div 
+          className="absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage: 'radial-gradient(rgba(0, 242, 169, 0.35) 1px, transparent 1px)',
+            backgroundSize: '32px 32px'
+          }}
+        />
+
+        {/* Faint Coordinate Grid */}
+        <div 
+          className="absolute inset-0 opacity-[0.025]"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(0, 242, 169, 0.4) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(0, 242, 169, 0.4) 1px, transparent 1px)
+            `,
+            backgroundSize: '128px 128px'
+          }}
+        />
+
+        {/* Ambient Glow Pools Along Page Scroll */}
+        {/* Attack Harness Area Ambient Glow */}
+        <div 
+          className="absolute top-[1000px] left-1/2 -translate-x-1/2 w-[1100px] h-[600px] rounded-full blur-[140px] opacity-15"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(0, 242, 169, 0.25) 0%, rgba(14, 165, 233, 0.08) 50%, transparent 80%)'
+          }}
+        />
+
+        {/* Challenges Section Ambient Glow */}
+        <div 
+          className="absolute top-[1900px] left-[10%] w-[800px] h-[550px] rounded-full blur-[150px] opacity-12"
+          style={{
+            background: 'radial-gradient(circle, rgba(0, 242, 169, 0.2) 0%, transparent 70%)'
+          }}
+        />
+
+        {/* Engineering Tracks Ambient Glow */}
+        <div 
+          className="absolute top-[2900px] right-[10%] w-[900px] h-[600px] rounded-full blur-[160px] opacity-12"
+          style={{
+            background: 'radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, rgba(0, 242, 169, 0.06) 50%, transparent 75%)'
+          }}
+        />
+
+        {/* Bottom Horizon Ambient Glow */}
+        <div 
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1300px] h-[400px] rounded-full blur-[130px] opacity-15"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 100%, rgba(0, 242, 169, 0.35) 0%, transparent 75%)'
+          }}
+        />
+      </div>
+
+      {/* 2. Complete Pixel-Matched Hero Section (with globe background.png) */}
+      <Hero
+        onLaunchArena={() => onSelectChallenge(challenges[0] || challenges[1])}
+        onBrowseTracks={onExploreChallenges}
+      />
 
       <div className="relative z-10">
-        {/* ========================================================= */}
-        {/* HERO SECTION */}
-        {/* ========================================================= */}
-        <section className="pt-14 sm:pt-16 pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center space-y-6">
-          {/* Eyebrow Pill */}
-          <div className="inline-flex items-center space-x-2.5 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.12] text-xs text-[#94a3b8] backdrop-blur-xl shadow-sm hover:border-emerald-400/40 transition-all cursor-default">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-            </span>
-            <span className="font-sans text-emerald-400 font-bold tracking-wider uppercase text-[11px]">
-              THE LEETCODE FOR BACKEND ENGINEERS
-            </span>
-            <span className="text-white/20">|</span>
-            <span className="text-[#f1f5f9] font-medium text-xs">Hands-on API Practice Arena</span>
-          </div>
-
-          {/* Main Hero Headings */}
-          <div className="space-y-1 sm:space-y-1.5 max-w-4xl mx-auto">
-            <h1 className="text-[clamp(42px,5.6vw,84px)] font-extrabold tracking-tight text-white leading-[0.98]">
-              Build Real APIs.
-            </h1>
-            <h1 className="text-[clamp(42px,5.6vw,84px)] font-extrabold tracking-tight text-[#cbd5e1] leading-[0.98]">
-              Defend Edge Cases.
-            </h1>
-            <h1 className="text-[clamp(42px,5.6vw,84px)] font-extrabold tracking-tight text-[#00f2a9] leading-[0.98]">
-              Ship With Verification.
-            </h1>
-          </div>
-
-          {/* Product Identity Subtitle */}
-          <p className="text-sm sm:text-base md:text-lg text-[#94a3b8] max-w-2xl mx-auto font-normal leading-relaxed">
-            Stop writing synthetic two-sum loops. Practice building production REST APIs, Redis rate limiters, distributed mutex locks, and idempotent payment webhooks against automated adversarial test harnesses.
-          </p>
-
-          {/* Primary CTA Action Row */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-            <button
-              onClick={() => onSelectChallenge(challenges[0] || challenges[1])}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2.5 px-7 py-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-sm transition-all active:scale-[0.98]"
-            >
-              <span>Launch Free Arena</span>
-              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-            </button>
-
-            <button
-              onClick={onExploreChallenges}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-[#f8fafc] border border-white/[0.15] hover:border-white/[0.25] font-semibold text-sm transition-all backdrop-blur-xl active:scale-[0.98]"
-            >
-              <Terminal className="w-4 h-4 text-emerald-400" />
-              <span>Browse 8 Production Tracks</span>
-            </button>
-          </div>
-
-          {/* Technical Value Badges */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto font-sans text-xs">
-            {conceptTags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.1] text-[#cbd5e1] hover:text-[#00f2a9] hover:border-emerald-400/40 transition-colors cursor-default font-medium backdrop-blur-md"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </section>
-
-        {/* ========================================================= */}
-        {/* LIVE EVALUATION TICKER (REAL-TIME ACTIVITY PROOF) */}
-        {/* ========================================================= */}
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
-          <div className="flex items-center space-x-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl overflow-x-auto text-xs font-sans scrollbar-none">
-            <div className="flex items-center space-x-1.5 text-emerald-400 font-bold shrink-0">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>LIVE EVALUATION:</span>
-            </div>
-            <div className="flex items-center space-x-6 text-[#94a3b8] shrink-0">
-              {recentActivity.map((act, i) => (
-                <div key={i} className="flex items-center space-x-2">
-                  <span className="text-white font-semibold">{act.user}</span>
-                  <span className="text-emerald-400 font-medium">✓ {act.challenge}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/[0.06] text-[#cbd5e1] font-medium">{act.lang}</span>
-                  <span className="text-[11px] font-mono text-[#64748b]">({act.latency})</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ========================================================= */}
         {/* HERO VISUAL: LIVE INTERACTIVE TEST RUNNER & ATTACK MATRIX */}
         {/* ========================================================= */}
-        <section className="px-4 sm:px-6 max-w-5xl mx-auto pb-20">
+        <section className="pt-8 sm:pt-12 pb-20 px-4 sm:px-6 max-w-5xl mx-auto relative z-10">
           <div className="rounded-2xl border border-white/[0.15] bg-[#0c1017]/90 shadow-[0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden text-xs backdrop-blur-2xl font-sans">
             {/* Terminal Window Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-5 py-3.5 bg-white/[0.04] border-b border-white/[0.1] gap-3">
@@ -876,10 +840,6 @@ export const LandingPageView: React.FC<Props> = ({
         {/* ========================================================= */}
         <section className="py-24 px-4 sm:px-6 max-w-4xl mx-auto text-center space-y-8 font-sans">
           <div className="p-10 rounded-3xl bg-white/[0.04] border border-white/[0.15] backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] space-y-6">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>ZERO MOCKS // REAL INFRASTRUCTURE</span>
-            </div>
             <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
               Ready to master production backend engineering?
             </h2>
