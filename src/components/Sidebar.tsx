@@ -25,65 +25,84 @@ export const Sidebar: React.FC<Props> = ({
   solvedCount
 }) => {
   const difficulties = ['ALL', 'BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
+  const completionRate = Math.round((solvedCount / (challengesCount || 1)) * 100);
 
   return (
-    <aside className="w-64 flex-no-shrink hidden lg:block font-sans">
-      <div className="space-y-6 sticky top-20">
-        <div className="space-y-1.5">
-          <div className="text-[10px] uppercase tracking-wider text-[#8b949e] px-2.5 py-1 font-semibold">
+    <aside className="w-64 flex-no-shrink hidden lg:block font-sans select-none">
+      <div className="space-y-4 sticky top-20">
+        {/* 1. Main Navigation */}
+        <div className="p-2 rounded-xl bg-[#090d14] border border-white/[0.08] space-y-1">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-[#64748b] px-2.5 py-1 font-semibold">
             NAVIGATION
           </div>
           <button
             onClick={() => onSelectTab('challenges')}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded text-xs transition-colors ${
-              activeTab === 'challenges'
-                ? 'bg-[#12161f] text-emerald-400 border border-[#262d3a] font-semibold'
-                : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#12161f]/50 border border-transparent'
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors ${
+              activeTab === 'challenges' || activeTab === 'dashboard'
+                ? 'bg-white/[0.08] text-white font-semibold'
+                : 'text-[#94a3b8] hover:text-white hover:bg-white/[0.04]'
             }`}
           >
-            <div className="flex items-center space-x-2.5">
-              <Layers className="w-4 h-4" />
+            <div className="flex items-center space-x-2">
+              <Layers className="w-3.5 h-3.5" />
               <span>Challenges</span>
             </div>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#090b0e] border border-[#262d3a] text-[#8b949e]">
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-[#8b949e]">
               {challengesCount}
             </span>
           </button>
+
           <button
             onClick={() => onSelectTab('progress')}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded text-xs transition-colors ${
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors ${
               activeTab === 'progress'
-                ? 'bg-[#12161f] text-emerald-400 border border-[#262d3a] font-semibold'
-                : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#12161f]/50 border border-transparent'
+                ? 'bg-white/[0.08] text-white font-semibold'
+                : 'text-[#94a3b8] hover:text-white hover:bg-white/[0.04]'
             }`}
           >
-            <div className="flex items-center space-x-2.5">
-              <CheckCircle2 className="w-4 h-4" />
+            <div className="flex items-center space-x-2">
+              <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Progress</span>
             </div>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-800/50 text-emerald-400">
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/40 text-emerald-400 font-semibold">
               {solvedCount}/{challengesCount}
             </span>
           </button>
         </div>
 
-        <div className="space-y-1.5">
-          <div className="text-[10px] uppercase tracking-wider text-[#8b949e] px-2.5 py-1">
+        {/* 2. Progress Overview */}
+        <div className="p-3.5 rounded-xl bg-[#090d14] border border-white/[0.08] space-y-2.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-[#94a3b8] font-medium">Completion</span>
+            <span className="font-mono text-emerald-400 font-bold">{completionRate}%</span>
+          </div>
+
+          <div className="w-full h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+            <div 
+              className="h-full bg-emerald-400 rounded-full transition-all duration-300"
+              style={{ width: `${Math.max(completionRate, 2)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* 3. Difficulty Tiers */}
+        <div className="p-3 rounded-xl bg-[#090d14] border border-white/[0.08] space-y-1.5">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-[#64748b] px-2 py-0.5 font-semibold">
             DIFFICULTY
           </div>
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {difficulties.map((diff) => (
               <button
                 key={diff}
                 onClick={() => onSelectDifficulty(diff)}
-                className={`w-full flex items-center justify-between px-3 py-1.5 rounded text-xs transition-colors ${
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
                   selectedDifficulty === diff
-                    ? 'bg-[#12161f] text-[#e6edf3] border border-[#262d3a] font-semibold'
-                    : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#12161f]/50 border border-transparent'
+                    ? 'bg-white/[0.08] text-white font-semibold'
+                    : 'text-[#94a3b8] hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
-                <span>{diff === 'ALL' ? 'All Difficulties' : diff}</span>
-                <span className="font-mono text-[10px] text-[#6e7681]">
+                <span>{diff === 'ALL' ? 'All Difficulties' : diff.charAt(0) + diff.slice(1).toLowerCase()}</span>
+                <span className="font-mono text-[10px] text-[#64748b]">
                   {diff === 'ALL' ? challengesCount : diff === 'BEGINNER' ? 3 : diff === 'INTERMEDIATE' ? 4 : 1}
                 </span>
               </button>
@@ -91,29 +110,30 @@ export const Sidebar: React.FC<Props> = ({
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <div className="text-[10px] uppercase tracking-wider text-[#8b949e] px-2.5 py-1">
-            BACKEND CONCEPTS
+        {/* 4. Core Concepts */}
+        <div className="p-3 rounded-xl bg-[#090d14] border border-white/[0.08] space-y-2">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-[#64748b] px-2 py-0.5 font-semibold">
+            CONCEPTS
           </div>
-          <div className="flex flex-wrap gap-1.5 px-1">
+          <div className="flex flex-wrap gap-1 px-1">
             <button
               onClick={() => onSelectConcept('ALL')}
-              className={`px-2 py-1 rounded text-[11px] transition-colors border ${
+              className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors border ${
                 selectedConcept === 'ALL'
-                  ? 'bg-emerald-950/60 border-emerald-800/70 text-emerald-400'
-                  : 'bg-[#12161f] border-[#262d3a] text-[#8b949e] hover:text-[#e6edf3]'
+                  ? 'bg-white/[0.1] border-white/[0.2] text-white font-semibold'
+                  : 'bg-[#050708] border-white/[0.06] text-[#94a3b8] hover:text-white'
               }`}
             >
-              All
+              ALL
             </button>
             {allConcepts.map((concept) => (
               <button
                 key={concept}
                 onClick={() => onSelectConcept(concept)}
-                className={`px-2 py-1 rounded text-[11px] transition-colors border ${
+                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors border ${
                   selectedConcept === concept
-                    ? 'bg-emerald-950/60 border-emerald-800/70 text-emerald-400'
-                    : 'bg-[#12161f] border-[#262d3a] text-[#8b949e] hover:text-[#e6edf3]'
+                    ? 'bg-emerald-950/40 border-emerald-800/50 text-emerald-400 font-semibold'
+                    : 'bg-[#050708] border-white/[0.06] text-[#94a3b8] hover:text-white'
                 }`}
               >
                 {concept}

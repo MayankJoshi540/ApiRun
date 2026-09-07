@@ -88,7 +88,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050608] text-[#e6edf3] font-sans antialiased">
+    <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans antialiased selection:bg-[#00f2a9] selection:text-black relative">
       {/* Route-Specific Navbar */}
       {currentRoute === 'landing' && !activeChallenge ? (
         <LandingNavbar

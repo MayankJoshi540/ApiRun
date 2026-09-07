@@ -86,6 +86,7 @@ export interface TestCase {
   endpoint: string;
   method: HttpMethod;
   isHidden?: boolean;
+  requestHeaders?: Record<string, string>;
   requestPayload?: string;
   expectedStatus: number;
   expectedResponseSnippet?: string;

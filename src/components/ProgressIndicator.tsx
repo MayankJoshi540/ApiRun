@@ -5,7 +5,8 @@ interface Props {
   total: number;
   isRunning?: boolean;
   showLabel?: boolean;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
+  accentColor?: 'mint' | 'blue' | 'amber';
 }
 
 export const ProgressIndicator: React.FC<Props> = ({
@@ -13,25 +14,36 @@ export const ProgressIndicator: React.FC<Props> = ({
   total,
   isRunning = false,
   showLabel = true,
-  size = 'sm'
+  size = 'sm',
+  accentColor = 'mint'
 }) => {
-  const percent = total > 0 ? Math.round((passed / total) * 100) : 0;
+  const percent = total > 0 ? Math.min(100, Math.round((passed / total) * 100)) : 0;
   const isComplete = passed === total && total > 0;
 
+  const heightClass = size === 'sm' ? 'h-1.5' : size === 'md' ? 'h-2' : 'h-2.5';
+
   return (
-    <div className="space-y-1 font-mono">
+    <div className="space-y-1.5 font-mono select-none">
       {showLabel && (
-        <div className="flex items-center justify-between text-[10px] text-[#8b949e]">
-          <span>{passed} / {total} Completed</span>
-          <span className={isComplete ? 'text-emerald-400 font-bold' : isRunning ? 'text-sky-400' : 'text-[#e6edf3]'}>
+        <div className="flex items-center justify-between text-xs text-[#94a3b8]">
+          <span className="text-[11px] font-medium">{passed} / {total} Completed</span>
+          <span className={`text-[11px] font-bold ${
+            isComplete ? 'text-[#00f2a9]' : isRunning ? 'text-sky-400' : percent > 0 ? 'text-white' : 'text-[#64748b]'
+          }`}>
             {percent}%
           </span>
         </div>
       )}
-      <div className={`w-full bg-[#262d3a] rounded-full overflow-hidden ${size === 'sm' ? 'h-1.5' : 'h-2'}`}>
+      <div className={`w-full bg-white/[0.06] rounded-full overflow-hidden p-0.5 border border-white/[0.04] ${heightClass}`}>
         <div
-          className={`h-full transition-all duration-300 ${
-            isComplete ? 'bg-emerald-500' : isRunning ? 'bg-sky-400 animate-pulse' : percent > 0 ? 'bg-amber-400' : 'bg-transparent'
+          className={`h-full rounded-full transition-all duration-500 ease-out ${
+            isComplete
+              ? 'bg-[#00f2a9]'
+              : isRunning
+              ? 'bg-sky-400 animate-pulse'
+              : percent > 0
+              ? 'bg-white/80'
+              : 'bg-transparent'
           }`}
           style={{ width: `${percent}%` }}
         />

@@ -1,55 +1,62 @@
 import React from 'react';
-import { Play, Loader2, CheckCircle2, AlertTriangle, Server, Clock } from 'lucide-react';
+import { Play, Loader2, CheckCircle2, AlertTriangle, Clock } from 'lucide-react';
 import { TestResultItem, TestSuiteSummary } from '../types';
 import { TestResult } from './TestResult';
 import { ProgressIndicator } from './ProgressIndicator';
 
 interface Props {
-  testResults: TestResultItem[];
+  results?: TestResultItem[];
+  testResults?: TestResultItem[];
   summary: TestSuiteSummary;
-  onRunTests: () => void;
+  onRunTests?: () => void;
+  onRerun?: () => void;
   isRunning: boolean;
-  serverUrl: string;
+  serverUrl?: string;
 }
 
 export const TestResultsPanel: React.FC<Props> = ({
+  results,
   testResults,
   summary,
   onRunTests,
+  onRerun,
   isRunning,
-  serverUrl
+  serverUrl = 'In-Browser Engine'
 }) => {
+  const items = results || testResults || [];
+  const handleRun = onRunTests || onRerun || (() => {});
+
   return (
-    <div className="space-y-4 font-sans">
-      { /* Summary Bar */ }
-      <div className="p-4 rounded-md bg-[#12161f] border border-[#262d3a] space-y-3">
+    <div className="space-y-4 font-sans select-none">
+      {/* Summary Bar */}
+      <div className="p-4 rounded-xl bg-[#090d14] border border-white/[0.08] space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-semibold text-[#e6edf3]">Test Suite Runner</span>
+              <span className="text-xs font-bold text-white">Test Suite Evaluation</span>
               <span className="text-xs text-[#8b949e]">
-                — Testing <span className="font-mono text-[11px] text-[#c9d1d9]">{serverUrl}</span>
+                — <span className="font-mono text-[11px] text-[#00f2a9]">{serverUrl}</span>
               </span>
             </div>
-            <div className="text-xs text-[#8b949e]">
-              <span className="font-mono text-emerald-400 font-medium">{summary.passed}</span> passed,{' '}
-              <span className="font-mono text-red-400 font-medium">{summary.failed}</span> failed,{' '}
-              <span className="font-mono text-[#c9d1d9] font-medium">{summary.total}</span> total
+            <div className="text-xs text-[#8b949e] font-mono">
+              <span className="text-emerald-400 font-bold">{summary.passed}</span> passed,{' '}
+              <span className="text-rose-400 font-bold">{summary.failed}</span> failed,{' '}
+              <span className="text-white font-bold">{summary.total}</span> total
             </div>
           </div>
 
           <div className="flex items-center space-x-3">
             <button
-              onClick={onRunTests}
+              onClick={handleRun}
               disabled={isRunning}
-              className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+              className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 isRunning
-                  ? 'bg-[#171c26] text-[#8b949e] cursor-not-allowed'
-                  : 'bg-emerald-500 text-black font-semibold hover:bg-emerald-400 active:scale-[0.98]'
+                  ? 'bg-white/[0.06] text-[#8b949e] cursor-not-allowed'
+                  : 'bg-[#00f2a9] text-black hover:bg-[#20fbb7] active:scale-95'
               }`}
             >
               {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-              <span>{isRunning ? 'Executing...' : 'Run Tests'}</span>
+              <span>{isRunning ? 'Evaluating...' : 'Run Test Suite'}</span>
             </button>
           </div>
         </div>
@@ -64,15 +71,21 @@ export const TestResultsPanel: React.FC<Props> = ({
         </div>
       </div>
 
-      { /* Test Cases List */ }
+      {/* Test Cases List */}
       <div className="space-y-2">
-        {testResults.map((testResult, index) => (
-          <TestResult
-            key={testResult.testId || index}
-            testResult={testResult}
-            index={index}
-          />
-        ))}
+        {items.length > 0 ? (
+          items.map((testResult, index) => (
+            <TestResult
+              key={testResult.testId || index}
+              testResult={testResult}
+              index={index}
+            />
+          ))
+        ) : (
+          <div className="p-8 rounded-xl border border-white/[0.06] bg-[#090d14] text-center text-xs text-[#8b949e]">
+            No tests executed yet. Click "Run Test Suite" to evaluate your implementation.
+          </div>
+        )}
       </div>
     </div>
   );

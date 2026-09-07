@@ -127,12 +127,14 @@ export const CodeEditorPanel: React.FC<Props> = ({
       // Disable false-positive module resolution errors (e.g. 'Cannot find module express') in browser
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: true,
-        noSyntaxValidation: false,
+        noSyntaxValidation: true,
+        noSuggestionDiagnostics: true,
       });
 
       monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: true,
-        noSyntaxValidation: false,
+        noSyntaxValidation: true,
+        noSuggestionDiagnostics: true,
       });
 
       // Provide ambient declaration for express/node so autocomplete stays smart
@@ -289,6 +291,7 @@ declare module 'path';`,
       <div className="flex-1 relative overflow-hidden bg-[#07080b]">
         <Editor
           height="100%"
+          path={fileNames[selectedLang]}
           language={monacoLanguages[selectedLang]}
           value={code}
           theme="apirun-vscode-dark"
