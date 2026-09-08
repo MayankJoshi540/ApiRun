@@ -3,11 +3,11 @@ import React from 'react';
 export const HeroBackground: React.FC = () => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-      {/* 1. Background Image from public/background.png with smooth entrance on reload */}
+      {/* 1. Background image from public/background.png */}
       <img
         src="/background.png"
-        alt="API Run Hero Background"
-        className="absolute inset-0 w-full h-full object-cover object-bottom pointer-events-none select-none animate-bg-reveal"
+        alt="APIRun Hero Background"
+        className="absolute inset-0 w-full h-full object-cover object-bottom pointer-events-none select-none"
         style={{ 
           objectPosition: 'center bottom',
           minHeight: '100%',
@@ -15,11 +15,11 @@ export const HeroBackground: React.FC = () => {
         }}
       />
 
-      {/* 2. Seamless bottom transition */}
+      {/* 2. Seamless bottom transition into page background */}
       <div 
-        className="absolute bottom-0 left-0 right-0 h-28 pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
         style={{
-          background: 'linear-gradient(to bottom, transparent 0%, rgba(5, 7, 8, 0.6) 60%, #050708 100%)'
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(5, 7, 8, 0.7) 60%, #050708 100%)'
         }}
       />
     </div>
