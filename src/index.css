@@ -162,9 +162,6 @@
   animation: bg-reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.animate-hero-badge {
-  animation: hero-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
-}
 
 .animate-hero-1 {
   animation: hero-fade-up 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both;

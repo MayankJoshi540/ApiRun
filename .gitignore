@@ -40,3 +40,5 @@ Desktop.ini
 .eslintcache
 .vite
 .cache
+.next/
+out/

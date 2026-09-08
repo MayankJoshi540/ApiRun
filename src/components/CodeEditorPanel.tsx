@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef } from 'react';
 import Editor, { OnMount } from '@monaco-editor/react';
 import { 
