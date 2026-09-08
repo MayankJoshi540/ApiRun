@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -156,9 +156,9 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
 
           <div className="flex items-center space-x-6 text-xs text-slate-500">
-            <a href="#" className="hover:text-slate-300 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-slate-300 transition-colors">Terms</a>
-            <a href="#" className="hover:text-slate-300 transition-colors">Security</a>
+            <Link href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
+            <Link href="/security" className="hover:text-slate-300 transition-colors">Security</Link>
           </div>
         </div>
       </div>
