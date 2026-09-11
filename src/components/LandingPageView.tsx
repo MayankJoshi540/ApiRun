@@ -42,6 +42,7 @@ import { Challenge } from '../types';
 import { DifficultyBadge } from './DifficultyBadge';
 import { ConceptBadge } from './ConceptBadge';
 import { Hero } from './hero/Hero';
+import { Footer } from './Footer';
 
 interface Props {
   challenges: Challenge[];
@@ -832,6 +833,12 @@ export const LandingPageView: React.FC<Props> = ({
             </div>
           </div>
         </section>
+
+        {/* Global Footer */}
+        <Footer 
+          onExploreChallenges={onExploreChallenges}
+          onNavigateProgress={onNavigateProgress}
+        />
       </div>
     </div>
   );
