@@ -37,6 +37,8 @@ Thumbs.db
 Desktop.ini
 
 # Build and cache outputs
+.next/
+out/
 .eslintcache
 .vite
 .cache
