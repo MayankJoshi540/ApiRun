@@ -57,7 +57,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // All unique backend concepts
   const allConcepts = Array.from(
     new Set(challengesList.flatMap(c => c.concepts))
   );
@@ -72,7 +71,6 @@ export default function App() {
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const handleChallengeSolved = (challengeId: string) => {
     setChallengesList(prev =>
       prev.map(c => c.id === challengeId ? { ...c, status: 'SOLVED' } : c)
