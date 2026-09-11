@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
 import { Challenge, UserStats } from '../types';
 import { ChallengeCard } from './ChallengeCard';

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Challenge, TestResultItem, TestSuiteSummary } from '../types';
 import { ChallengeHeader } from './ChallengeHeader';

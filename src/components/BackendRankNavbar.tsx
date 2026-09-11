@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import { CheckCircle2, User } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
+import { AuthControls } from './AuthControls';
 
 interface Props {
   activeTab: 'landing' | 'challenges' | 'progress' | 'dashboard';
@@ -77,15 +80,9 @@ export const BackendRankNavbar: React.FC<Props> = ({
             <span className="text-[#64748b]">/{totalCount}</span>
           </div>
 
-          {/* User Profile Capsule */}
-          <div className="flex items-center space-x-2 pl-2 border-l border-white/[0.1]">
-            <div className="w-7 h-7 rounded-full bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-white">
-              <User className="w-3.5 h-3.5 text-[#94a3b8]" />
-            </div>
-            <div className="hidden sm:block text-left">
-              <div className="text-xs font-medium text-white leading-tight">dev_user</div>
-              <div className="text-[10px] text-[#64748b] font-mono">localhost:8000</div>
-            </div>
+          {/* Auth Controls Integration */}
+          <div className="flex items-center pl-2 border-l border-white/[0.1]">
+            <AuthControls variant="navbar" />
           </div>
         </div>
       </div>

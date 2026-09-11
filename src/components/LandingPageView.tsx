@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { 
   ArrowRight, 
@@ -330,41 +332,9 @@ export const LandingPageView: React.FC<Props> = ({
           }}
         />
 
-        {/* Ambient Glow Pools Along Page Scroll */}
-        {/* Attack Harness Area Ambient Glow */}
-        <div 
-          className="absolute top-[1000px] left-1/2 -translate-x-1/2 w-[1100px] h-[600px] rounded-full blur-[140px] opacity-15"
-          style={{
-            background: 'radial-gradient(ellipse at center, rgba(0, 242, 169, 0.25) 0%, rgba(14, 165, 233, 0.08) 50%, transparent 80%)'
-          }}
-        />
-
-        {/* Challenges Section Ambient Glow */}
-        <div 
-          className="absolute top-[1900px] left-[10%] w-[800px] h-[550px] rounded-full blur-[150px] opacity-12"
-          style={{
-            background: 'radial-gradient(circle, rgba(0, 242, 169, 0.2) 0%, transparent 70%)'
-          }}
-        />
-
-        {/* Engineering Tracks Ambient Glow */}
-        <div 
-          className="absolute top-[2900px] right-[10%] w-[900px] h-[600px] rounded-full blur-[160px] opacity-12"
-          style={{
-            background: 'radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, rgba(0, 242, 169, 0.06) 50%, transparent 75%)'
-          }}
-        />
-
-        {/* Bottom Horizon Ambient Glow */}
-        <div 
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1300px] h-[400px] rounded-full blur-[130px] opacity-15"
-          style={{
-            background: 'radial-gradient(ellipse at 50% 100%, rgba(0, 242, 169, 0.35) 0%, transparent 75%)'
-          }}
-        />
       </div>
 
-      {/* 2. Complete Pixel-Matched Hero Section (with globe background.png) */}
+      {/* 2. Hero Section */}
       <Hero
         onLaunchArena={() => onSelectChallenge(challenges[0] || challenges[1])}
         onBrowseTracks={onExploreChallenges}
@@ -466,7 +436,7 @@ export const LandingPageView: React.FC<Props> = ({
                     </span>
                     <span className="text-white font-semibold text-xs">{currentDemo.path}</span>
                   </div>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                  <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border ${
                     currentDemo.status === 201 || currentDemo.status === 200
                       ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
                       : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
@@ -512,7 +482,7 @@ export const LandingPageView: React.FC<Props> = ({
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                     <span className="font-bold text-white text-xs tracking-wide">AUTOMATED ASSERTION SUITE</span>
                   </div>
-                  <span className="font-sans text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                  <span className="font-sans text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-md">
                     {demoProgress}/6 ASSERTIONS PASSED
                   </span>
                 </div>
@@ -648,7 +618,7 @@ export const LandingPageView: React.FC<Props> = ({
                 className="p-6 rounded-2xl bg-white/[0.03] border border-white/[0.1] hover:border-emerald-400/40 transition-all space-y-4 backdrop-blur-xl group hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-md">
                     TRACK {track.number}
                   </span>
                   <span className="text-[11px] text-[#94a3b8] font-medium">

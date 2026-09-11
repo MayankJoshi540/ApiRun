@@ -1,7 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { HeroBackground } from './HeroBackground';
-import { HeroBadge } from './HeroBadge';
 import { HeroButtons } from './HeroButtons';
 import { FloatingCodeCard } from './FloatingCodeCard';
 import { ChecklistCard } from './ChecklistCard';
@@ -37,11 +36,6 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
 
       {/* 4. Central Hero Content Container with Staggered Entrance Reveal */}
       <div className="relative z-20 max-w-xl sm:max-w-2xl lg:max-w-3xl 2xl:max-w-4xl mx-auto flex flex-col items-center text-center space-y-5 sm:space-y-6 my-auto pt-2 pb-4 px-4">
-        {/* Status Pipeline Badge */}
-        <div className="animate-hero-badge">
-          <HeroBadge />
-        </div>
-
         {/* 3-Line Headline strictly bounded and centered with Staggered Fade Up */}
         <div className="space-y-1 font-display font-black tracking-tight leading-[0.98] sm:leading-[0.94] max-w-lg sm:max-w-xl lg:max-w-2xl 2xl:max-w-3xl mx-auto">
           <h1 className="animate-hero-1 text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-white">

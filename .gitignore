@@ -42,3 +42,5 @@ out/
 .eslintcache
 .vite
 .cache
+.next/
+out/
