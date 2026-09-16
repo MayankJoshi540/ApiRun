@@ -1,21 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, CheckCircle2, Lock, Mail, AlertCircle, ArrowRight, Terminal } from 'lucide-react';
+import { HeroBackground } from '@/components/hero/HeroBackground';
+import { ArrowLeft, CheckCircle2, Lock, Mail, AlertCircle, ArrowRight, Server, Check } from 'lucide-react';
 
 export default function SignInPage() {
   const router = useRouter();
-  const { signInWithEmail, signInWithGoogle, user, isConfigured } = useAuth();
+  const { signInWithEmail, signInWithGoogle, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // If already logged in, redirect
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       router.push('/challenges');
     }
@@ -24,7 +24,7 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
-      setError('Please enter both email and password.');
+      setError('Please enter your email and password.');
       return;
     }
 
@@ -36,9 +36,11 @@ export default function SignInPage() {
     } catch (err: any) {
       console.error('Sign in error:', err);
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-        setError('Invalid email or password. Please check your credentials.');
+        setError('Invalid email or password. Please verify your credentials.');
+      } else if (err.code === 'auth/configuration-not-found') {
+        setError('Firebase Authentication is not initialized yet in Firebase Console. Please click "Get Started" in Firebase Auth.');
       } else if (err.code === 'auth/too-many-requests') {
-        setError('Too many failed attempts. Please try again later.');
+        setError('Too many failed attempts. Please wait a moment and try again.');
       } else {
         setError(err.message || 'Failed to sign in. Please try again.');
       }
@@ -55,8 +57,10 @@ export default function SignInPage() {
       router.push('/challenges');
     } catch (err: any) {
       console.error('Google sign in error:', err);
-      if (err.code !== 'auth/popup-closed-by-user') {
-        setError(err.message || 'Google sign in failed. Please try again.');
+      if (err.code === 'auth/configuration-not-found') {
+        setError('Google sign-in is not enabled in Firebase Console. Please enable Google in Firebase Authentication.');
+      } else if (err.code !== 'auth/popup-closed-by-user') {
+        setError(err.message || 'Google sign-in failed. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -64,87 +68,129 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050607] text-[#F5F7FA] flex flex-col justify-between selection:bg-[#F8B81F] selection:text-black">
-      {/* Top Navbar */}
-      <header className="w-full px-6 py-4 flex items-center justify-between border-b border-white/[0.06] bg-[#080B10]/80 backdrop-blur-xl">
-        <Link 
-          href="/"
-          className="flex items-center space-x-2 transition-transform hover:scale-105"
-        >
-          <div className="w-8 h-8 rounded-lg bg-[#0c121e] border border-white/[0.12] flex items-center justify-center text-[#F8B81F]">
-            <Terminal className="w-4 h-4" />
-          </div>
-          <span className="font-extrabold text-lg tracking-tight font-display">
-            <span className="text-white">API</span>
-            <span className="text-[#F8B81F]">Run</span>
-          </span>
-        </Link>
+    <div className="relative min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased overflow-hidden selection:bg-[#00f2a9] selection:text-black flex flex-col justify-between">
+      {/* 1. Exact Home Page Background Asset with Globe & Grid Texture */}
+      <HeroBackground />
 
-        <Link
-          href="/challenges"
-          className="inline-flex items-center space-x-2 text-xs font-semibold text-zinc-400 hover:text-white px-3.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
-        >
-          <ArrowLeft className="w-3.5 h-3.5 text-[#F8B81F]" />
-          <span>Explore Challenges</span>
-        </Link>
+      {/* Fine Technical Grid Texture Overlay */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-[0.035] z-0"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 1px, transparent 1px)
+          `,
+          backgroundSize: '48px 48px'
+        }}
+      />
+
+      {/* 2. Floating Pill Navbar Matching Home Page */}
+      <header className="relative z-50 w-full pt-4 sm:pt-6 px-4 sm:px-6 font-sans">
+        <div className="max-w-5xl mx-auto rounded-full px-5 sm:px-6 h-14 sm:h-16 flex items-center justify-between bg-[#05070a]/80 border border-white/[0.1] shadow-[0_10px_35px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+          {/* Logo {•>} APIRun */}
+          <Link
+            href="/"
+            className="flex items-center space-x-2 text-left transition-transform hover:scale-105 active:scale-95 group"
+          >
+            <div className="flex items-center font-mono text-base sm:text-lg font-extrabold text-[#00f2a9] tracking-tighter">
+              &#123;&bull;&gt;&#125;
+            </div>
+            <span className="font-extrabold text-base sm:text-lg tracking-tight font-sans">
+              <span className="text-white">API</span>
+              <span className="text-[#00f2a9]">Run</span>
+            </span>
+          </Link>
+
+          {/* Right Action */}
+          <Link
+            href="/challenges"
+            className="inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium text-slate-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-[#00f2a9]" />
+            <span>Explore Challenges</span>
+          </Link>
+        </div>
       </header>
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-12 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        {/* Left Column: Platform info */}
-        <div className="lg:col-span-6 space-y-8">
-          <div className="space-y-3">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white font-display tracking-tight leading-tight">
-              Sign In to <span className="text-[#F8B81F]">APIRun</span>
+      {/* 3. Main Two-Column Auth Container */}
+      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center my-auto">
+        
+        {/* Left Column: Home-styled Hero Copy & Live Test Preview Card */}
+        <div className="lg:col-span-6 space-y-6 sm:space-y-8">
+          {/* Eyebrow Pill */}
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#00f2a9]/10 border border-[#00f2a9]/25 text-[#00f2a9] text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00f2a9] animate-pulse" />
+            <span>BACKEND PRACTICE PLATFORM</span>
+          </div>
+
+          {/* Main Headline */}
+          <div className="space-y-1 sm:space-y-2 font-display font-black tracking-tight leading-[1.05]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl text-white">
+              Practice Real Backends.
             </h1>
-            <p className="text-zinc-400 text-sm sm:text-base leading-relaxed max-w-lg font-normal">
-              Practice hands-on backend challenges covering REST APIs, concurrency, idempotency, and automated test verification.
-            </p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl text-[#00f2a9]">
+              Level Up Your Skills.
+            </h1>
           </div>
 
-          {/* Key platform benefits */}
-          <div className="space-y-4 text-xs sm:text-sm text-zinc-300">
-            <div className="flex items-center space-x-3">
-              <CheckCircle2 className="w-4 h-4 text-[#00f2a9] shrink-0" />
-              <span>Real-time benchmark assertion telemetry against local or cloud endpoints</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <CheckCircle2 className="w-4 h-4 text-[#00f2a9] shrink-0" />
-              <span>Track progress across 4 core backend engineering disciplines</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <CheckCircle2 className="w-4 h-4 text-[#00f2a9] shrink-0" />
-              <span>Solve rate limiting, webhook verification, and distributed lock scenarios</span>
-            </div>
-          </div>
+          <p className="text-sm sm:text-base text-[#94a3b8] leading-relaxed max-w-lg font-normal">
+            Sign in to track your challenge completions, latency benchmarks, and test assertions across real production scenarios.
+          </p>
 
-          <div className="p-4 rounded-2xl bg-[#080B10] border border-white/[0.08] text-xs text-zinc-400 space-y-1">
-            <div className="font-semibold text-zinc-200">Firebase Authentication</div>
-            <div>Secure, token-based session management across web and local CLI testing runners.</div>
+          {/* Live Platform Endpoint Card (Matching Home Page Floating Cards) */}
+          <div className="rounded-2xl bg-[#090d14]/90 border border-white/[0.1] backdrop-blur-xl p-5 shadow-2xl space-y-3 font-sans text-xs max-w-lg">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-2.5">
+              <div className="flex items-center space-x-2">
+                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold font-mono text-[11px] border border-emerald-500/20">
+                  POST
+                </span>
+                <span className="font-mono text-zinc-300">/api/v1/users</span>
+              </div>
+              <span className="text-[11px] text-[#00f2a9] font-mono font-semibold">201 CREATED &bull; 12.4ms</span>
+            </div>
+
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center space-x-2 text-zinc-300 text-[11px]">
+                <Check className="w-3.5 h-3.5 text-[#00f2a9] stroke-[3]" />
+                <span>RFC-5322 payload schema validated</span>
+              </div>
+              <div className="flex items-center space-x-2 text-zinc-300 text-[11px]">
+                <Check className="w-3.5 h-3.5 text-[#00f2a9] stroke-[3]" />
+                <span>Deterministic duplicate email collision handling</span>
+              </div>
+              <div className="flex items-center space-x-2 text-zinc-300 text-[11px]">
+                <Check className="w-3.5 h-3.5 text-[#00f2a9] stroke-[3]" />
+                <span>Response contract headers verified</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Right Column: Sign In Form Box */}
-        <div className="lg:col-span-6 max-w-md mx-auto w-full">
-          <div className="rounded-2xl bg-[#080B10] border border-white/[0.08] p-6 sm:p-8 shadow-2xl space-y-6">
-            <div className="space-y-1">
-              <h2 className="text-xl font-bold text-white font-display">Welcome back</h2>
-              <p className="text-xs text-zinc-400">Sign in with your Firebase account credentials.</p>
+        {/* Right Column: Sign In Card */}
+        <div className="lg:col-span-6 w-full max-w-md mx-auto lg:ml-auto">
+          <div className="rounded-3xl bg-[#080c14]/90 border border-white/[0.12] backdrop-blur-2xl p-7 sm:p-9 shadow-[0_20px_50px_rgba(0,0,0,0.8)] space-y-6">
+            <div className="space-y-1.5 text-left">
+              <h2 className="text-2xl font-black text-white font-display tracking-tight">
+                Welcome back
+              </h2>
+              <p className="text-xs sm:text-sm text-[#94a3b8]">
+                Sign in to your APIRun account to continue.
+              </p>
             </div>
 
-            {/* Error Alert */}
+            {/* Error Message */}
             {error && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-start space-x-2">
+              <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-xs flex items-start space-x-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>{error}</span>
+                <span className="leading-relaxed">{error}</span>
               </div>
             )}
 
-            {/* Google Sign In Button */}
+            {/* Google OAuth Button */}
             <button
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-zinc-200 hover:text-white transition-all text-xs font-semibold flex items-center justify-center space-x-3 group"
+              className="w-full py-3 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.12] hover:border-white/[0.2] text-white transition-all text-xs sm:text-sm font-semibold flex items-center justify-center space-x-3 active:scale-[0.99]"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
@@ -170,42 +216,42 @@ export default function SignInPage() {
             {/* Divider */}
             <div className="relative flex items-center justify-center">
               <div className="border-t border-white/[0.08] w-full" />
-              <span className="bg-[#080B10] px-3 text-[11px] text-zinc-500 uppercase tracking-wider shrink-0">
+              <span className="bg-[#080c14] px-3 text-[11px] text-zinc-500 uppercase tracking-wider shrink-0 font-medium">
                 Or with email
               </span>
               <div className="border-t border-white/[0.08] w-full" />
             </div>
 
             {/* Email / Password Form */}
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-              <div className="space-y-1.5">
-                <label className="text-zinc-300 font-medium">Email address</label>
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
+              <div className="space-y-1.5 text-left">
+                <label className="text-zinc-300 font-medium text-xs">Email</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="developer@apirun.dev"
-                    className="w-full pl-9 pr-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#F8B81F] transition-colors"
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-[#05070a]/90 border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs sm:text-sm"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 text-left">
                 <div className="flex items-center justify-between">
-                  <label className="text-zinc-300 font-medium">Password</label>
+                  <label className="text-zinc-300 font-medium text-xs">Password</label>
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-9 pr-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#F8B81F] transition-colors"
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-[#05070a]/90 border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs sm:text-sm"
                   />
                 </div>
               </div>
@@ -213,32 +259,33 @@ export default function SignInPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 px-4 rounded-xl bg-[#F8B81F] hover:bg-[#e0a213] text-black font-semibold transition-all shadow-md flex items-center justify-center space-x-2 text-xs"
+                className="w-full py-3 px-4 rounded-xl bg-[#00f2a9] hover:bg-[#00d696] text-black font-bold font-display text-xs sm:text-sm transition-all shadow-[0_4px_20px_rgba(0,242,169,0.25)] flex items-center justify-center space-x-2 active:scale-[0.99] disabled:opacity-50"
               >
                 {loading ? (
                   <span>Signing in...</span>
                 ) : (
                   <>
-                    <span>Sign In</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <span>Sign In to Account</span>
+                    <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
             </form>
 
-            <div className="pt-2 text-center text-xs text-zinc-400">
+            <div className="pt-1 text-center text-xs text-zinc-400">
               Don&apos;t have an account?{' '}
-              <Link href="/sign-up" className="text-[#F8B81F] hover:underline font-semibold">
+              <Link href="/sign-up" className="text-[#00f2a9] hover:underline font-semibold">
                 Sign Up
               </Link>
             </div>
           </div>
         </div>
+
       </main>
 
-      {/* Footer */}
-      <footer className="w-full px-6 py-4 border-t border-white/[0.06] text-center text-xs text-zinc-500">
-        APIRun Backend Engineering Labs &bull; Powered by Firebase Auth
+      {/* 4. Footer */}
+      <footer className="relative z-10 w-full py-6 text-center text-xs text-zinc-500 border-t border-white/[0.06] bg-[#050708]/60 backdrop-blur-sm">
+        APIRun Backend Engineering Platform &bull; Real Labs &bull; Production Ready
       </footer>
     </div>
   );
