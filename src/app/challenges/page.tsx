@@ -1,19 +1,40 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { challenges as defaultChallenges, initialUserStats } from '@/data/challenges';
 import { BackendRankNavbar } from '@/components/BackendRankNavbar';
 import { Sidebar } from '@/components/Sidebar';
 import { DashboardView } from '@/components/DashboardView';
+import { useAuth } from '@/context/AuthContext';
+import { loadUserProgress, applyUserProgressToChallenges } from '@/lib/userProgress';
 import { Challenge, UserStats } from '@/types';
 
 export default function ChallengesPage() {
   const router = useRouter();
-  const [challengesList] = useState<Challenge[]>(defaultChallenges);
-  const [userStats] = useState<UserStats>(initialUserStats);
+  const { user } = useAuth();
+  const [challengesList, setChallengesList] = useState<Challenge[]>(defaultChallenges);
+  const [userStats, setUserStats] = useState<UserStats>(initialUserStats);
   const [selectedDifficulty, setSelectedDifficulty] = useState('ALL');
   const [selectedConcept, setSelectedConcept] = useState('ALL');
+
+  useEffect(() => {
+    async function syncProgress() {
+      const progress = await loadUserProgress(user?.uid);
+      const updatedChallenges = applyUserProgressToChallenges(defaultChallenges, progress);
+      setChallengesList(updatedChallenges);
+
+      const solvedCount = updatedChallenges.filter(c => c.status === 'SOLVED').length;
+      setUserStats(prev => ({
+        ...prev,
+        solvedCount,
+        challengesSolved: solvedCount,
+        currentStreak: progress.streak || prev.currentStreak,
+      }));
+    }
+
+    syncProgress();
+  }, [user?.uid]);
 
   const solvedCount = challengesList.filter(c => c.status === 'SOLVED').length;
   const allConcepts = Array.from(

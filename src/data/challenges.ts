@@ -1,14 +1,14 @@
 import { Challenge, UserStats } from '../types';
 
 export const initialUserStats: UserStats = {
-  solvedCount: 1,
-  challengesSolved: 1,
+  solvedCount: 0,
+  challengesSolved: 0,
   totalChallenges: 8,
-  totalTestsPassed: 11,
-  totalSubmissions: 4,
-  averageLatencyMs: 14.8,
-  currentStreak: 3,
-  rankTitle: 'L2 Backend Engineer',
+  totalTestsPassed: 0,
+  totalSubmissions: 0,
+  averageLatencyMs: 0,
+  currentStreak: 0,
+  rankTitle: 'Backend Engineer',
 };
 
 export const challenges: Challenge[] = [
@@ -21,7 +21,7 @@ export const challenges: Challenge[] = [
     summary: 'Build an API for creating, validating, and retrieving users with proper HTTP status codes.',
     estimatedMinutes: 25,
     concepts: ['HTTP', 'REST', 'Validation'],
-    status: 'SOLVED',
+    status: 'UNSOLVED',
     problemStatement: `Design and implement a standard RESTful User Management API.
 
 The API must allow clients to register new users, fetch user lists, and inspect individual user profiles by unique ID. You must strictly adhere to HTTP protocol semantics, including correct status code usage (201, 200, 400, 404, 409, 422) and accurate Content-Type response headers.`,

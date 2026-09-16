@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { challenges as defaultChallenges } from '@/data/challenges';
 import { ChallengeDetailView } from '@/components/ChallengeDetailView';
+import { useAuth } from '@/context/AuthContext';
+import { loadUserProgress, recordChallengeSolved, applyUserProgressToChallenges } from '@/lib/userProgress';
 import { notFound } from 'next/navigation';
 import { Challenge } from '@/types';
 
@@ -13,23 +15,24 @@ interface Props {
 
 export default function ChallengeDetailPage({ params }: Props) {
   const router = useRouter();
+  const { user } = useAuth();
   const [challengesList, setChallengesList] = useState<Challenge[]>(defaultChallenges);
 
-  // Safely support both Next.js 14 (synchronous params object) and Next.js 15+ (Promise params)
-  const [slug, setSlug] = useState<string>(() => {
-    if (params && typeof params.slug === 'string') return params.slug;
-    return '';
-  });
+  // Unwrap params using React 19 use()
+  const resolvedParams = params && typeof (params as any).then === 'function'
+    ? React.use(params as Promise<{ slug: string }>)
+    : (params as { slug: string });
 
+  const slug = resolvedParams?.slug || '';
+
+  // Synchronize challenge state with user's personal Firestore progress
   useEffect(() => {
-    if (params && typeof params.then === 'function') {
-      params.then((p: any) => {
-        if (p?.slug) setSlug(p.slug);
-      });
-    } else if (params?.slug) {
-      setSlug(params.slug);
+    async function syncProgress() {
+      const progress = await loadUserProgress(user?.uid);
+      setChallengesList(applyUserProgressToChallenges(defaultChallenges, progress));
     }
-  }, [params]);
+    syncProgress();
+  }, [user?.uid]);
 
   const challenge = challengesList.find(c => c.slug === slug);
 
@@ -41,10 +44,18 @@ export default function ChallengeDetailPage({ params }: Props) {
     notFound();
   }
 
-  const handleChallengeSolved = (challengeId: string) => {
+  const handleChallengeSolved = async (challengeId: string) => {
+    // 1. Optimistic local state update
     setChallengesList(prev =>
       prev.map(c => c.id === challengeId ? { ...c, status: 'SOLVED' } : c)
     );
+
+    // 2. Persist to Firestore under user document
+    try {
+      await recordChallengeSolved(user?.uid, challengeId);
+    } catch (err) {
+      console.error('Failed to save challenge solve to Firestore:', err);
+    }
   };
 
   return (

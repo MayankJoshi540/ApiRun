@@ -1,16 +1,37 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { challenges as defaultChallenges, initialUserStats } from '@/data/challenges';
 import { BackendRankNavbar } from '@/components/BackendRankNavbar';
 import { ProgressView } from '@/components/ProgressView';
+import { useAuth } from '@/context/AuthContext';
+import { loadUserProgress, applyUserProgressToChallenges } from '@/lib/userProgress';
 import { Challenge, UserStats } from '@/types';
 
 export default function ProgressPage() {
   const router = useRouter();
-  const [challengesList] = useState<Challenge[]>(defaultChallenges);
-  const [userStats] = useState<UserStats>(initialUserStats);
+  const { user } = useAuth();
+  const [challengesList, setChallengesList] = useState<Challenge[]>(defaultChallenges);
+  const [userStats, setUserStats] = useState<UserStats>(initialUserStats);
+
+  useEffect(() => {
+    async function syncProgress() {
+      const progress = await loadUserProgress(user?.uid);
+      const updatedChallenges = applyUserProgressToChallenges(defaultChallenges, progress);
+      setChallengesList(updatedChallenges);
+
+      const solvedCount = updatedChallenges.filter(c => c.status === 'SOLVED').length;
+      setUserStats(prev => ({
+        ...prev,
+        solvedCount,
+        challengesSolved: solvedCount,
+        currentStreak: progress.streak || prev.currentStreak,
+      }));
+    }
+
+    syncProgress();
+  }, [user?.uid]);
 
   const solvedCount = challengesList.filter(c => c.status === 'SOLVED').length;
 
@@ -25,7 +46,7 @@ export default function ProgressPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased relative">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative">
       <BackendRankNavbar
         activeTab="progress"
         onSelectTab={handleNavigate}
@@ -33,7 +54,7 @@ export default function ProgressPage() {
         totalCount={challengesList.length}
       />
 
-      <main className="pb-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <ProgressView
           userStats={userStats}
           challenges={challengesList}
