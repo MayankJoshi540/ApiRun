@@ -1,5 +1,6 @@
 import React from 'react';
-import { ChevronDown } from '@/components/ui/GoogleIcon';
+import Link from 'next/link';
+import { ChevronDown, ArrowRight } from '@/components/ui/GoogleIcon';
 import { HeroBackground } from './HeroBackground';
 import { HeroButtons } from './HeroButtons';
 import { FloatingCodeCard } from './FloatingCodeCard';
@@ -36,6 +37,22 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
 
       {/* 4. Central Hero Content Container with Staggered Entrance Reveal */}
       <div className="relative z-20 max-w-xl sm:max-w-2xl lg:max-w-3xl 2xl:max-w-4xl mx-auto flex flex-col items-center text-center space-y-5 sm:space-y-6 my-auto pt-2 pb-4 px-4">
+        
+        {/* Active Development & Feedback Announcement Pill */}
+        <Link
+          href="/feedback"
+          className="animate-hero-1 inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 text-xs font-medium text-emerald-400 transition-all duration-300 group shadow-[0_0_25px_rgba(16,185,129,0.18)] hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <span className="flex h-2 w-2 relative">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span className="text-slate-300 font-normal">Active Development</span>
+          <span className="text-emerald-500/40 hidden sm:inline">&bull;</span>
+          <span className="font-semibold text-emerald-400">Accepting Feedback &amp; Ideas</span>
+          <ArrowRight className="w-3.5 h-3.5 text-emerald-400 transition-transform duration-200 group-hover:translate-x-0.5" />
+        </Link>
+
         {/* 3-Line Headline strictly bounded and centered with Staggered Fade Up */}
         <div className="space-y-1 font-display font-black tracking-tight leading-[0.98] sm:leading-[0.94] max-w-lg sm:max-w-xl lg:max-w-2xl 2xl:max-w-3xl mx-auto">
           <h1 className="animate-hero-1 text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-white">
