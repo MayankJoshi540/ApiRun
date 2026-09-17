@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Trash2, Copy, Check } from 'lucide-react';
+import { Terminal, Trash2, Copy, Check } from '@/components/ui/GoogleIcon';
 
 export interface LogEntry {
   timestamp: string;
