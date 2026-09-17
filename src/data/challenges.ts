@@ -212,7 +212,7 @@ The API must allow clients to register new users, fetch user lists, and inspect 
         id: 'tc-5',
         name: 'Returns 404 for non-existent user ID',
         category: 'Contract',
-        description: 'GEU /users/99999 returns HTTP 404 Not Found, not a 500 error.',
+        description: 'GET /users/99999 returns HTTP 404 Not Found, not a 500 error.',
         endpoint: '/users/99999',
         method: 'GET',
         expectedStatus: 404,
@@ -246,62 +246,44 @@ interface User {
 
 // In-memory data store
 const users: User[] = [];
+let nextId = 1;
 
-// Simple RFC email regex validator
+// Helper: Basic RFC email regex validator
 const isValidEmail = (email: string): boolean => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
 };
 
-// POST /users - Create a new user
+// TODO 1: Implement POST /users
+// - Validate required fields (name, email). Return 400 if missing.
+// - Trim name, normalize email to lowercase.
+// - Validate email format. Return 422 if invalid.
+// - Reject duplicate email with 409 Conflict ({"error": "email_already_exists"}).
+// - Persist user with auto-increment ID and ISO createdAt.
+// - Return 201 Created with the new user object.
 app.post('/users', (req: Request, res: Response) => {
-  const { name, email } = req.body;
-
-  // 1. Check required fields
-  if (!name || typeof name !== 'string' || !email || typeof email !== 'string') {
-    return res.status(400).json({ error: 'missing_required_field' });
-  }
-
-  const trimmedName = name.trim();
-  const normalizedEmail = email.trim().toLowerCase();
-
-  // 2. Validate email format
-  if (!isValidEmail(normalizedEmail)) {
-    return res.status(422).json({ error: 'invalid_email_format' });
-  }
-
-  // 3. Check for duplicate email
-  const existingUser = users.find(u => u.email === normalizedEmail);
-  if (existingUser) {
-    return res.status(409).json({ error: 'email_already_exists' });
-  }
-
-  // 4. Save and return new user
-  const newUser: User = {
-    id: users.length + 1,
-    name: trimmedName,
-    email: normalizedEmail,
-    createdAt: new Date().toISOString(),
-  };
-
-  users.push(newUser);
-  return res.status(201).json(newUser);
+  // TODO: Your implementation here
+  return res.status(501).json({ error: 'not_implemented' });
 });
 
-// GET /users - List all users
+// TODO 2: Implement GET /users
+// - Return 200 OK with list of users: { data: users, total: users.length }
 app.get('/users', (_req: Request, res: Response) => {
-  return res.status(200).json({ data: users, total: users.length });
+  // TODO: Your implementation here
+  return res.status(501).json({ error: 'not_implemented' });
 });
 
-// GET /users/:id - Fetch user by ID
+// TODO 3: Implement GET /users/:id
+// - Look up user by numeric ID. Return 200 with user if found, or 404 ({"error": "user_not_found"}).
 app.get('/users/:id', (req: Request, res: Response) => {
-  const id = parseInt(req.params.id, 10);
-  const user = users.find(u => u.id === id);
+  // TODO: Your implementation here
+  return res.status(501).json({ error: 'not_implemented' });
+});
 
-  if (!user) {
-    return res.status(404).json({ error: 'user_not_found' });
-  }
-
-  return res.status(200).json(user);
+// TODO 4: Implement DELETE /users/:id
+// - Delete user by ID. Return 204 No Content, or 404 if not found.
+app.delete('/users/:id', (req: Request, res: Response) => {
+  // TODO: Your implementation here
+  return res.status(501).json({ error: 'not_implemented' });
 });
 
 export default app;`,
@@ -334,59 +316,8 @@ var emailRegex = regexp.MustCompile(\`^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a
 
 func handleUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-	switch r.Method {
-	case http.MethodPost:
-		var body struct {
-			Name  string \`json:"name"\`
-			Email string \`json:"email"\`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Name == "" || body.Email == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{"error": "missing_required_field"})
-			return
-		}
-
-		name := strings.TrimSpace(body.Name)
-		email := strings.ToLower(strings.TrimSpace(body.Email))
-
-		if !emailRegex.MatchString(email) {
-			w.WriteHeader(http.StatusUnprocessableEntity)
-			json.NewEncoder(w).Encode(map[string]string{"error": "invalid_email_format"})
-			return
-		}
-
-		store.Lock()
-		defer store.Unlock()
-
-		for _, u := range store.users {
-			if u.Email == email {
-				w.WriteHeader(http.StatusConflict)
-				json.NewEncoder(w).Encode(map[string]string{"error": "email_already_exists"})
-				return
-			}
-		}
-
-		newUser := User{
-			ID:        len(store.users) + 1,
-			Name:      name,
-			Email:     email,
-			CreatedAt: time.Now().UTC(),
-		}
-		store.users = append(store.users, newUser)
-
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(newUser)
-
-	case http.MethodGet:
-		store.RLock()
-		defer store.RUnlock()
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{"data": store.users, "total": len(store.users)})
-
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-	}
+	// TODO: Implement REST handlers for POST /users and GET /users
+	w.WriteHeader(http.StatusNotImplemented)
 }
 
 func main() {
@@ -407,42 +338,15 @@ class UserCreate(BaseModel):
 EMAIL_REGEX = r"^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
 users_db = []
 
+# TODO: Implement POST /users, GET /users, GET /users/{id}
 @app.post("/users", status_code=status.HTTP_201_CREATED)
 def create_user(payload: UserCreate):
-    name = payload.name.strip()
-    email = payload.email.strip().lower()
-
-    if not name or not email:
-        raise HTTPException(status_code=400, detail={"error": "missing_required_field"})
-
-    if not re.match(EMAIL_REGEX, email):
-        raise HTTPException(status_code=422, detail={"error": "invalid_email_format"})
-
-    if any(u["email"] == email for u in users_db):
-        raise HTTPException(status_code=409, detail={"error": "email_already_exists"})
-
-    new_user = {
-        "id": len(users_db) + 1,
-        "name": name,
-        "email": email,
-        "createdAt": datetime.utcnow().isoformat() + "Z"
-    }
-    users_db.append(new_user)
-    return new_user
-
-@app.get("/users")
-def get_users():
-    return {"data": users_db, "total": len(users_db)}
-
-@app.get("/users/{user_id}")
-def get_user_by_id(user_id: int):
-    user = next((u for u in users_db if u["id"] == user_id), None)
-    if not user:
-        raise HTTPException(status_code=404, detail={"error": "user_not_found"})
-    return user`
+    # TODO: Implement validation and persistence
+    raise HTTPException(status_code=501, detail={"error": "not_implemented"})
+`
     }
   },
-   {
+  {
     id: 'url-shortener',
     title: 'URL Shortener API',
     slug: 'url-shortener',
@@ -456,7 +360,7 @@ def get_user_by_id(user_id: int):
     requirements: [
       { id: 'u1', title: 'POST /shorten endpoint', detail: 'Accepts url and optional customAlias. Returns 201 Created with shortCode.', isCritical: true, badge: 'REST' },
       { id: 'u2', title: 'GET /:code Redirection', detail: 'Responds with 302 Found and Location header. If not found, return 404.', isCritical: true, badge: 'HTTP' },
-      { id: 'u3', title: 'Click Counter Analytics', detail: 'GEU /analytics/:code returns clicks count, createdAt, originalUrl.', isCritical: false, badge: 'Database' }
+      { id: 'u3', title: 'Click Counter Analytics', detail: 'GET /analytics/:code returns clicks count, createdAt, originalUrl.', isCritical: false, badge: 'Database' }
     ],
     constraints: ['Short codes must be alphanumeric [0-9a-zA-Z]', 'Reject malformed URL protocols with 400'],
     endpoints: [
@@ -495,9 +399,9 @@ def get_user_by_id(user_id: int):
       }
     ],
     testCases: [
-      { id: 'u-tc1', name: 'Creates short code for valid URL', category: 'Contract', description: 'POST /shorten returns 201 and shortCode.', endpoint: '/shorten', method: 'POST', requestPayload: JSON.stringify({ url: 'https://kernel.org' }), expectedStatus: 201 },
+      { id: 'u-tc1', name: 'Creates short code for valid URL', category: 'Contract', description: 'POST /shorten returns 201 and shortCode.', endpoint: '/shorten', method: 'POST', requestPayload: JSON.stringify({ url: 'https://kernel.org' }), expectedStatus: 201, expectedResponseSnippet: 'shortCode' },
       { id: 'u-tc2', name: 'Redirects with HTTP 302', category: 'Contract', description: 'GET /:code yields 302 redirect.', endpoint: '/a1b2c3', method: 'GET', expectedStatus: 302 },
-      { id: 'u-tc3', name: 'Rejects malformed URL protocols', category: 'Validation', description: 'Rejects non-http URLs with 400.', endpoint: '/shorten', method: 'POST', requestPayload: JSON.stringify({ url: 'javascript:alert(1)' }), expectedStatus: 400 }
+      { id: 'u-tc3', name: 'Rejects malformed URL protocols', category: 'Validation', description: 'Rejects non-http URLs with 400.', endpoint: '/shorten', method: 'POST', requestPayload: JSON.stringify({ url: 'javascript:alert(1)' }), expectedStatus: 400, expectedResponseSnippet: 'invalid_url_protocol' }
     ],
     starterCode: {
       nodejs: `import express, { Request, Response } from 'express';
@@ -524,42 +428,22 @@ const isValidUrl = (urlString: string): boolean => {
   }
 };
 
-// POST /shorten - Create shortened URL
+// TODO 1: Implement POST /shorten
+// - Validate url is present and valid http/https (return 400 if invalid).
+// - Generate unique short code or use customAlias if provided.
+// - If customAlias already exists, return 409 Conflict ({"error": "alias_already_exists"}).
+// - Save to urlStore and return 201 Created with { shortCode, shortUrl: \`http://rank.sh/\${shortCode}\` }.
 app.post('/shorten', (req: Request, res: Response) => {
-  const { url, customAlias } = req.body;
-
-  if (!url || typeof url !== 'string' || !isValidUrl(url)) {
-    return res.status(400).json({ error: 'invalid_url_protocol' });
-  }
-
-  const shortCode = customAlias || crypto.randomBytes(4).toString('base64url');
-
-  if (urlStore.has(shortCode)) {
-    return res.status(409).json({ error: 'alias_already_exists' });
-  }
-
-  const record: ShortLink = {
-    code: shortCode,
-    originalUrl: url,
-    clicks: 0,
-    createdAt: new Date().toISOString(),
-  };
-
-  urlStore.set(shortCode, record);
-  return res.status(201).json({ shortCode, shortUrl: \`http://rank.sh/\${shortCode}\` });
+  // TODO: Your implementation here
+  return res.status(501).json({ error: 'not_implemented' });
 });
 
-// GET /:code - Redirect to original URL
+// TODO 2: Implement GET /:code
+// - Look up code in urlStore. Return 404 ({"error": "shortcode_not_found"}) if missing.
+// - Increment clicks count and return 302 redirect to originalUrl.
 app.get('/:code', (req: Request, res: Response) => {
-  const { code } = req.params;
-  const link = urlStore.get(code);
-
-  if (!link) {
-    return res.status(404).json({ error: 'shortcode_not_found' });
-  }
-
-  link.clicks += 1;
-  return res.redirect(302, link.originalUrl);
+  // TODO: Your implementation here
+  return res.status(501).json({ error: 'not_implemented' });
 });
 
 export default app;`,
@@ -589,53 +473,8 @@ var (
 )
 
 func handleShorten(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	var req struct {
-		URL         string \`json:"url"\`
-		CustomAlias string \`json:"customAlias"\`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "invalid_payload"})
-		return
-	}
-
-	parsedURL, err := url.ParseRequestURI(req.URL)
-	if err != nil || (parsedURL.Scheme != "http" && parsedURL.Scheme != "https") {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "invalid_url_protocol"})
-		return
-	}
-
-	mu.Lock()
-	defer mu.Unlock()
-
-	code := req.CustomAlias
-	if code == "" {
-		b := make([]byte, 4)
-		rand.Read(b)
-		code = base64.RawURLEncoding.EncodeToString(b)
-	}
-
-	if _, exists := store[code]; exists {
-		w.WriteHeader(http.StatusConflict)
-		json.NewEncoder(w).Encode(map[string]string{"error": "alias_already_exists"})
-		return
-	}
-
-	link := &ShortLink{
-		Code:        code,
-		OriginalURL: req.URL,
-		Clicks:      0,
-		CreatedAt:   time.Now().UTC(),
-	}
-	store[code] = link
-
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{
-		"shortCode": code,
-		"shortUrl":  "http://rank.sh/" + code,
-	})
+	// TODO: Implement POST /shorten
+	w.WriteHeader(http.StatusNotImplemented)
 }
 
 func main() {
@@ -659,33 +498,9 @@ url_db = {}
 
 @app.post("/shorten", status_code=status.HTTP_201_CREATED)
 def shorten_url(payload: ShortenRequest):
-    if not payload.url.startswith(("http://", "https://")):
-        raise HTTPException(status_code=400, detail={"error": "invalid_url_protocol"})
-
-    code = payload.customAlias or secrets.token_urlsafe(4)
-
-    if code in url_db:
-        raise HTTPException(status_code=409, detail={"error": "alias_already_exists"})
-
-    url_db[code] = {
-        "shortCode": code,
-        "originalUrl": payload.url,
-        "clicks": 0,
-        "createdAt": datetime.utcnow().isoformat() + "Z"
-    }
-
-    return {
-        "shortCode": code,
-        "shortUrl": f"http://rank.sh/{code}"
-    }
-
-@app.get("/{code}")
-def redirect_url(code: str):
-    link = url_db.get(code)
-    if not link:
-        raise HTTPException(status_code=404, detail={"error": "shortcode_not_found"})
-    link["clicks"] += 1
-    return RedirectResponse(url=link["originalUrl"], status_code=302)`
+    # TODO: Implement URL shortening logic
+    raise HTTPException(status_code=501, detail={"error": "not_implemented"})
+`
     }
   },
   {
@@ -718,7 +533,45 @@ def redirect_url(code: str):
     testCases: [
       { id: 'l-tc1', name: 'Generates X-Request-Id when omitted', category: 'Contract', description: 'Stamps valid UUIDv4 on outgoing headers.', endpoint: '/api/v1/ping', method: 'GET', expectedStatus: 200 },
       { id: 'l-tc2', name: 'Preserves existing client trace ID', category: 'Edge Case', description: 'Echoes inbound X-Request-ID unaltered.', endpoint: '/api/v1/ping', method: 'GET', expectedStatus: 200 }
-    ]
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
+
+const app = express();
+app.use(express.json());
+
+// TODO: Implement Request Logger Middleware
+// - If incoming request has 'x-request-id' header, preserve it; otherwise generate UUIDv4.
+// - Attach 'x-request-id' header to response.
+// - Measure execution duration and attach 'x-response-time' header in ms.
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const reqId = req.headers['x-request-id'] || crypto.randomUUID();
+  res.setHeader('x-request-id', reqId);
+  next();
+});
+
+app.get('/api/v1/ping', (req: Request, res: Response) => {
+  return res.status(200).json({ status: 'pong' });
+});
+
+export default app;`,
+      go: `package main
+
+import "net/http"
+
+func main() {
+	// TODO: Implement request logger middleware in Go
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, Request
+import time, uuid
+
+app = FastAPI()
+
+# TODO: Implement request logger middleware in FastAPI
+`
+    }
   },
   {
     id: 'rate-limiter',
@@ -753,7 +606,36 @@ def redirect_url(code: str):
       { id: 'rl-tc1', name: 'Allows requests under limit', category: 'Contract', description: 'Decrements X-RateLimit-Remaining.', endpoint: '/api/resource', method: 'GET', expectedStatus: 200 },
       { id: 'rl-tc2', name: 'Returns 429 when 60-request quota breached', category: 'Validation', description: 'Rejects with 429 on excess.', endpoint: '/api/resource', method: 'GET', expectedStatus: 429 },
       { id: 'rl-tc3', name: 'Parallel concurrency race condition safety [Hidden]', category: 'Concurrency', description: '50 simultaneous requests test.', endpoint: '/api/resource', method: 'GET', isHidden: true, expectedStatus: 200 }
-    ]
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response, NextFunction } from 'express';
+
+const app = express();
+app.use(express.json());
+
+const requestLogs = new Map<string, number[]>();
+const LIMIT = 60;
+const WINDOW_MS = 60000;
+
+// TODO: Implement sliding window rate limiter
+app.get('/api/resource', (req: Request, res: Response) => {
+  return res.status(200).json({ data: 'Resource payload' });
+});
+
+export default app;`,
+      go: `package main
+
+import "net/http"
+
+func main() {
+	// TODO: Implement rate limiter in Go
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI
+app = FastAPI()
+# TODO: Implement rate limiter in FastAPI
+`
+    }
   },
   {
     id: 'idempotent-payment-webhook',
@@ -791,7 +673,32 @@ def redirect_url(code: str):
     testCases: [
       { id: 'p-tc1', name: 'Credits account on first arrival', category: 'Contract', description: 'New payment event acknowledges with 200.', endpoint: '/webhooks/stripe', method: 'POST', expectedStatus: 200 },
       { id: 'p-tc2', name: 'Deduplicates identical event without mutation', category: 'Edge Case', description: 'Retried webhook returns 200 without double-crediting.', endpoint: '/webhooks/stripe', method: 'POST', expectedStatus: 200 }
-    ]
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+const processedEvents = new Set<string>();
+
+// TODO: Implement POST /webhooks/stripe
+// - Validate event ID
+// - Deduplicate: return 200 without double-crediting
+app.post('/webhooks/stripe', (req: Request, res: Response) => {
+  const { id } = req.body;
+  if (!id) return res.status(400).json({ error: 'missing_event_id' });
+  processedEvents.add(id);
+  return res.status(200).json({ received: true, status: 'processed' });
+});
+
+export default app;`,
+      go: `package main
+import "net/http"
+func main() { http.ListenAndServe(":8000", nil) }`,
+      python: `from fastapi import FastAPI
+app = FastAPI()`
+    }
   },
   {
     id: 'jwt-auth-refresh',
@@ -823,7 +730,27 @@ def redirect_url(code: str):
     testCases: [
       { id: 'j-tc1', name: 'Issues JWT pair on valid credentials', category: 'Contract', description: 'POST /auth/login yields accessToken.', endpoint: '/auth/login', method: 'POST', expectedStatus: 200 },
       { id: 'j-tc2', name: 'Rejects invalid password with 401', category: 'Validation', description: 'Incorrect password returns 401 Unauthorized.', endpoint: '/auth/login', method: 'POST', expectedStatus: 401 }
-    ]
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+import crypto from 'crypto';
+
+const app = express();
+app.use(express.json());
+
+// TODO: Implement POST /auth/login
+app.post('/auth/login', (req: Request, res: Response) => {
+  // Validate credentials and issue tokens
+  return res.status(501).json({ error: 'not_implemented' });
+});
+
+export default app;`,
+      go: `package main
+import "net/http"
+func main() { http.ListenAndServe(":8000", nil) }`,
+      python: `from fastapi import FastAPI
+app = FastAPI()`
+    }
   },
   {
     id: 'in-memory-kv-ttl',
@@ -853,7 +780,32 @@ def redirect_url(code: str):
     testCases: [
       { id: 'kv-tc1', name: 'Sets and retrieves value', category: 'Contract', description: 'POST then GET returns matching value.', endpoint: '/kv/get/session_89', method: 'GET', expectedStatus: 200 },
       { id: 'kv-tc2', name: 'Key expires after TTL elapsed', category: 'Edge Case', description: 'Returns 404 after TTL expires.', endpoint: '/kv/get/session_89', method: 'GET', expectedStatus: 404 }
-    ]
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+const store = new Map<string, { value: any; expiresAt?: number }>();
+
+// TODO 1: Implement POST /kv/set
+app.post('/kv/set', (req: Request, res: Response) => {
+  return res.status(501).json({ error: 'not_implemented' });
+});
+
+// TODO 2: Implement GET /kv/get/:key
+app.get('/kv/get/:key', (req: Request, res: Response) => {
+  return res.status(501).json({ error: 'not_implemented' });
+});
+
+export default app;`,
+      go: `package main
+import "net/http"
+func main() { http.ListenAndServe(":8000", nil) }`,
+      python: `from fastapi import FastAPI
+app = FastAPI()`
+    }
   },
   {
     id: 'job-queue-worker',
@@ -885,6 +837,30 @@ def redirect_url(code: str):
     testCases: [
       { id: 'q-tc1', name: 'Returns 202 Accepted with job ticket', category: 'Contract', description: 'Acknowledges queued workload.', endpoint: '/jobs/enqueue', method: 'POST', expectedStatus: 202 },
       { id: 'q-tc2', name: 'Moves to DEAD_LETTER after 3 failed retries [Hidden]', category: 'Edge Case', description: 'Verifies DLQ quarantine.', endpoint: '/jobs/job_fail/status', method: 'GET', isHidden: true, expectedStatus: 200 }
-    ]
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+import crypto from 'crypto';
+
+const app = express();
+app.use(express.json());
+
+// TODO 1: Implement POST /jobs/enqueue
+app.post('/jobs/enqueue', (req: Request, res: Response) => {
+  return res.status(501).json({ error: 'not_implemented' });
+});
+
+// TODO 2: Implement GET /jobs/:jobId/status
+app.get('/jobs/:jobId/status', (req: Request, res: Response) => {
+  return res.status(501).json({ error: 'not_implemented' });
+});
+
+export default app;`,
+      go: `package main
+import "net/http"
+func main() { http.ListenAndServe(":8000", nil) }`,
+      python: `from fastapi import FastAPI
+app = FastAPI()`
+    }
   }
 ];
