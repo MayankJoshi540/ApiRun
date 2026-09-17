@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { APIEndpoint as EndpointType } from '../types';
 import { CodeBlock } from './CodeBlock';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight } from '@/components/ui/GoogleIcon';
 
 interface Props {
   endpoint: EndpointType;
