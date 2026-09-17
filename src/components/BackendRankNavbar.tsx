@@ -1,12 +1,11 @@
-'use client';
-
 import React from 'react';
+import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
 import { AuthControls } from './AuthControls';
 
 interface Props {
   activeTab: 'landing' | 'challenges' | 'progress' | 'feedback' | 'dashboard';
-  onSelectTab: (tab: 'landing' | 'challenges' | 'progress' | 'feedback' | 'dashboard') => void;
+  onSelectTab?: (tab: 'landing' | 'challenges' | 'progress' | 'feedback' | 'dashboard') => void;
   solvedCount: number;
   totalCount: number;
   onOpenSearch?: () => void;
@@ -23,8 +22,9 @@ export const BackendRankNavbar: React.FC<Props> = ({
       <div className="max-w-6xl mx-auto pointer-events-auto rounded-full bg-[#05070a]/90 backdrop-blur-xl border border-white/[0.1] px-4 sm:px-6 h-14 flex items-center justify-between transition-colors">
         {/* Brand Logo */}
         <div className="flex items-center space-x-6">
-          <button
-            onClick={() => onSelectTab('landing')}
+          <Link
+            href="/"
+            onClick={() => onSelectTab?.('landing')}
             className="flex items-center space-x-2 text-left shrink-0 transition-transform duration-200 hover:scale-105 active:scale-95 group"
             aria-label="API Run home"
           >
@@ -37,12 +37,13 @@ export const BackendRankNavbar: React.FC<Props> = ({
               <span className="text-white">API</span>
               <span className="text-[#00f2a9]">Run</span>
             </span>
-          </button>
+          </Link>
 
           {/* Navigation Pill Container */}
           <nav className="hidden md:flex items-center p-1 rounded-full bg-[#0c1017] border border-white/[0.08]">
-            <button
-              onClick={() => onSelectTab('challenges')}
+            <Link
+              href="/challenges"
+              onClick={() => onSelectTab?.('challenges')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 activeTab === 'challenges' || activeTab === 'dashboard'
                   ? 'bg-white/[0.1] text-white' 
@@ -50,9 +51,10 @@ export const BackendRankNavbar: React.FC<Props> = ({
               }`}
             >
               Challenges
-            </button>
-            <button
-              onClick={() => onSelectTab('progress')}
+            </Link>
+            <Link
+              href="/progress"
+              onClick={() => onSelectTab?.('progress')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 activeTab === 'progress'
                   ? 'bg-white/[0.1] text-white'
@@ -60,17 +62,18 @@ export const BackendRankNavbar: React.FC<Props> = ({
               }`}
             >
               Progress
-            </button>
-            <button
-              onClick={() => onSelectTab('feedback')}
+            </Link>
+            <Link
+              href="/feedback"
+              onClick={() => onSelectTab?.('feedback')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 activeTab === 'feedback'
-                  ? 'bg-white/[0.1] text-[#00f2a9]'
-                  : 'text-[#94a3b8] hover:text-[#00f2a9]'
+                  ? 'bg-white/[0.1] text-white'
+                  : 'text-[#94a3b8] hover:text-white'
               }`}
             >
               Feedback
-            </button>
+            </Link>
           </nav>
         </div>
 

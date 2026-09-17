@@ -1,10 +1,9 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { AuthControls } from './AuthControls';
 
 interface Props {
-  onNavigate: (route: 'landing' | 'challenges' | 'progress' | 'feedback') => void;
+  onNavigate?: (route: 'landing' | 'challenges' | 'progress' | 'feedback') => void;
   onStartBuilding?: () => void;
 }
 
@@ -31,8 +30,9 @@ export const LandingNavbar: React.FC<Props> = ({ onNavigate }) => {
       >
         {/* Left: Brand Logo {•>} APIRun */}
         <div className="flex items-center gap-6 sm:gap-8">
-          <button
-            onClick={() => onNavigate('landing')}
+          <Link
+            href="/"
+            onClick={() => onNavigate?.('landing')}
             className="flex items-center space-x-2 text-left shrink-0 transition-transform duration-300 hover:scale-105 active:scale-95 group"
             aria-label="API Run home"
           >
@@ -45,7 +45,7 @@ export const LandingNavbar: React.FC<Props> = ({ onNavigate }) => {
               <span className="text-white">API</span>
               <span className="text-[#00f2a9]">Run</span>
             </span>
-          </button>
+          </Link>
         </div>
 
         {/* Center: Pill Navigation Group */}
@@ -53,24 +53,27 @@ export const LandingNavbar: React.FC<Props> = ({ onNavigate }) => {
           className="hidden sm:flex items-center p-1 rounded-full bg-[#0c1017]/90 border border-white/[0.08] shadow-inner" 
           aria-label="Primary navigation"
         >
-          <button
-            onClick={() => onNavigate('challenges')}
+          <Link
+            href="/challenges"
+            onClick={() => onNavigate?.('challenges')}
             className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-white transition-all duration-200 hover:bg-white/[0.08]"
           >
             Challenges
-          </button>
-          <button
-            onClick={() => onNavigate('progress')}
+          </Link>
+          <Link
+            href="/progress"
+            onClick={() => onNavigate?.('progress')}
             className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-white transition-all duration-200 hover:bg-white/[0.08]"
           >
             Progress
-          </button>
-          <button
-            onClick={() => onNavigate('feedback')}
-            className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-[#00f2a9] transition-all duration-200 hover:bg-white/[0.08]"
+          </Link>
+          <Link
+            href="/feedback"
+            onClick={() => onNavigate?.('feedback')}
+            className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-white transition-all duration-200 hover:bg-white/[0.08]"
           >
             Feedback
-          </button>
+          </Link>
         </nav>
 
         {/* Right Section: Auth Controls (Sign In / Sign Up / User Avatar) */}

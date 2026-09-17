@@ -45,9 +45,10 @@ export default function ChallengesPage() {
     router.push(`/challenges/${challenge.slug}`);
   };
 
-  const handleNavigate = (tab: 'landing' | 'challenges' | 'progress' | 'dashboard') => {
+  const handleNavigate = (tab: 'landing' | 'challenges' | 'progress' | 'feedback' | 'dashboard') => {
     if (tab === 'landing') router.push('/');
     else if (tab === 'progress') router.push('/progress');
+    else if (tab === 'feedback') router.push('/feedback');
     else router.push('/challenges');
   };
 

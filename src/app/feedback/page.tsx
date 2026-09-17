@@ -137,7 +137,7 @@ export default function FeedbackPage() {
           {isSuccess ? (
             /* Success Screen */
             <div className="py-8 text-center space-y-6 animate-in fade-in zoom-in-95 duration-200">
-              <div className="w-16 h-16 rounded-2xl bg-[#00f2a9]/10 border border-[#00f2a9]/30 flex items-center justify-center mx-auto text-[#00f2a9] shadow-[0_0_30px_rgba(0,242,169,0.2)]">
+              <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-[#00f2a9]/40 flex items-center justify-center mx-auto text-[#00f2a9]">
                 <Check className="w-8 h-8 stroke-[3]" />
               </div>
 
@@ -148,11 +148,6 @@ export default function FeedbackPage() {
                 <p className="text-sm text-zinc-400 max-w-md mx-auto">
                   Thank you for contributing! Your feedback has been saved to your local machine file:
                 </p>
-                {savedLocation && (
-                  <div className="inline-block mt-2 px-4 py-2 rounded-xl bg-black/60 border border-white/[0.1] text-xs font-mono text-[#00f2a9]">
-                    {savedLocation}
-                  </div>
-                )}
               </div>
 
               <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -165,7 +160,7 @@ export default function FeedbackPage() {
 
                 <button
                   onClick={() => router.push('/challenges')}
-                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-[#00f2a9] hover:bg-[#00d696] text-black text-xs font-bold font-display shadow-md transition-all"
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-white/[0.1] hover:bg-white/[0.16] text-white text-xs font-semibold border border-white/[0.15] transition-all"
                 >
                   <span>Back to Challenges</span>
                   <ArrowRight className="w-4 h-4" />
@@ -199,7 +194,7 @@ export default function FeedbackPage() {
                         onClick={() => setCategory(cat.id)}
                         className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col space-y-1 text-left ${
                           isSelected
-                            ? 'bg-[#00f2a9]/10 border-[#00f2a9]/50 shadow-[0_0_15px_rgba(0,242,169,0.15)] text-white'
+                            ? 'bg-white/[0.08] border-[#00f2a9]/50 text-white'
                             : 'bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.05] text-zinc-400'
                         }`}
                       >
@@ -311,7 +306,7 @@ export default function FeedbackPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 px-6 rounded-xl bg-[#00f2a9] hover:bg-[#00d696] text-black font-bold font-display text-sm transition-all shadow-[0_4px_25px_rgba(0,242,169,0.3)] flex items-center justify-center space-x-2 active:scale-[0.99] disabled:opacity-50"
+                  className="w-full py-3 px-6 rounded-xl bg-[#00f2a9] hover:bg-[#00d696] text-black font-bold font-display text-sm transition-all shadow-sm flex items-center justify-center space-x-2 active:scale-[0.99] disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
