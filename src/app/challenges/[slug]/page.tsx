@@ -44,7 +44,7 @@ export default function ChallengeDetailPage({ params }: Props) {
     notFound();
   }
 
-  const handleChallengeSolved = async (challengeId: string) => {
+  const handleChallengeSolved = async (challengeId: string, submission?: { code: string; language: string; testsPassed: number }) => {
     // 1. Optimistic local state update
     setChallengesList(prev =>
       prev.map(c => c.id === challengeId ? { ...c, status: 'SOLVED' } : c)
@@ -52,7 +52,7 @@ export default function ChallengeDetailPage({ params }: Props) {
 
     // 2. Persist to Firestore under user document
     try {
-      await recordChallengeSolved(user?.uid, challengeId);
+      await recordChallengeSolved(user?.uid, challengeId, submission);
     } catch (err) {
       console.error('Failed to save challenge solve to Firestore:', err);
     }

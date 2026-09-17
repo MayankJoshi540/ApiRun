@@ -66,13 +66,6 @@ export const BackendRankNavbar: React.FC<Props> = ({
 
         {/* Right Controls */}
         <div className="flex items-center space-x-3">
-          {/* Engine Status Badge */}
-          <div className="hidden lg:flex items-center space-x-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] font-mono text-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span className="text-[#8b949e]">ENGINE:</span>
-            <span className="text-emerald-400 font-semibold">ONLINE</span>
-          </div>
-
           {/* Solved Progress Counter */}
           <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs font-mono">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />

@@ -41,7 +41,8 @@ import {
   User as UserIcon
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { loadUserProgress, updateUserProfile } from '@/lib/userProgress';
+import { loadUserProgress, updateUserProfile, UserProgressRecord } from '@/lib/userProgress';
+import { SubmissionHeatmap } from './SubmissionHeatmap';
 
 interface Props {
   userStats: UserStats;
@@ -62,6 +63,9 @@ export const ProgressView: React.FC<Props> = ({
 }) => {
   const { user } = useAuth();
 
+  // Full user progress record
+  const [userProgress, setUserProgress] = useState<UserProgressRecord | null>(null);
+
   // Profile data states
   const [profileBio, setProfileBio] = useState('Practicing production-grade backend engineering with Express, Go, and Python. Focused on resilient APIs, clean validation, and sub-20ms SLAs.');
   const [profileLocation, setProfileLocation] = useState('San Francisco, CA');
@@ -81,10 +85,11 @@ export const ProgressView: React.FC<Props> = ({
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(false);
 
-  // Synchronize profile with Firestore/localStorage
+  // Synchronize profile and submissions with Firestore/localStorage
   useEffect(() => {
     async function fetchProfile() {
       const progress = await loadUserProgress(user?.uid);
+      setUserProgress(progress);
       if (progress?.profile) {
         if (progress.profile.bio) setProfileBio(progress.profile.bio);
         if (progress.profile.location) setProfileLocation(progress.profile.location);
@@ -206,21 +211,6 @@ export const ProgressView: React.FC<Props> = ({
     { id: 'b5', name: 'JWT Auth Sentinel', desc: 'Bearer token crypto verify', date: 'Locked', unlocked: false, icon: Key, color: 'text-zinc-500 bg-zinc-900/40 border-zinc-800/80' },
     { id: 'b6', name: 'Production 50 AC', desc: '50 challenges completed', date: 'Locked', unlocked: false, icon: Award, color: 'text-zinc-500 bg-zinc-900/40 border-zinc-800/80' }
   ];
-
-  // LeetCode Heatmap Weeks Simulation
-  const heatmapWeeks = useMemo(() => {
-    const weeks: { day: number; count: number; active: boolean }[][] = [];
-    for (let w = 0; w < 16; w++) {
-      const week: { day: number; count: number; active: boolean }[] = [];
-      for (let d = 0; d < 7; d++) {
-        const isRecent = w >= 13;
-        const count = isRecent && (d === 1 || d === 2 || d === 3 || d === 4 || d === 5) ? (w === 15 ? 4 : (d % 3) + 1) : 0;
-        week.push({ day: d, count, active: count > 0 });
-      }
-      weeks.push(week);
-    }
-    return weeks;
-  }, []);
 
   // Filtered Submissions List
   const filteredSubmissions = useMemo(() => {
@@ -532,60 +522,12 @@ export const ProgressView: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* 2. LEETCODE SUBMISSION HEATMAP ACTIVITY CALENDAR */}
-          <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 sm:p-7 space-y-5 shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div className="flex items-center space-x-2">
-                <Flame className="w-4 h-4 text-amber-400" />
-                <h2 className="text-sm font-bold text-white">
-                  11 Submissions in 2026
-                </h2>
-              </div>
-              <div className="flex items-center space-x-4 text-xs text-slate-300">
-                <span>Total Active Days: <strong className="text-white font-bold">5</strong></span>
-                <span>•</span>
-                <span>Max Streak: <strong className="text-[#00f2a9] font-bold">12 days</strong></span>
-              </div>
-            </div>
-
-            {/* Heatmap Grid */}
-            <div className="overflow-x-auto pb-2">
-              <div className="inline-flex space-x-1.5 min-w-full">
-                {heatmapWeeks.map((week, wIdx) => (
-                  <div key={wIdx} className="flex flex-col space-y-1.5">
-                    {week.map((cell, dIdx) => (
-                      <div
-                        key={dIdx}
-                        className={`w-3.5 h-3.5 rounded-sm transition-all ${
-                          cell.count >= 4
-                            ? 'bg-[#00f2a9] shadow-sm shadow-[#00f2a9]/40'
-                            : cell.count >= 2
-                            ? 'bg-emerald-500'
-                            : cell.count === 1
-                            ? 'bg-emerald-800/80'
-                            : 'bg-white/[0.05] border border-white/[0.04]'
-                        }`}
-                        title={cell.active ? `${cell.count} submissions` : 'No activity'}
-                      />
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Heatmap Legend */}
-            <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-white/[0.06]">
-              <span>Current Streak: <strong className="text-[#00f2a9] font-bold">3 days</strong></span>
-              <div className="flex items-center space-x-2">
-                <span>Less</span>
-                <span className="w-3 h-3 rounded-sm bg-white/[0.05]" />
-                <span className="w-3 h-3 rounded-sm bg-emerald-800/80" />
-                <span className="w-3 h-3 rounded-sm bg-emerald-500" />
-                <span className="w-3 h-3 rounded-sm bg-[#00f2a9]" />
-                <span>More</span>
-              </div>
-            </div>
-          </div>
+          {/* 2. REAL SUBMISSION HEATMAP ACTIVITY CALENDAR */}
+          <SubmissionHeatmap
+            submissions={userProgress?.submissions || {}}
+            streak={userProgress?.streak || userStats.currentStreak}
+            solvedCount={solvedCount}
+          />
 
           {/* 3. SKILL TAGS (LEETCODE SKILL TAGS MATRIX) */}
           <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 sm:p-7 space-y-5 shadow-xl">

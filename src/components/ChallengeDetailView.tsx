@@ -16,7 +16,7 @@ import { runChallengeTests } from '../utils/challengeRunner';
 interface Props {
   challenge: Challenge;
   onBack: () => void;
-  onChallengeSolved?: (challengeId: string) => void;
+  onChallengeSolved?: (challengeId: string, submission?: { code: string; language: string; testsPassed: number }) => void;
   onNavigateProgress: () => void;
 }
 
@@ -137,7 +137,11 @@ export const ChallengeDetailView: React.FC<Props> = ({
     setIsSubmitting(false);
 
     if (output.allPassed && onChallengeSolved) {
-      onChallengeSolved(challenge.id);
+      onChallengeSolved(challenge.id, {
+        code: editorCodes[selectedEditorLang],
+        language: selectedEditorLang,
+        testsPassed: output.results.filter(r => r.status === 'PASSED').length
+      });
     }
   };
 
