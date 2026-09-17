@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Play, Send, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Play, Send, CheckCircle2, Loader2 } from '@/components/ui/GoogleIcon';
 import { Challenge } from '../types';
 import { DifficultyBadge } from './DifficultyBadge';
 
@@ -55,7 +55,7 @@ export const ChallengeHeader: React.FC<Props> = ({
             </span>
             {isSolved && (
               <span className="inline-flex items-center space-x-1 font-mono text-[11px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/70 px-2 py-0.5 rounded-md font-medium">
-                <CheckCircle2 className="w-3 h-3" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>SOLVED</span>
               </span>
             )}
@@ -82,7 +82,7 @@ export const ChallengeHeader: React.FC<Props> = ({
             className="flex items-center space-x-1.5 px-4 py-1.5 rounded-md bg-[#171c26] text-[#e6edf3] hover:text-white border border-[#262d3a] hover:border-[#374151] text-xs font-medium transition-colors disabled:opacity-50 active:scale-[0.98]"
           >
             {isRunning ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+              <Loader2 className="w-3.5 h-3.5 text-emerald-400" />
             ) : (
               <Play className="w-3.5 h-3.5 text-emerald-400" />
             )}
@@ -93,12 +93,12 @@ export const ChallengeHeader: React.FC<Props> = ({
           <button
             disabled={isRunning || isSubmitting}
             onClick={onSubmitSolution}
-            className="flex items-center space-x-1.5 px-4 py-1.5 rounded-md bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-semibold transition-all disabled:opacity-50 active:scale-[0.98]"
+            className="flex items-center space-x-1.5 px-4 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all disabled:opacity-50 active:scale-[0.98] shadow-sm"
           >
             {isSubmitting ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 text-white" />
             ) : (
-              <Send className="w-3.5 h-3.5" />
+              <Send className="w-3.5 h-3.5 text-white" />
             )}
             <span>{isSubmitting ? 'Submitting...' : 'Submit Solution'}</span>
           </button>
