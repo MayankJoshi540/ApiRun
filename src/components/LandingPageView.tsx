@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { 
   ArrowRight, 
   Terminal, 
@@ -15,27 +16,28 @@ import {
   Zap, 
   Lock, 
   Clock, 
-  Server,
-  Activity,
-  ChevronRight,
-  GitBranch,
-  RefreshCw,
-  ArrowUpRight,
-  Code2,
-  Boxes,
-  Gauge,
-  TerminalSquare,
-  Copy,
-  Flame,
-  Radio,
-  FileCode2,
-  Sliders,
-  CheckCheck,
-  AlertTriangle,
-  Network,
-  Binary,
-  Layers2,
+  Server, 
+  Activity, 
+  ChevronRight, 
+  GitBranch, 
+  RefreshCw, 
+  ArrowUpRight, 
+  Code2, 
+  Boxes, 
+  Gauge, 
+  TerminalSquare, 
+  Copy, 
+  Flame, 
+  Radio, 
+  FileCode2, 
+  Sliders, 
+  CheckCheck, 
+  AlertTriangle, 
+  Network, 
+  Binary, 
+  Layers2, 
   Share2,
+  MessageSquarePlus,
 } from '@/components/ui/GoogleIcon';
 import { Challenge } from '../types';
 import { DifficultyBadge } from './DifficultyBadge';
@@ -802,6 +804,41 @@ export const LandingPageView: React.FC<Props> = ({
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* ACTIVE DEVELOPMENT & COMMUNITY FEEDBACK BANNER */}
+        {/* ========================================================= */}
+        <section className="py-8 px-4 sm:px-6 max-w-5xl mx-auto font-sans">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/40 via-[#080d14] to-slate-900/40 border border-emerald-500/30 p-6 sm:p-8 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_15px_40px_rgba(0,0,0,0.6)]">
+            <div className="flex items-start sm:items-center space-x-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner">
+                <MessageSquarePlus className="w-6 h-6" />
+              </div>
+              <div className="space-y-1 text-left">
+                <div className="flex items-center space-x-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold uppercase tracking-wider border border-emerald-500/30">
+                    Live Early Preview
+                  </span>
+                  <span className="text-xs text-slate-400 hidden sm:inline">Actively expanding challenge library</span>
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                  We&apos;re in active development &mdash; accepting developer feedback!
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-400 max-w-xl leading-relaxed">
+                  Have a real-world API scenario, edge-case challenge idea, or runner suggestion? Help shape APIRun for backend engineers worldwide.
+                </p>
+              </div>
+            </div>
+
+            <Link
+              href="/feedback"
+              className="shrink-0 w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-all shadow-md active:scale-95"
+            >
+              <span>Share Feedback</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </section>
 
