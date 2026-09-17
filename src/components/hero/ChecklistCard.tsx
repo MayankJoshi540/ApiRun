@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check } from '@/components/ui/GoogleIcon';
 
 export const ChecklistCard: React.FC = () => {
   const items = [
@@ -16,8 +16,8 @@ export const ChecklistCard: React.FC = () => {
         <div className="space-y-2.5">
           {items.map((item, idx) => (
             <div key={idx} className="flex items-center space-x-2.5">
-              <div className="w-4 h-4 rounded-full bg-[#00f2a9]/15 border border-[#00f2a9]/60 flex items-center justify-center text-[#00f2a9] shrink-0">
-                <Check className="w-2.5 h-2.5 stroke-[3]" />
+              <div className="w-4 h-4 rounded-full bg-[#10b981]/15 border border-[#10b981]/60 flex items-center justify-center text-[#10b981] shrink-0">
+                <Check className="text-[11px]" />
               </div>
               <span className="text-[11px] 2xl:text-xs font-medium text-[#f1f5f9] tracking-tight">
                 {item}
