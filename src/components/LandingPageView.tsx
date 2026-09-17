@@ -310,14 +310,14 @@ export const LandingPageView: React.FC<Props> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans selection:bg-[#00f2a9] selection:text-black relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans selection:bg-[#10b981] selection:text-black relative overflow-x-hidden">
       {/* 1. Global Page Technical Background Atmosphere (Extends down the entire page) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {/* Continuous Technical Dot Matrix */}
         <div 
           className="absolute inset-0 opacity-[0.08]"
           style={{
-            backgroundImage: 'radial-gradient(rgba(0, 242, 169, 0.35) 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(rgba(16, 185, 129, 0.3) 1px, transparent 1px)',
             backgroundSize: '32px 32px'
           }}
         />
@@ -327,13 +327,12 @@ export const LandingPageView: React.FC<Props> = ({
           className="absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage: `
-              linear-gradient(to right, rgba(0, 242, 169, 0.4) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(0, 242, 169, 0.4) 1px, transparent 1px)
+              linear-gradient(to right, rgba(16, 185, 129, 0.35) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(16, 185, 129, 0.35) 1px, transparent 1px)
             `,
-            backgroundSize: '128px 128px'
+            backgroundSize: '64px 64px'
           }}
         />
-
       </div>
 
       {/* 2. Hero Section */}
@@ -469,7 +468,7 @@ export const LandingPageView: React.FC<Props> = ({
                 <div className="space-y-1.5">
                   <div className="flex justify-between font-sans text-[10px] text-[#94a3b8] font-medium">
                     <span>DEFENSIVE RESPONSE BODY</span>
-                    <span className="text-[#00f2a9] font-semibold font-mono">{currentDemo.latency}</span>
+                    <span className="text-emerald-400 font-semibold font-mono">{currentDemo.latency}</span>
                   </div>
                   <pre className="p-3.5 rounded-xl bg-black/50 border border-white/[0.08] text-emerald-300 font-mono text-[11px] overflow-x-auto leading-relaxed">
                     {currentDemo.responseBody}
@@ -658,7 +657,7 @@ export const LandingPageView: React.FC<Props> = ({
         <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans">
           <div className="text-center space-y-3">
             <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
-              HOW APIRUN EVALUATES
+              VERIFICATION ENGINE
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
               Production evaluation, zero mock fluff
@@ -670,44 +669,44 @@ export const LandingPageView: React.FC<Props> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Step 1 */}
-            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] transition-all space-y-3 backdrop-blur-xl">
-              <div className="font-sans text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-md w-fit">
-                PHASE 01
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-emerald-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
+              <div className="font-mono text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-md w-fit">
+                01 &bull; Sandbox Isolation
               </div>
-              <h3 className="text-sm font-bold text-white">Ephemeral Sandbox</h3>
+              <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Ephemeral Container</h3>
               <p className="text-xs text-[#94a3b8] leading-relaxed">
                 Spins an isolated in-memory container running your Node.js, Go, or Python service in under 50ms.
               </p>
             </div>
 
             {/* Step 2 */}
-            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] transition-all space-y-3 backdrop-blur-xl">
-              <div className="font-sans text-xs font-bold text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-md w-fit">
-                PHASE 02
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-sky-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
+              <div className="font-mono text-[11px] font-bold text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 rounded-md w-fit">
+                02 &bull; Contract Checks
               </div>
-              <h3 className="text-sm font-bold text-white">RFC Contract Verify</h3>
+              <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors">RFC Specification</h3>
               <p className="text-xs text-[#94a3b8] leading-relaxed">
                 Validates exact HTTP status semantics (201 Created, 400, 404, 409, 422, 429) and content-type headers.
               </p>
             </div>
 
             {/* Step 3 */}
-            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] transition-all space-y-3 backdrop-blur-xl">
-              <div className="font-sans text-xs font-bold text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-md w-fit">
-                PHASE 03
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-purple-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
+              <div className="font-mono text-[11px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2.5 py-0.5 rounded-md w-fit">
+                03 &bull; Parallel Fuzzing
               </div>
-              <h3 className="text-sm font-bold text-white">Concurrency Fuzzing</h3>
+              <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors">Concurrency Mutex</h3>
               <p className="text-xs text-[#94a3b8] leading-relaxed">
                 Injects parallel concurrent requests to uncover race conditions, double charges, and deadlock bugs.
               </p>
             </div>
 
             {/* Step 4 */}
-            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] transition-all space-y-3 backdrop-blur-xl">
-              <div className="font-sans text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-md w-fit">
-                PHASE 04
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-amber-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
+              <div className="font-mono text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-md w-fit">
+                04 &bull; Scorecard
               </div>
-              <h3 className="text-sm font-bold text-white">Microsecond Profiling</h3>
+              <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">Latency &amp; Traces</h3>
               <p className="text-xs text-[#94a3b8] leading-relaxed">
                 Generates a detailed execution scorecard with latency p99 distributions and assertion diffs.
               </p>

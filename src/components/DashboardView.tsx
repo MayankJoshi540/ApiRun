@@ -72,35 +72,36 @@ export const DashboardView: React.FC<Props> = ({
   return (
     <div className="flex-1 space-y-6 font-sans">
       {/* 1. Header Banner */}
-      <div className="rounded-2xl bg-[#090d14] border border-white/[0.08] p-6 space-y-5">
+      <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 sm:p-7 space-y-5 shadow-xl">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
           {/* Title and Intro */}
           <div className="space-y-1.5 max-w-2xl">
-            <div className="text-[11px] font-mono font-medium tracking-wider text-emerald-400 uppercase">
-              BACKEND PRACTICE LABS
+            <div className="text-[11px] font-mono font-medium tracking-wider text-emerald-400 uppercase flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>PRODUCTION BACKEND LABS</span>
             </div>
 
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Backend Challenges
             </h1>
 
-            <p className="text-xs sm:text-sm text-[#94a3b8] leading-relaxed">
-              Build and test real RESTful API endpoints against RFC-9110 HTTP specifications, concurrency locks, and edge cases.
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              Build and test real RESTful API endpoints against RFC-9110 HTTP specifications, concurrency locks, and defensive payload validations.
             </p>
           </div>
 
           {/* Quick Stats */}
           <div className="flex items-center space-x-2.5 shrink-0 text-xs font-mono">
-            <div className="px-3 py-2 rounded-xl bg-black/30 border border-white/[0.06]">
-              <span className="text-[#94a3b8]">TOTAL: </span>
+            <div className="px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.08] shadow-inner">
+              <span className="text-slate-400">TOTAL: </span>
               <span className="text-white font-bold">{challenges.length} APIs</span>
             </div>
-            <div className="px-3 py-2 rounded-xl bg-black/30 border border-white/[0.06]">
-              <span className="text-[#94a3b8]">SOLVED: </span>
+            <div className="px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.08] shadow-inner">
+              <span className="text-slate-400">SOLVED: </span>
               <span className="text-emerald-400 font-bold">{solvedCount}</span>
             </div>
-            <div className="px-3 py-2 rounded-xl bg-black/30 border border-white/[0.06]">
-              <span className="text-[#94a3b8]">MASTERY: </span>
+            <div className="px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.08] shadow-inner">
+              <span className="text-slate-400">MASTERY: </span>
               <span className="text-sky-400 font-bold">{completionPercentage}%</span>
             </div>
           </div>
@@ -110,11 +111,11 @@ export const DashboardView: React.FC<Props> = ({
         <div className="pt-4 border-t border-white/[0.06] flex items-center space-x-3">
           <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
             <div 
-              className="h-full bg-emerald-400 rounded-full transition-all duration-300"
+              className="h-full bg-emerald-400 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${Math.max(completionPercentage, 2)}%` }}
             />
           </div>
-          <span className="text-xs font-mono text-[#94a3b8] shrink-0">
+          <span className="text-xs font-mono text-slate-400 shrink-0">
             {solvedCount} of {challenges.length} completed
           </span>
         </div>
@@ -125,18 +126,18 @@ export const DashboardView: React.FC<Props> = ({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           {/* Search Input */}
           <div className="relative flex-1 w-full">
-            <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-[#64748b]" />
+            <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search challenges, routes (e.g. POST /users), Redis locks..."
-              className="w-full pl-9 pr-8 py-2 bg-[#090d14] border border-white/[0.08] rounded-xl text-xs text-white placeholder:text-[#64748b] focus:outline-none focus:border-white/[0.2] font-sans transition-colors"
+              className="w-full pl-9 pr-8 py-2.5 bg-[#0b0f17] border border-white/[0.08] rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 font-sans transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-2.5 text-[#64748b] hover:text-white"
+                className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -144,15 +145,15 @@ export const DashboardView: React.FC<Props> = ({
           </div>
 
           {/* Status Filter Toggle */}
-          <div className="flex items-center rounded-xl bg-[#090d14] border border-white/[0.08] p-1 text-xs w-full sm:w-auto">
+          <div className="flex items-center rounded-xl bg-[#0b0f17] border border-white/[0.08] p-1 text-xs w-full sm:w-auto">
             {(['ALL', 'SOLVED', 'UNSOLVED'] as const).map((status) => (
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`px-3 py-1 rounded-lg font-medium transition-colors flex-1 sm:flex-none ${
+                className={`px-3 py-1.5 rounded-lg font-medium transition-all duration-150 active:scale-[0.97] flex-1 sm:flex-none ${
                   statusFilter === status 
-                    ? 'bg-white/[0.1] text-white font-semibold' 
-                    : 'text-[#94a3b8] hover:text-white'
+                    ? 'bg-white/[0.12] text-white font-semibold shadow-sm' 
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {status === 'ALL' ? 'All' : status === 'SOLVED' ? 'Solved' : 'Unsolved'}
@@ -165,15 +166,15 @@ export const DashboardView: React.FC<Props> = ({
         <div className="flex flex-wrap items-center justify-between gap-2.5 pt-0.5">
           {/* Track Filter */}
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-mono text-[#64748b] mr-1 hidden sm:inline">Track:</span>
+            <span className="text-[11px] font-mono text-slate-500 mr-1 hidden sm:inline">Track:</span>
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-2.5 py-1 rounded-lg text-xs transition-colors border ${
+                className={`px-3 py-1 rounded-xl text-xs transition-all duration-150 active:scale-[0.96] border ${
                   selectedCategory === cat
-                    ? 'bg-white/[0.1] border-white/[0.2] text-white font-medium'
-                    : 'bg-[#090d14] border-white/[0.06] text-[#94a3b8] hover:text-white'
+                    ? 'bg-white/[0.12] border-white/[0.22] text-white font-semibold shadow-sm'
+                    : 'bg-[#0b0f17] border-white/[0.06] text-slate-400 hover:text-white hover:border-white/[0.12]'
                 }`}
               >
                 {cat === 'ALL' ? 'All' : cat}
@@ -183,15 +184,15 @@ export const DashboardView: React.FC<Props> = ({
 
           {/* Difficulty Filter */}
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-mono text-[#64748b] mr-1 hidden sm:inline">Tier:</span>
+            <span className="text-[11px] font-mono text-slate-500 mr-1 hidden sm:inline">Tier:</span>
             {(['ALL', 'BEGINNER', 'INTERMEDIATE', 'ADVANCED'] as const).map((diff) => (
               <button
                 key={diff}
                 onClick={() => onSelectDifficulty(diff)}
-                className={`px-2.5 py-1 rounded-lg text-xs transition-colors border ${
+                className={`px-3 py-1 rounded-xl text-xs transition-all duration-150 active:scale-[0.96] border ${
                   selectedDifficulty === diff
-                    ? 'bg-white/[0.1] border-white/[0.2] text-white font-medium'
-                    : 'bg-[#090d14] border-white/[0.06] text-[#94a3b8] hover:text-white'
+                    ? 'bg-white/[0.12] border-white/[0.22] text-white font-semibold shadow-sm'
+                    : 'bg-[#0b0f17] border-white/[0.06] text-slate-400 hover:text-white hover:border-white/[0.12]'
                 }`}
               >
                 {diff === 'ALL' ? 'All' : diff.charAt(0) + diff.slice(1).toLowerCase()}
@@ -202,51 +203,51 @@ export const DashboardView: React.FC<Props> = ({
 
         {/* Active Filters Summary */}
         {hasActiveFilters && (
-          <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.04] text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-xs">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[#64748b] text-[11px]">Active:</span>
+              <span className="text-slate-400 text-[11px] font-mono">Active:</span>
               
               {selectedCategory !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
+                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
                   <span>track: {selectedCategory}</span>
-                  <button onClick={() => setSelectedCategory('ALL')}><X className="w-3 h-3 ml-1" /></button>
+                  <button onClick={() => setSelectedCategory('ALL')} className="hover:text-emerald-400"><X className="w-3 h-3 ml-1" /></button>
                 </span>
               )}
 
               {selectedDifficulty !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
+                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
                   <span>tier: {selectedDifficulty}</span>
-                  <button onClick={() => onSelectDifficulty('ALL')}><X className="w-3 h-3 ml-1" /></button>
+                  <button onClick={() => onSelectDifficulty('ALL')} className="hover:text-emerald-400"><X className="w-3 h-3 ml-1" /></button>
                 </span>
               )}
 
               {selectedConcept !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-white/[0.06] border border-white/[0.1] text-emerald-400 text-[11px]">
+                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-800/50 text-emerald-400 text-[11px]">
                   <span>concept: {selectedConcept}</span>
-                  <button onClick={() => onSelectConcept('ALL')}><X className="w-3 h-3 ml-1" /></button>
+                  <button onClick={() => onSelectConcept('ALL')} className="hover:text-white"><X className="w-3 h-3 ml-1" /></button>
                 </span>
               )}
 
               {statusFilter !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
+                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
                   <span>status: {statusFilter.toLowerCase()}</span>
-                  <button onClick={() => setStatusFilter('ALL')}><X className="w-3 h-3 ml-1" /></button>
+                  <button onClick={() => setStatusFilter('ALL')} className="hover:text-emerald-400"><X className="w-3 h-3 ml-1" /></button>
                 </span>
               )}
 
               {searchQuery && (
-                <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
+                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
                   <span>query: "{searchQuery}"</span>
-                  <button onClick={() => setSearchQuery('')}><X className="w-3 h-3 ml-1" /></button>
+                  <button onClick={() => setSearchQuery('')} className="hover:text-emerald-400"><X className="w-3 h-3 ml-1" /></button>
                 </span>
               )}
             </div>
 
             <button
               onClick={handleResetFilters}
-              className="text-[11px] font-mono text-[#10b981] hover:underline"
+              className="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 transition-colors font-medium active:scale-95"
             >
-              Reset
+              Reset All
             </button>
           </div>
         )}
@@ -265,21 +266,21 @@ export const DashboardView: React.FC<Props> = ({
           ))
         ) : (
           /* Empty Search State */
-          <div className="rounded-2xl border border-white/[0.06] bg-[#090d14] p-10 text-center space-y-3">
-            <div className="w-10 h-10 rounded-full bg-white/[0.04] flex items-center justify-center mx-auto text-[#64748b]">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0b0f17] p-12 text-center space-y-4 shadow-xl">
+            <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto text-slate-400">
               <Search className="w-5 h-5" />
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 max-w-sm mx-auto">
               <h3 className="text-sm font-bold text-white">No matching challenges found</h3>
-              <p className="text-xs text-[#94a3b8]">
-                Try adjusting your search terms or filters.
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Try adjusting your search criteria, tier filter, or concept selection.
               </p>
             </div>
             <button
               onClick={handleResetFilters}
-              className="px-4 py-1.5 rounded-lg bg-[#10b981] text-black text-xs font-bold transition-colors shadow-sm"
+              className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold transition-all duration-150 active:scale-95 shadow-lg shadow-emerald-500/10"
             >
-              Clear Filters
+              Reset Filters
             </button>
           </div>
         )}

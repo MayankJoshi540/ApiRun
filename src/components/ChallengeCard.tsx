@@ -21,12 +21,12 @@ export const ChallengeCard: React.FC<Props> = ({
   return (
     <div 
       onClick={() => onSelect(challenge)}
-      className={`group relative rounded-xl bg-[#090d14] hover:bg-[#0e131d] border transition-colors duration-200 p-5 mb-3 cursor-pointer select-none ${
+      className={`group relative rounded-2xl bg-[#090d14] hover:bg-[#0c121d] border p-5 mb-3 cursor-pointer select-none transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] active:scale-[0.99] ${
         isSolved 
-          ? 'border-emerald-500/30' 
+          ? 'border-emerald-500/30 hover:border-emerald-500/50' 
           : isInProgress 
-          ? 'border-amber-500/30' 
-          : 'border-white/[0.08] hover:border-white/[0.18]'
+          ? 'border-amber-500/30 hover:border-amber-500/50' 
+          : 'border-white/[0.08] hover:border-emerald-500/30'
       }`}
     >
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
