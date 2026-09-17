@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check } from '@/components/ui/GoogleIcon';
 
 export const TestCard: React.FC = () => {
   return (
@@ -11,8 +11,8 @@ export const TestCard: React.FC = () => {
           <div className="space-y-1.5">
             {/* Header with dot */}
             <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-[#00f2a9]" />
-              <span className="text-xs sm:text-sm font-bold text-[#00f2a9] tracking-tight">
+              <span className="w-2 h-2 rounded-full bg-[#10b981]" />
+              <span className="text-xs sm:text-sm font-bold text-[#10b981] tracking-tight">
                 All tests passed
               </span>
             </div>
@@ -26,8 +26,8 @@ export const TestCard: React.FC = () => {
           </div>
 
           {/* Right Clean Check Circle Badge */}
-          <div className="w-9 h-9 2xl:w-10 2xl:h-10 rounded-full bg-[#00f2a9]/15 border border-[#00f2a9]/60 flex items-center justify-center text-[#00f2a9] shrink-0 group-hover:scale-110 transition-transform duration-300">
-            <Check className="w-4.5 h-4.5 stroke-[3]" />
+          <div className="w-9 h-9 2xl:w-10 2xl:h-10 rounded-full bg-[#10b981]/15 border border-[#10b981]/60 flex items-center justify-center text-[#10b981] shrink-0 group-hover:scale-110 transition-transform duration-300">
+            <Check className="text-lg font-bold" />
           </div>
         </div>
       </div>
