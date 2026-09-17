@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, CheckCircle2 } from 'lucide-react';
+import { Layers, CheckCircle2 } from '@/components/ui/GoogleIcon';
 
 interface Props {
   activeTab: 'challenges' | 'progress' | 'dashboard';
