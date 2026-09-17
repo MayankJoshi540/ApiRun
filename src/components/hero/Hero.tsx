@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown } from '@/components/ui/GoogleIcon';
 import { HeroBackground } from './HeroBackground';
 import { HeroButtons } from './HeroButtons';
 import { FloatingCodeCard } from './FloatingCodeCard';
@@ -44,7 +44,7 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
           <h1 className="animate-hero-2 text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-[#f1f5f9]">
             Defend Edge Cases.
           </h1>
-          <h1 className="animate-hero-3 text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-[#00f2a9]">
+          <h1 className="animate-hero-3 text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-[#10b981]">
             Master Production Systems.
           </h1>
         </div>
@@ -65,7 +65,7 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
 
       {/* 5. Bottom Horizon Arc & Scroll Indicator */}
       <div className="relative z-20 flex flex-col items-center justify-center pt-2 space-y-1 opacity-85 hover:opacity-100 transition-opacity animate-hero-cta">
-        <ChevronDown className="w-4 h-4 text-[#00f2a9] animate-bounce" />
+        <ChevronDown className="w-4 h-4 text-[#10b981] animate-bounce" />
         <span className="text-[10px] sm:text-[11px] font-mono font-medium tracking-[0.25em] text-[#94a3b8] uppercase">
           Scroll to explore
         </span>
