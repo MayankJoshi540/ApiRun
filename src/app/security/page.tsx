@@ -1,6 +1,6 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck, Lock, Terminal, CheckCircle2, Server, Cpu } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Lock, Terminal, CheckCircle2, Server, Cpu } from '@/components/ui/GoogleIcon';
 import { Footer } from '@/components/Footer';
 
 export const metadata = {
@@ -10,17 +10,17 @@ export const metadata = {
 
 export default function SecurityPage() {
   return (
-    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans selection:bg-[#00f2a9] selection:text-black flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans selection:bg-[#10b981] selection:text-white flex flex-col justify-between">
       {/* Top Header */}
       <header className="w-full px-6 py-5 flex items-center justify-between border-b border-white/[0.08] bg-[#070a10]/80 backdrop-blur-xl sticky top-0 z-40">
         <Link 
           href="/"
           className="flex items-center space-x-2 transition-transform hover:scale-105"
         >
-          <span className="font-mono text-base font-extrabold text-[#00f2a9]">&#123;&bull;&gt;&#125;</span>
+          <span className="font-mono text-base font-extrabold text-[#10b981]">&#123;&bull;&gt;&#125;</span>
           <span className="font-bold text-lg tracking-tight">
             <span className="text-white">API</span>
-            <span className="text-[#00f2a9]">Run</span>
+            <span className="text-[#10b981]">Run</span>
           </span>
         </Link>
 
@@ -29,7 +29,7 @@ export default function SecurityPage() {
             href="/challenges"
             className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-[#00f2a9]" />
+            <ArrowLeft className="w-3.5 h-3.5 text-[#10b981]" />
             <span>Back to Challenges</span>
           </Link>
         </div>
@@ -49,14 +49,14 @@ export default function SecurityPage() {
             How APIRun ensures safe code execution, rigorous container sandboxing, and zero data leakage across local and cloud environments.
           </p>
           <div className="text-xs font-mono text-slate-500 pt-1">
-            Security Contact: <span className="text-[#00f2a9]">security@apirun.dev</span> &bull; PGP Fingerprint Available
+            Security Contact: <span className="text-[#10b981]">security@apirun.dev</span> &bull; PGP Fingerprint Available
           </div>
         </div>
 
         {/* Technical Architecture Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="p-5 rounded-2xl bg-[#090d14] border border-white/[0.08] space-y-2">
-            <div className="flex items-center space-x-2 text-[#00f2a9]">
+            <div className="flex items-center space-x-2 text-[#10b981]">
               <Server className="w-4 h-4" />
               <span className="font-bold text-xs text-white">Ephemeral Sandbox Isolation</span>
             </div>
@@ -101,7 +101,7 @@ export default function SecurityPage() {
           {/* Section 1 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#00f2a9] font-mono">01.</span>
+              <span className="text-[#10b981] font-mono">01.</span>
               <span>Authentication & Session Security</span>
             </h2>
             <p className="text-slate-400">
@@ -112,7 +112,7 @@ export default function SecurityPage() {
           {/* Section 2 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#00f2a9] font-mono">02.</span>
+              <span className="text-[#10b981] font-mono">02.</span>
               <span>Adversarial Test Suite Bounds</span>
             </h2>
             <p className="text-slate-400">
@@ -123,7 +123,7 @@ export default function SecurityPage() {
           {/* Section 3 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#00f2a9] font-mono">03.</span>
+              <span className="text-[#10b981] font-mono">03.</span>
               <span>Responsible Vulnerability Disclosure</span>
             </h2>
             <p className="text-slate-400">
@@ -132,7 +132,7 @@ export default function SecurityPage() {
             <div className="p-4 rounded-xl bg-[#090d14] border border-white/[0.08] space-y-2 text-xs">
               <div className="text-white font-semibold">Disclosure Protocol:</div>
               <ul className="list-disc list-inside space-y-1 text-slate-400 pl-1">
-                <li>Email details directly to <span className="text-[#00f2a9] font-mono">security@apirun.dev</span>.</li>
+                <li>Email details directly to <span className="text-[#10b981] font-mono">security@apirun.dev</span>.</li>
                 <li>Please include reproducible steps, target endpoints, and proof-of-concept payloads.</li>
                 <li>Allow our engineering team 48 hours to assess the report before public disclosure.</li>
                 <li>Do NOT access, modify, or exfiltrate other users&apos; accounts or submissions during testing.</li>
