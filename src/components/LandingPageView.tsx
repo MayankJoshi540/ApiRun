@@ -36,8 +36,7 @@ import {
   Binary,
   Layers2,
   Share2,
-  Workflow
-} from 'lucide-react';
+} from '@/components/ui/GoogleIcon';
 import { Challenge } from '../types';
 import { DifficultyBadge } from './DifficultyBadge';
 import { ConceptBadge } from './ConceptBadge';
