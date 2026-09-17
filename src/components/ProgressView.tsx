@@ -39,7 +39,7 @@ import {
   Save,
   Globe,
   User as UserIcon
-} from 'lucide-react';
+} from '@/components/ui/GoogleIcon';
 import { useAuth } from '@/context/AuthContext';
 import { loadUserProgress, updateUserProfile, UserProgressRecord } from '@/lib/userProgress';
 import { SubmissionHeatmap } from './SubmissionHeatmap';
