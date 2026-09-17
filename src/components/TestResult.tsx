@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, XCircle, Loader2, Clock, ChevronDown, ChevronRight } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, Clock, ChevronDown, ChevronRight } from '@/components/ui/GoogleIcon';
 import { TestResultItem } from '../types';
 
 interface Props {
