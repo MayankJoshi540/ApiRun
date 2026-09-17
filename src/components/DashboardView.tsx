@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Challenge, UserStats } from '../types';
 import { ChallengeCard } from './ChallengeCard';
-import { Search, X } from 'lucide-react';
+import { Search, X } from '@/components/ui/GoogleIcon';
 
 interface Props {
   challenges: Challenge[];
@@ -244,7 +244,7 @@ export const DashboardView: React.FC<Props> = ({
 
             <button
               onClick={handleResetFilters}
-              className="text-[11px] font-mono text-[#00f2a9] hover:underline"
+              className="text-[11px] font-mono text-[#10b981] hover:underline"
             >
               Reset
             </button>
@@ -277,7 +277,7 @@ export const DashboardView: React.FC<Props> = ({
             </div>
             <button
               onClick={handleResetFilters}
-              className="px-4 py-1.5 rounded-lg bg-[#00f2a9] text-black text-xs font-bold transition-colors"
+              className="px-4 py-1.5 rounded-lg bg-[#10b981] text-black text-xs font-bold transition-colors shadow-sm"
             >
               Clear Filters
             </button>
