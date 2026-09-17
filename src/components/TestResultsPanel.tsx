@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Loader2, CheckCircle2, AlertTriangle, Clock } from 'lucide-react';
+import { Play, Loader2, CheckCircle2, AlertTriangle, Clock } from '@/components/ui/GoogleIcon';
 import { TestResultItem, TestSuiteSummary } from '../types';
 import { TestResult } from './TestResult';
 import { ProgressIndicator } from './ProgressIndicator';
@@ -35,7 +35,7 @@ export const TestResultsPanel: React.FC<Props> = ({
             <div className="flex items-center space-x-2">
               <span className="text-xs font-bold text-white">Test Suite Evaluation</span>
               <span className="text-xs text-[#8b949e]">
-                — <span className="font-mono text-[11px] text-[#00f2a9]">{serverUrl}</span>
+                — <span className="font-mono text-[11px] text-[#10b981]">{serverUrl}</span>
               </span>
             </div>
             <div className="text-xs text-[#8b949e] font-mono">
@@ -52,10 +52,10 @@ export const TestResultsPanel: React.FC<Props> = ({
               className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 isRunning
                   ? 'bg-white/[0.06] text-[#8b949e] cursor-not-allowed'
-                  : 'bg-[#00f2a9] text-black hover:bg-[#20fbb7] active:scale-95'
+                  : 'bg-[#10b981] text-black hover:bg-[#059669] active:scale-95 shadow-sm'
               }`}
             >
-              {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+              {isRunning ? <Loader2 className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
               <span>{isRunning ? 'Evaluating...' : 'Run Test Suite'}</span>
             </button>
           </div>
