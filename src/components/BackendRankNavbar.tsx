@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from '@/components/ui/GoogleIcon';
 import { AuthControls } from './AuthControls';
 
 interface Props {
@@ -29,13 +29,13 @@ export const BackendRankNavbar: React.FC<Props> = ({
             aria-label="API Run home"
           >
             {/* Code Bracket Icon */}
-            <div className="flex items-center font-mono text-sm sm:text-base font-extrabold text-[#00f2a9] tracking-tighter">
+            <div className="flex items-center font-mono text-sm sm:text-base font-extrabold text-[#10b981] tracking-tighter">
               &#123;&bull;&gt;&#125;
             </div>
             {/* Brand Text */}
             <span className="font-extrabold text-base sm:text-lg tracking-tight font-sans">
               <span className="text-white">API</span>
-              <span className="text-[#00f2a9]">Run</span>
+              <span className="text-[#10b981]">Run</span>
             </span>
           </Link>
 
@@ -81,7 +81,7 @@ export const BackendRankNavbar: React.FC<Props> = ({
         <div className="flex items-center space-x-3">
           {/* Solved Progress Counter */}
           <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs font-mono">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981]" />
             <span className="text-white font-bold">{solvedCount}</span>
             <span className="text-[#64748b]">/{totalCount}</span>
           </div>
