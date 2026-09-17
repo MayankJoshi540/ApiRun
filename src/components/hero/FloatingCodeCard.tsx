@@ -35,7 +35,7 @@ export const FloatingCodeCard: React.FC = () => {
             <span className="text-blue-400">json</span>
             <span className="text-slate-300">(&#123; </span>
             <span className="text-slate-300">success: </span>
-            <span className="text-[#00f2a9] font-bold">true</span>
+            <span className="text-[#10b981] font-bold">true</span>
             <span className="text-slate-300"> &#125;);</span>
           </div>
           <div className="text-slate-300">&#125;);</div>
