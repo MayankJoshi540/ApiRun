@@ -13,7 +13,7 @@ import {
   Minimize2,
   Terminal,
   Settings2
-} from 'lucide-react';
+} from '@/components/ui/GoogleIcon';
 import { Challenge } from '../types';
 
 interface Props {
@@ -300,7 +300,7 @@ declare module 'path';`,
           onChange={(value) => onChangeCode(value || '')}
           onMount={handleEditorDidMount}
           options={{
-            fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', Menlo, monospace",
+            fontFamily: "'Fira Code', 'Cascadia Code', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace",
             fontSize: 13,
             lineHeight: 22,
             fontLigatures: true,
