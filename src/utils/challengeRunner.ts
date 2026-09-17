@@ -16,7 +16,7 @@ export interface RunTestOutput {
 }
 
 /**
- * Normalizes route path matching Express / FastAPI route patterns (e.g., /users/:id matching /users/123)
+ * Normalizes and matches route paths (e.g. /users/:id matching /users/123 or /kv/get/:key)
  */
 function matchRoute(routePattern: string, actualPath: string): { matches: boolean; params: Record<string, string> } {
   const cleanPattern = routePattern.split('?')[0].replace(/\/$/, '') || '/';
@@ -47,6 +47,44 @@ function matchRoute(routePattern: string, actualPath: string): { matches: boolea
 }
 
 /**
+ * Converts TypeScript / ES module source into runnable vanilla browser JavaScript
+ */
+export function stripTypeScript(code: string): string {
+  let cleaned = code;
+
+  // 1. Strip import statements (single-line or multiline, with or without semicolons)
+  cleaned = cleaned.replace(/import\s+(?:(?:(?:\*\s+as\s+\w+|[\w\s{},*]+)\s+from\s+)?['"][^'"]+['"]|['"][^'"]+['"])\s*;?/g, '');
+
+  // 2. Strip export statements
+  cleaned = cleaned.replace(/export\s+default\s+[^;]+;?/g, '');
+  cleaned = cleaned.replace(/export\s+(const|let|var|function|async\s+function|class)\s+/g, '$1 ');
+
+  // 3. Strip interface declarations (single and multiline)
+  cleaned = cleaned.replace(/interface\s+\w+(?:<[^>]*>)?(?:\s+extends\s+[^{]+)?\s*\{[\s\S]*?\n\}/g, '');
+  cleaned = cleaned.replace(/interface\s+\w+(?:<[^>]*>)?(?:\s+extends\s+[^{]+)?\s*\{[^\}]*\}/g, '');
+
+  // 4. Strip type aliases
+  cleaned = cleaned.replace(/type\s+\w+(?:<[^>]*>)?\s*=\s*[^;]+;/g, '');
+
+  // 5. Strip generic type arguments like <string, ShortLink> or <T>
+  cleaned = cleaned.replace(/<[A-Za-z0-9_,\s|&<>\[\]]+>(?=\s*[\(\.])/g, '');
+
+  // 6. Strip 'as Type' type assertions
+  cleaned = cleaned.replace(/\s+as\s+[A-Za-z0-9_<>[\]|&?]+/g, '');
+
+  // 7. Strip function return type annotations, e.g. ): Promise<void> =>, ): boolean =>, ): void {
+  cleaned = cleaned.replace(/\):\s*[A-Za-z0-9_<>[\]|&?]+\s*(?=[={])/g, ') ');
+
+  // 8. Strip parameter types, e.g. (req: Request, res: Response) or (name: string, email: string)
+  cleaned = cleaned.replace(/(\b\w+)\s*:\s*[A-Za-z0-9_<>[\]|&?]+(?=\s*[,)])/g, '$1');
+
+  // 9. Strip variable type annotations, e.g. const users: User[] = [] or let map: Map = ...
+  cleaned = cleaned.replace(/(const|let|var)\s+(\w+)\s*:\s*[A-Za-z0-9_<>[\]|&?]+(?=\s*=)/g, '$1 $2');
+
+  return cleaned;
+}
+
+/**
  * Real In-Browser JavaScript/Node execution & contract evaluator
  */
 export async function runChallengeTests(options: RunTestOptions): Promise<RunTestOutput> {
@@ -62,7 +100,7 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
     message: `[RUNTIME] Initialized APIRun Evaluation Engine (${language.toUpperCase()})`
   });
 
-  // MODE 1: Real Local Server Fetch Mode
+  // MODE 1: Real Local Server Fetch Mode (Target: http://localhost:8000)
   if (isLocalServerMode && serverUrl) {
     logs.push({
       timestamp: getTimestamp(),
@@ -94,7 +132,16 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
         }
 
         const actualStatus = response.status;
-        const passed = actualStatus === tc.expectedStatus;
+        const statusPassed = actualStatus === tc.expectedStatus;
+
+        let snippetPassed = true;
+        if (tc.expectedResponseSnippet) {
+          const cleanActual = actualBody.replace(/[\s"'{}\[\]]/g, '').toLowerCase();
+          const cleanSnippet = tc.expectedResponseSnippet.replace(/[\s"'{}\[\]]/g, '').toLowerCase();
+          snippetPassed = cleanActual.includes(cleanSnippet);
+        }
+
+        const passed = statusPassed && snippetPassed;
 
         results.push({
           testId: tc.id,
@@ -113,7 +160,7 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
           logs: [
             `${tc.method} ${tc.endpoint} -> HTTP ${actualStatus} (${durationMs}ms)`,
             `Expected HTTP ${tc.expectedStatus}, received HTTP ${actualStatus}`,
-            passed ? 'Assertion passed.' : 'Response status or body mismatch.'
+            passed ? 'Assertion passed.' : 'Response status or body contract mismatch.'
           ]
         });
 
@@ -159,12 +206,25 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
   }
 
   // MODE 2: In-Browser Real JavaScript / Node.js Engine
-  // We compile user code and run each test case against the user's route handlers
   type RouteHandler = (req: any, res: any) => Promise<any> | any;
-  const routes: { method: string; path: string; handler: RouteHandler }[] = [];
+  type MiddlewareHandler = (req: any, res: any, next: (err?: any) => void) => Promise<any> | any;
 
-  const mockApp = {
-    use: () => {},
+  const routes: { method: string; path: string; handler: RouteHandler }[] = [];
+  const middlewares: MiddlewareHandler[] = [];
+
+  const mockApp: any = {
+    use: (fnOrPath: any, maybeFn?: any) => {
+      if (typeof fnOrPath === 'function') {
+        middlewares.push(fnOrPath);
+      } else if (typeof maybeFn === 'function') {
+        middlewares.push((req, res, next) => {
+          if (req.url.startsWith(fnOrPath) || req.path.startsWith(fnOrPath)) {
+            return maybeFn(req, res, next);
+          }
+          next();
+        });
+      }
+    },
     get: (path: string, handler: RouteHandler) => routes.push({ method: 'GET', path, handler }),
     post: (path: string, handler: RouteHandler) => routes.push({ method: 'POST', path, handler }),
     put: (path: string, handler: RouteHandler) => routes.push({ method: 'PUT', path, handler }),
@@ -173,41 +233,68 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
     listen: () => {}
   };
 
-  // Compile user code in a safe closure
+  const expressMock = () => mockApp;
+  expressMock.json = () => (_req: any, _res: any, next: any) => { if (next) next(); };
+  expressMock.urlencoded = () => (_req: any, _res: any, next: any) => { if (next) next(); };
+  expressMock.Router = () => mockApp;
+
+  const cryptoMock = {
+    randomUUID: () => {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+      return 'f47ac10b-58cc-4372-a567-' + Math.random().toString(16).substring(2, 14);
+    },
+    randomBytes: (n: number) => ({
+      toString: (enc: string) => {
+        const hex = '0123456789abcdef';
+        let str = '';
+        for (let i = 0; i < n * 2; i++) str += hex[Math.floor(Math.random() * hex.length)];
+        return enc === 'hex' ? str : btoa(str).slice(0, n);
+      }
+    }),
+    createHash: (_alg: string) => ({
+      update: (_data: any) => ({ digest: (_enc?: string) => 'hash_' + Math.random().toString(36).substring(2, 10) })
+    }),
+    createHmac: (_alg: string, _secret: string) => ({
+      update: (_data: any) => ({ digest: (_enc?: string) => 'hmac_' + Math.random().toString(36).substring(2, 10) })
+    })
+  };
+
+  const consoleMock = {
+    log: (...args: any[]) => {
+      logs.push({ timestamp: getTimestamp(), level: 'INFO', message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') });
+    },
+    info: (...args: any[]) => {
+      logs.push({ timestamp: getTimestamp(), level: 'INFO', message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') });
+    },
+    warn: (...args: any[]) => {
+      logs.push({ timestamp: getTimestamp(), level: 'WARN', message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') });
+    },
+    error: (...args: any[]) => {
+      logs.push({ timestamp: getTimestamp(), level: 'ERROR', message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') });
+    }
+  };
+
+  // Compile user code inside browser sandbox
   let compilationError: string | null = null;
   try {
-    // Strip import / export statements to make it browser-executable
-    const sanitizedCode = code
-      .replace(/import\s+.*?;/g, '')
-      .replace(/export\s+default\s+.*?;/g, '')
-      .replace(/export\s+const\s+/g, 'const ')
-      .replace(/export\s+function\s+/g, 'function ')
-      .replace(/export\s+class\s+/g, 'class ')
-      .replace(/:\s*[A-Za-z0-9_<>[\]|&?]+\s*(?=[,)=;{])/g, ''); // basic type annotation stripping
-
+    const sanitized = stripTypeScript(code);
     const runnerFn = new Function(
-      'app',
       'express',
+      'crypto',
       'console',
-      `
-      try {
-        const express = () => app;
-        express.json = () => (req, res, next) => { if (next) next(); };
-        ${sanitizedCode}
-      } catch (e) {
-        throw e;
-      }
-      `
+      sanitized
     );
 
-    runnerFn(mockApp, () => mockApp, console);
+    runnerFn(expressMock, cryptoMock, consoleMock);
     logs.push({
       timestamp: getTimestamp(),
       level: 'INFO',
       message: `Compiled source successfully. Registered ${routes.length} route handlers.`
     });
   } catch (err: any) {
-    compilationError = err.message || 'Syntax/compilation error in user code';
+    compilationError = err?.message || 'Syntax or compilation error in user code';
     logs.push({
       timestamp: getTimestamp(),
       level: 'ERROR',
@@ -215,7 +302,7 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
     });
   }
 
-  // If compilation failed or no routes registered in JS, perform structured contract evaluation
+  // Execute test cases against registered handlers
   for (let i = 0; i < challenge.testCases.length; i++) {
     const tc = challenge.testCases[i];
     const startTime = performance.now();
@@ -240,7 +327,7 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
       continue;
     }
 
-    // Find matching route handler
+    // Match route handler
     const matched = routes.find(r => {
       if (r.method !== tc.method) return false;
       const { matches } = matchRoute(r.path, tc.endpoint);
@@ -248,61 +335,70 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
     });
 
     if (!matched) {
-      // Check if user code is non-JS or has no direct route
-      // If code implements the scenario logic, evaluate contract
-      const codeHasRoute = code.includes(tc.endpoint.split('?')[0]) || code.includes(tc.method);
-      const codeHandlesStatus = code.includes(String(tc.expectedStatus));
-
-      const simulatedLatency = Math.floor(Math.random() * 12 + 4);
-      const passed = codeHasRoute && codeHandlesStatus;
-
+      const durationMs = 2;
       results.push({
         testId: tc.id,
         name: tc.name,
         category: tc.category,
-        status: passed ? 'PASSED' : 'FAILED',
-        durationMs: simulatedLatency,
+        status: 'FAILED',
+        durationMs,
         isHidden: tc.isHidden,
         endpoint: tc.endpoint,
         method: tc.method,
         expectedStatus: tc.expectedStatus,
-        actualStatus: passed ? tc.expectedStatus : 404,
+        actualStatus: 404,
         requestPayload: tc.requestPayload,
         expectedResponse: tc.expectedResponseSnippet,
-        actualResponse: passed ? (tc.expectedResponseSnippet || '{}') : JSON.stringify({ error: 'route_not_found', path: tc.endpoint }),
+        actualResponse: JSON.stringify({ error: 'route_not_found', path: tc.endpoint, method: tc.method }, null, 2),
         logs: [
-          `Dispatched ${tc.method} ${tc.endpoint}`,
-          passed ? `Matched handler and validated HTTP ${tc.expectedStatus}` : `No handler found for ${tc.method} ${tc.endpoint}`
+          `No route handler registered for ${tc.method} ${tc.endpoint}`,
+          `Expected route pattern matching ${tc.endpoint}`
         ]
       });
 
       logs.push({
         timestamp: getTimestamp(),
-        level: passed ? 'INFO' : 'WARN',
-        message: `${passed ? '✓' : '✗'} Test #${i + 1}: ${tc.name} [HTTP ${passed ? tc.expectedStatus : 404}] (${simulatedLatency}ms)`
+        level: 'ERROR',
+        message: `✗ Test #${i + 1}: ${tc.name} [HTTP 404 Route Not Found]`
       });
       continue;
     }
 
-    // Execute the real matched handler!
+    // Prepare simulated Request and Response objects
     const { params } = matchRoute(matched.path, tc.endpoint);
     let statusCode = 200;
     let responseData: any = null;
     const responseHeaders: Record<string, string> = {};
 
-    const req = {
+    let parsedBody: any = {};
+    if (tc.requestPayload) {
+      try {
+        parsedBody = typeof tc.requestPayload === 'string' ? JSON.parse(tc.requestPayload) : tc.requestPayload;
+      } catch {
+        parsedBody = tc.requestPayload;
+      }
+    }
+
+    const req: any = {
       method: tc.method,
       url: tc.endpoint,
-      path: tc.endpoint,
+      path: tc.endpoint.split('?')[0],
       params,
       query: {},
       headers: { 'content-type': 'application/json', ...(tc.requestHeaders || {}) },
-      body: tc.requestPayload ? (typeof tc.requestPayload === 'string' ? JSON.parse(tc.requestPayload) : tc.requestPayload) : {}
+      header: (name: string) => (tc.requestHeaders || {})[name.toLowerCase()] || (req.headers || {})[name.toLowerCase()],
+      get: (name: string) => (tc.requestHeaders || {})[name.toLowerCase()] || (req.headers || {})[name.toLowerCase()],
+      body: parsedBody
     };
 
     const res: any = {
       status: (code: number) => {
         statusCode = code;
+        return res;
+      },
+      sendStatus: (code: number) => {
+        statusCode = code;
+        responseData = { status: code };
         return res;
       },
       setHeader: (key: string, val: string) => {
@@ -313,6 +409,12 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
         responseHeaders[key.toLowerCase()] = val;
         return res;
       },
+      set: (key: string, val: string) => {
+        responseHeaders[key.toLowerCase()] = val;
+        return res;
+      },
+      getHeader: (key: string) => responseHeaders[key.toLowerCase()],
+      get: (key: string) => responseHeaders[key.toLowerCase()],
       json: (data: any) => {
         responseData = data;
         return res;
@@ -320,15 +422,47 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
       send: (data: any) => {
         responseData = data;
         return res;
+      },
+      redirect: (arg1: any, arg2?: any) => {
+        if (typeof arg1 === 'number') {
+          statusCode = arg1;
+          responseHeaders['location'] = String(arg2 || '');
+        } else {
+          statusCode = 302;
+          responseHeaders['location'] = String(arg1 || '');
+        }
+        responseData = { redirect: responseHeaders['location'] };
+        return res;
       }
     };
 
     try {
+      // Execute any registered middleware
+      for (const mw of middlewares) {
+        if (typeof mw === 'function') {
+          let nextCalled = false;
+          await mw(req, res, () => { nextCalled = true; });
+          if (!nextCalled && statusCode !== 200) {
+            break;
+          }
+        }
+      }
+
+      // Execute matched route handler
       await matched.handler(req, res);
       const durationMs = Math.max(1, Math.round(performance.now() - startTime));
 
-      const passed = statusCode === tc.expectedStatus;
-      const actualResponseStr = typeof responseData === 'object' ? JSON.stringify(responseData, null, 2) : String(responseData || '');
+      const actualResponseStr = typeof responseData === 'object' ? JSON.stringify(responseData, null, 2) : String(responseData ?? '');
+      const statusPassed = statusCode === tc.expectedStatus;
+
+      let snippetPassed = true;
+      if (tc.expectedResponseSnippet) {
+        const cleanActual = actualResponseStr.replace(/[\s"'{}\[\]]/g, '').toLowerCase();
+        const cleanSnippet = tc.expectedResponseSnippet.replace(/[\s"'{}\[\]]/g, '').toLowerCase();
+        snippetPassed = cleanActual.includes(cleanSnippet);
+      }
+
+      const passed = statusPassed && snippetPassed;
 
       results.push({
         testId: tc.id,
@@ -346,8 +480,8 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
         actualResponse: actualResponseStr,
         logs: [
           `Handler executed in ${durationMs}ms`,
-          `Received status: ${statusCode} (Expected: ${tc.expectedStatus})`,
-          passed ? 'Assertion passed.' : `Status code mismatch: expected ${tc.expectedStatus}, got ${statusCode}`
+          `Received HTTP ${statusCode} (Expected: ${tc.expectedStatus})`,
+          passed ? 'Assertion passed.' : `Validation failed: expected HTTP ${tc.expectedStatus}, got HTTP ${statusCode}`
         ]
       });
 
@@ -371,14 +505,14 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
         actualStatus: 500,
         requestPayload: tc.requestPayload,
         expectedResponse: tc.expectedResponseSnippet,
-        actualResponse: JSON.stringify({ error: 'internal_handler_error', message: handlerErr.message }, null, 2),
-        logs: [`Runtime Error in handler: ${handlerErr.message}`]
+        actualResponse: JSON.stringify({ error: 'internal_handler_error', message: handlerErr?.message }, null, 2),
+        logs: [`Runtime Error in handler: ${handlerErr?.message}`]
       });
 
       logs.push({
         timestamp: getTimestamp(),
         level: 'ERROR',
-        message: `✗ Test #${i + 1}: ${tc.name} -> Runtime exception: ${handlerErr.message}`
+        message: `✗ Test #${i + 1}: ${tc.name} -> Runtime exception: ${handlerErr?.message}`
       });
     }
   }
