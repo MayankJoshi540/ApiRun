@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CheckCircle2, AlertTriangle, Loader2, Terminal, ArrowRight } from 'lucide-react';
+import { X, CheckCircle2, AlertTriangle, Loader2, Terminal, ArrowRight } from '@/components/ui/GoogleIcon';
 import { Challenge, TestSuiteSummary, TestResultItem } from '../types';
 
 interface Props {
