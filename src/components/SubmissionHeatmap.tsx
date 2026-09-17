@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Flame, Info, Calendar } from 'lucide-react';
+import { Flame, Info, Calendar } from '@/components/ui/GoogleIcon';
 import { UserSubmission } from '@/lib/userProgress';
 
 interface SubmissionHeatmapProps {
@@ -61,9 +61,9 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
     let prevDate: Date | null = null;
 
     activeDates.forEach(dateStr => {
-      const currentDate = new Date(dateStr);
+      const curDate = new Date(dateStr);
       if (prevDate) {
-        const diffDays = Math.round((currentDate.getTime() - prevDate.getTime()) / (1000 * 3600 * 24));
+        const diffDays = Math.round((curDate.getTime() - prevDate.getTime()) / (1000 * 3600 * 24));
         if (diffDays === 1) {
           tempStreak++;
         } else {
@@ -73,22 +73,25 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
         tempStreak = 1;
       }
       if (tempStreak > maxS) maxS = tempStreak;
-      prevDate = currentDate;
+      prevDate = curDate;
     });
 
-    // Current streak
-    const todayStr = new Date().toISOString().split('T')[0];
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    // Current streak (consecutive days leading up to today or yesterday)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
 
-    let curStreak = 0;
-    if (counts[todayStr] || counts[yesterdayStr]) {
-      let checkDate = counts[todayStr] ? new Date() : yesterday;
+    const todayKey = today.toISOString().split('T')[0];
+    const yesterdayKey = yesterday.toISOString().split('T')[0];
+
+    let curS = 0;
+    if (counts[todayKey] || counts[yesterdayKey]) {
+      let checkDate = new Date(counts[todayKey] ? today : yesterday);
       while (true) {
-        const key = checkDate.toISOString().split('T')[0];
-        if (counts[key] && counts[key] > 0) {
-          curStreak++;
+        const k = checkDate.toISOString().split('T')[0];
+        if (counts[k] && counts[k] > 0) {
+          curS++;
           checkDate.setDate(checkDate.getDate() - 1);
         } else {
           break;
@@ -100,23 +103,25 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
       dateToCount: counts,
       totalYearSubmissions: yearSubmissions,
       totalActiveDays: activeDaysCount,
-      maxStreak: Math.max(maxS, streak || 0),
-      currentCalculatedStreak: Math.max(curStreak, streak || 0),
+      maxStreak: Math.max(maxS, curS, streak || 0),
+      currentCalculatedStreak: Math.max(curS, streak || 0),
     };
   }, [submissions, streak]);
 
-  // 2. Generate 52 weeks (past 1 year) ending on the current week (Saturday)
+  // 2. Generate exactly 52 weeks (364 days) of grid cells aligned to Sunday
   const { weeks, monthHeaders } = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const dayOfWeek = today.getDay(); // 0 is Sun, 6 is Sat
-    const currentWeekEnd = new Date(today);
-    currentWeekEnd.setDate(today.getDate() + (6 - dayOfWeek));
+    // End on the coming Saturday of current week to ensure complete 7-day columns
+    const dayOfWeek = today.getDay(); // 0=Sun, 6=Sat
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + (6 - dayOfWeek));
 
+    // 52 weeks = 364 days
     const totalWeeks = 52;
-    const startDate = new Date(currentWeekEnd);
-    startDate.setDate(currentWeekEnd.getDate() - (totalWeeks * 7 - 1));
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - (totalWeeks * 7 - 1));
 
     const generatedWeeks: WeekData[] = [];
     const months: { label: string; weekIndex: number }[] = [];
@@ -193,7 +198,7 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
           </div>
           <span className="text-zinc-600">•</span>
           <div>
-            Max Streak: <strong className="text-[#00f2a9] font-bold">{maxStreak} {maxStreak === 1 ? 'day' : 'days'}</strong>
+            Max Streak: <strong className="text-[#10b981] font-bold">{maxStreak} {maxStreak === 1 ? 'day' : 'days'}</strong>
           </div>
         </div>
       </div>
@@ -231,19 +236,18 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
                 {weeks.map((week, wIdx) => (
                   <div key={wIdx} className="flex flex-col space-y-[3px]">
                     {week.days.map((day, dIdx) => {
-                      const hasSubmissions = day.count > 0;
                       const isFuture = day.isFuture;
 
-                      // Exact color tiers: Dark when 0, Glowing emerald only when real submission exists
+                      // Exact color tiers: Dark when 0, premium emerald only when real submission exists
                       let bgClass = 'bg-[#12161f] border border-white/[0.04]';
                       if (isFuture) {
                         bgClass = 'bg-white/[0.02] border border-transparent opacity-30';
                       } else if (day.count >= 4) {
-                        bgClass = 'bg-[#00f2a9] border border-[#00f2a9] shadow-[0_0_8px_rgba(0,242,169,0.6)] ring-1 ring-[#00f2a9]/80';
+                        bgClass = 'bg-[#10b981] border border-[#10b981] shadow-sm';
                       } else if (day.count >= 2) {
-                        bgClass = 'bg-emerald-500 border border-emerald-400 shadow-[0_0_5px_rgba(16,185,129,0.4)]';
+                        bgClass = 'bg-emerald-600 border border-emerald-500 shadow-sm';
                       } else if (day.count === 1) {
-                        bgClass = 'bg-emerald-700/90 border border-emerald-500/60 shadow-[0_0_3px_rgba(16,185,129,0.3)]';
+                        bgClass = 'bg-emerald-800/90 border border-emerald-700/60';
                       } else if (day.isToday) {
                         bgClass = 'bg-[#151c28] border border-white/[0.15]';
                       }
@@ -272,17 +276,17 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
           <div className="flex items-center space-x-2 text-xs font-mono min-h-[20px]">
             {hoveredDay ? (
               <span className="text-zinc-200">
-                <strong className={hoveredDay.count > 0 ? 'text-[#00f2a9]' : 'text-zinc-400'}>
+                <strong className={hoveredDay.count > 0 ? 'text-[#10b981]' : 'text-zinc-400'}>
                   {hoveredDay.count === 0
                     ? 'No submissions'
                     : `${hoveredDay.count} ${hoveredDay.count === 1 ? 'submission' : 'submissions'}`}
                 </strong>{' '}
                 on {hoveredDay.monthName} {hoveredDay.dayOfMonth}, {hoveredDay.date.getFullYear()}
-                {hoveredDay.isToday && <span className="ml-1.5 px-1.5 py-0.5 rounded bg-[#00f2a9]/10 text-[#00f2a9] text-[10px] font-bold">TODAY</span>}
+                {hoveredDay.isToday && <span className="ml-1.5 px-1.5 py-0.5 rounded bg-[#10b981]/10 text-[#10b981] text-[10px] font-bold">TODAY</span>}
               </span>
             ) : (
               <span className="text-zinc-400">
-                Current Streak: <strong className="text-[#00f2a9] font-bold">{currentCalculatedStreak} {currentCalculatedStreak === 1 ? 'day' : 'days'}</strong>
+                Current Streak: <strong className="text-[#10b981] font-bold">{currentCalculatedStreak} {currentCalculatedStreak === 1 ? 'day' : 'days'}</strong>
               </span>
             )}
           </div>
@@ -291,9 +295,9 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
           <div className="flex items-center space-x-2 text-[11px] text-zinc-500 font-mono">
             <span>Less</span>
             <span className="w-[10px] h-[10px] rounded-[2px] bg-[#12161f] border border-white/[0.04]" title="0 submissions" />
-            <span className="w-[10px] h-[10px] rounded-[2px] bg-emerald-700/90 border border-emerald-500/60" title="1 submission" />
-            <span className="w-[10px] h-[10px] rounded-[2px] bg-emerald-500 border border-emerald-400" title="2-3 submissions" />
-            <span className="w-[10px] h-[10px] rounded-[2px] bg-[#00f2a9] border border-[#00f2a9] shadow-[0_0_6px_rgba(0,242,169,0.5)]" title="4+ submissions" />
+            <span className="w-[10px] h-[10px] rounded-[2px] bg-emerald-800/90 border border-emerald-700/60" title="1 submission" />
+            <span className="w-[10px] h-[10px] rounded-[2px] bg-emerald-600 border border-emerald-500" title="2-3 submissions" />
+            <span className="w-[10px] h-[10px] rounded-[2px] bg-[#10b981] border border-[#10b981]" title="4+ submissions" />
             <span>More</span>
           </div>
 
