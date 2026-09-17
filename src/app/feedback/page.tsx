@@ -20,7 +20,7 @@ import {
   Check,
   Code2,
   ThumbsUp
-} from 'lucide-react';
+} from '@/components/ui/GoogleIcon';
 
 const CATEGORIES = [
   { id: 'Challenge Suggestion', label: 'New Challenge Idea', icon: Layers, desc: 'Suggest a real-world backend scenario or edge case' },
@@ -102,7 +102,7 @@ export default function FeedbackPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-[#00f2a9] selection:text-black">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-[#10b981] selection:text-white">
       
       {/* Top Navbar */}
       <BackendRankNavbar
@@ -117,7 +117,7 @@ export default function FeedbackPage() {
         
         {/* Header Eyebrow & Title */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#00f2a9]/10 border border-[#00f2a9]/25 text-[#00f2a9] text-xs font-semibold uppercase tracking-wider">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/25 text-[#10b981] text-xs font-semibold uppercase tracking-wider">
             <MessageSquarePlus className="w-3.5 h-3.5" />
             <span>DEVELOPER FEEDBACK</span>
           </div>
@@ -137,7 +137,7 @@ export default function FeedbackPage() {
           {isSuccess ? (
             /* Success Screen */
             <div className="py-8 text-center space-y-6 animate-in fade-in zoom-in-95 duration-200">
-              <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-[#00f2a9]/40 flex items-center justify-center mx-auto text-[#00f2a9]">
+              <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-[#10b981]/40 flex items-center justify-center mx-auto text-[#10b981]">
                 <Check className="w-8 h-8 stroke-[3]" />
               </div>
 
@@ -194,12 +194,12 @@ export default function FeedbackPage() {
                         onClick={() => setCategory(cat.id)}
                         className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col space-y-1 text-left ${
                           isSelected
-                            ? 'bg-white/[0.08] border-[#00f2a9]/50 text-white'
+                            ? 'bg-white/[0.08] border-[#10b981]/50 text-white'
                             : 'bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.05] text-zinc-400'
                         }`}
                       >
                         <div className="flex items-center space-x-2">
-                          <Icon className={`w-4 h-4 ${isSelected ? 'text-[#00f2a9]' : 'text-zinc-500'}`} />
+                          <Icon className={`w-4 h-4 ${isSelected ? 'text-[#10b981]' : 'text-zinc-500'}`} />
                           <span className="text-xs font-bold text-white">{cat.label}</span>
                         </div>
                         <p className="text-[11px] text-zinc-500 leading-tight">
@@ -252,7 +252,7 @@ export default function FeedbackPage() {
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder="e.g. Add distributed Redlock challenge / Improve dark mode contrast"
-                  className="w-full px-4 py-3 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs sm:text-sm"
+                  className="w-full px-4 py-3 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981] transition-all text-xs sm:text-sm"
                 />
               </div>
 
@@ -272,7 +272,7 @@ export default function FeedbackPage() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Describe your suggestion, edge case scenario, or feedback in detail. How can we make this platform more valuable for your backend interview and system practice?"
-                  className="w-full px-4 py-3 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs sm:text-sm resize-y leading-relaxed"
+                  className="w-full px-4 py-3 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981] transition-all text-xs sm:text-sm resize-y leading-relaxed"
                 />
               </div>
 
@@ -285,7 +285,7 @@ export default function FeedbackPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Mayank Joshi"
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] text-xs sm:text-sm"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#10b981] text-xs sm:text-sm"
                   />
                 </div>
 
@@ -296,7 +296,7 @@ export default function FeedbackPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="e.g. developer@apirun.dev"
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] text-xs sm:text-sm"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#10b981] text-xs sm:text-sm"
                   />
                 </div>
               </div>
@@ -306,7 +306,7 @@ export default function FeedbackPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 px-6 rounded-xl bg-[#00f2a9] hover:bg-[#00d696] text-black font-bold font-display text-sm transition-all shadow-sm flex items-center justify-center space-x-2 active:scale-[0.99] disabled:opacity-50"
+                  className="w-full py-3 px-6 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-bold font-display text-sm transition-all shadow-sm flex items-center justify-center space-x-2 active:scale-[0.99] disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
@@ -331,7 +331,7 @@ export default function FeedbackPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-zinc-400">
           <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] space-y-1.5">
             <div className="font-bold text-white flex items-center space-x-1.5">
-              <Code2 className="w-3.5 h-3.5 text-[#00f2a9]" />
+              <Code2 className="w-3.5 h-3.5 text-[#10b981]" />
               <span>Challenge Ideas</span>
             </div>
             <p className="leading-relaxed">
@@ -355,7 +355,7 @@ export default function FeedbackPage() {
               <span>Platform Quality</span>
             </div>
             <p className="leading-relaxed">
-              Every piece of feedback is saved locally into <code className="text-[#00f2a9]">feedbacks.json</code> to iterate on.
+              Every piece of feedback is saved locally into <code className="text-[#10b981]">feedbacks.json</code> to iterate on.
             </p>
           </div>
         </div>
