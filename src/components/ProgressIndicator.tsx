@@ -28,7 +28,7 @@ export const ProgressIndicator: React.FC<Props> = ({
         <div className="flex items-center justify-between text-xs text-[#94a3b8]">
           <span className="text-[11px] font-medium">{passed} / {total} Completed</span>
           <span className={`text-[11px] font-bold ${
-            isComplete ? 'text-[#00f2a9]' : isRunning ? 'text-sky-400' : percent > 0 ? 'text-white' : 'text-[#64748b]'
+            isComplete ? 'text-[#10b981]' : isRunning ? 'text-sky-400' : percent > 0 ? 'text-white' : 'text-[#64748b]'
           }`}>
             {percent}%
           </span>
@@ -38,7 +38,7 @@ export const ProgressIndicator: React.FC<Props> = ({
         <div
           className={`h-full rounded-full transition-all duration-500 ease-out ${
             isComplete
-              ? 'bg-[#00f2a9]'
+              ? 'bg-[#10b981]'
               : isRunning
               ? 'bg-sky-400 animate-pulse'
               : percent > 0
