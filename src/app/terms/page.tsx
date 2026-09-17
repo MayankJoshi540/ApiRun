@@ -1,6 +1,6 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Scale, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Scale, CheckCircle2, AlertTriangle } from '@/components/ui/GoogleIcon';
 import { Footer } from '@/components/Footer';
 
 export const metadata = {
@@ -10,17 +10,17 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans selection:bg-[#00f2a9] selection:text-black flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans selection:bg-[#10b981] selection:text-white flex flex-col justify-between">
       {/* Top Header */}
       <header className="w-full px-6 py-5 flex items-center justify-between border-b border-white/[0.08] bg-[#070a10]/80 backdrop-blur-xl sticky top-0 z-40">
         <Link 
           href="/"
           className="flex items-center space-x-2 transition-transform hover:scale-105"
         >
-          <span className="font-mono text-base font-extrabold text-[#00f2a9]">&#123;&bull;&gt;&#125;</span>
+          <span className="font-mono text-base font-extrabold text-[#10b981]">&#123;&bull;&gt;&#125;</span>
           <span className="font-bold text-lg tracking-tight">
             <span className="text-white">API</span>
-            <span className="text-[#00f2a9]">Run</span>
+            <span className="text-[#10b981]">Run</span>
           </span>
         </Link>
 
@@ -29,7 +29,7 @@ export default function TermsPage() {
             href="/challenges"
             className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-[#00f2a9]" />
+            <ArrowLeft className="w-3.5 h-3.5 text-[#10b981]" />
             <span>Back to Challenges</span>
           </Link>
         </div>
@@ -58,7 +58,7 @@ export default function TermsPage() {
           {/* Section 1 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#00f2a9] font-mono">01.</span>
+              <span className="text-[#10b981] font-mono">01.</span>
               <span>Acceptance of Terms</span>
             </h2>
             <p className="text-slate-400">
@@ -69,7 +69,7 @@ export default function TermsPage() {
           {/* Section 2 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#00f2a9] font-mono">02.</span>
+              <span className="text-[#10b981] font-mono">02.</span>
               <span>Acceptable Sandbox & Execution Use</span>
             </h2>
             <p className="text-slate-400">
@@ -86,7 +86,7 @@ export default function TermsPage() {
           {/* Section 3 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#00f2a9] font-mono">03.</span>
+              <span className="text-[#10b981] font-mono">03.</span>
               <span>Intellectual Property & Code Ownership</span>
             </h2>
             <p className="text-slate-400">
@@ -100,7 +100,7 @@ export default function TermsPage() {
           {/* Section 4 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#00f2a9] font-mono">04.</span>
+              <span className="text-[#10b981] font-mono">04.</span>
               <span>Account Responsibility</span>
             </h2>
             <p className="text-slate-400">
@@ -111,7 +111,7 @@ export default function TermsPage() {
           {/* Section 5 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#00f2a9] font-mono">05.</span>
+              <span className="text-[#10b981] font-mono">05.</span>
               <span>Disclaimer of Warranties</span>
             </h2>
             <p className="text-slate-400">
@@ -124,7 +124,7 @@ export default function TermsPage() {
             <h3 className="font-bold text-white text-sm">Need Help with Terms?</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
               If you have questions regarding these terms or enterprise licensing agreements, please reach out to{' '}
-              <a href="mailto:legal@apirun.dev" className="text-[#00f2a9] hover:underline">
+              <a href="mailto:legal@apirun.dev" className="text-[#10b981] hover:underline">
                 legal@apirun.dev
               </a>.
             </p>
