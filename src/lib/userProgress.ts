@@ -9,6 +9,15 @@ export interface UserSubmission {
   timestamp: string;
 }
 
+export interface UserProfileData {
+  bio?: string;
+  location?: string;
+  github?: string;
+  displayName?: string;
+  website?: string;
+  title?: string;
+}
+
 export interface UserProgressRecord {
   userId: string;
   solvedChallengeIds: string[];
@@ -17,6 +26,7 @@ export interface UserProgressRecord {
   streak: number;
   lastActiveDate: string;
   updatedAt: string;
+  profile?: UserProfileData;
 }
 
 const LOCAL_STORAGE_KEY_PREFIX = 'apirun_progress_';
@@ -29,6 +39,12 @@ export const getInitialProgress = (userId = 'guest'): UserProgressRecord => ({
   streak: 0,
   lastActiveDate: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
+  profile: {
+    bio: 'Practicing production-grade backend engineering with Express, Go, and Python. Focused on resilient APIs, clean validation, and sub-20ms SLAs.',
+    location: 'San Francisco, CA',
+    github: '',
+    title: 'Backend Engineer',
+  },
 });
 
 /**
@@ -180,3 +196,48 @@ export function applyUserProgressToChallenges(
     return { ...c, status: 'UNSOLVED' };
   });
 }
+
+/**
+ * Updates user profile bio, location, github, etc.
+ */
+export async function updateUserProfile(
+  userId: string | null | undefined,
+  profileData: UserProfileData
+): Promise<UserProgressRecord> {
+  const currentUid = userId || 'guest';
+  const existing = await loadUserProgress(userId);
+
+  const updatedProfile: UserProfileData = {
+    ...existing.profile,
+    ...profileData,
+  };
+
+  const updatedRecord: UserProgressRecord = {
+    ...existing,
+    userId: currentUid,
+    profile: updatedProfile,
+    updatedAt: new Date().toISOString(),
+  };
+
+  // 1. Sync to local storage
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}${currentUid}`, JSON.stringify(updatedRecord));
+    } catch (e) {
+      console.warn('Failed to cache updated profile locally:', e);
+    }
+  }
+
+  // 2. Sync to Firestore
+  if (db && userId && userId !== 'guest') {
+    try {
+      const userDocRef = doc(db, 'users', userId);
+      await setDoc(userDocRef, { profile: updatedProfile, updatedAt: updatedRecord.updatedAt }, { merge: true });
+    } catch (err) {
+      console.error('Failed to sync profile update to Firestore:', err);
+    }
+  }
+
+  return updatedRecord;
+}
+

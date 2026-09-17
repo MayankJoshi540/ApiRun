@@ -59,6 +59,9 @@ export default function ProgressPage() {
           userStats={userStats}
           challenges={challengesList}
           onSelectChallenge={handleSelectChallenge}
+          userName={user?.displayName || (user?.email ? user.email.split('@')[0] : null)}
+          userEmail={user?.email || null}
+          userPhotoURL={user?.photoURL || null}
         />
       </main>
     </div>

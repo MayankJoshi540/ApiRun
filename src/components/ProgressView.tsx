@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Challenge, UserStats } from '../types';
 import { 
   CheckCircle2, 
@@ -31,20 +31,133 @@ import {
   Calendar,
   CheckCircle,
   Tag,
-  ChevronRight
+  ChevronRight,
+  Edit3,
+  X,
+  Loader2,
+  Sparkles,
+  Save,
+  Globe,
+  User as UserIcon
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { loadUserProgress, updateUserProfile } from '@/lib/userProgress';
 
 interface Props {
   userStats: UserStats;
   challenges: Challenge[];
   onSelectChallenge: (challenge: Challenge) => void;
+  userName?: string | null;
+  userEmail?: string | null;
+  userPhotoURL?: string | null;
 }
 
 export const ProgressView: React.FC<Props> = ({
   userStats,
   challenges,
-  onSelectChallenge
+  onSelectChallenge,
+  userName: propUserName,
+  userEmail: propUserEmail,
+  userPhotoURL: propUserPhotoURL
 }) => {
+  const { user } = useAuth();
+
+  // Profile data states
+  const [profileBio, setProfileBio] = useState('Practicing production-grade backend engineering with Express, Go, and Python. Focused on resilient APIs, clean validation, and sub-20ms SLAs.');
+  const [profileLocation, setProfileLocation] = useState('San Francisco, CA');
+  const [profileGithub, setProfileGithub] = useState('');
+  const [profileTitle, setProfileTitle] = useState('Backend Engineer');
+  const [customDisplayName, setCustomDisplayName] = useState('');
+  
+  // Modal & Edit State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    bio: '',
+    location: '',
+    github: '',
+    title: '',
+    displayName: ''
+  });
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState(false);
+
+  // Synchronize profile with Firestore/localStorage
+  useEffect(() => {
+    async function fetchProfile() {
+      const progress = await loadUserProgress(user?.uid);
+      if (progress?.profile) {
+        if (progress.profile.bio) setProfileBio(progress.profile.bio);
+        if (progress.profile.location) setProfileLocation(progress.profile.location);
+        if (progress.profile.github) setProfileGithub(progress.profile.github);
+        if (progress.profile.title) setProfileTitle(progress.profile.title);
+        if (progress.profile.displayName) setCustomDisplayName(progress.profile.displayName);
+      }
+    }
+    fetchProfile();
+  }, [user?.uid]);
+
+  const displayName = customDisplayName || propUserName || user?.displayName || user?.email?.split('@')[0] || 'Backend Engineer';
+  const displayEmail = propUserEmail || user?.email || null;
+  const displayPhoto = propUserPhotoURL || user?.photoURL || null;
+
+  const handle = profileGithub 
+    ? `@${profileGithub.replace(/^@/, '')}` 
+    : displayEmail 
+      ? `@${displayEmail.split('@')[0]}` 
+      : '@apirun_developer';
+
+  const initials = (() => {
+    if (displayName && displayName !== 'Backend Engineer') {
+      const parts = displayName.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+      return displayName.slice(0, 2).toUpperCase();
+    }
+    return 'AP';
+  })();
+
+  const handleOpenEditModal = () => {
+    setEditForm({
+      bio: profileBio,
+      location: profileLocation,
+      github: profileGithub || (displayEmail ? displayEmail.split('@')[0] : ''),
+      title: profileTitle,
+      displayName: displayName
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingProfile(true);
+    try {
+      await updateUserProfile(user?.uid, {
+        bio: editForm.bio.trim(),
+        location: editForm.location.trim(),
+        github: editForm.github.trim(),
+        title: editForm.title.trim(),
+        displayName: editForm.displayName.trim()
+      });
+
+      setProfileBio(editForm.bio.trim());
+      setProfileLocation(editForm.location.trim() || 'San Francisco, CA');
+      setProfileGithub(editForm.github.trim());
+      setProfileTitle(editForm.title.trim() || 'Backend Engineer');
+      if (editForm.displayName.trim()) {
+        setCustomDisplayName(editForm.displayName.trim());
+      }
+
+      setIsEditModalOpen(false);
+      setSaveSuccessMsg(true);
+      setTimeout(() => setSaveSuccessMsg(false), 4000);
+    } catch (err) {
+      console.error('Failed to update user profile:', err);
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
   const [selectedSubmissionsTab, setSelectedSubmissionsTab] = useState<'ALL' | 'AC' | 'IN_PROGRESS'>('ALL');
   const [selectedSkillCategory, setSelectedSkillCategory] = useState<'ALL' | 'CORE' | 'SECURITY' | 'DISTRIBUTED'>('ALL');
   const [searchHistory, setSearchHistory] = useState('');
@@ -125,6 +238,19 @@ export const ProgressView: React.FC<Props> = ({
   return (
     <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans select-none text-slate-100 antialiased">
       
+      {/* Save Success Alert */}
+      {saveSuccessMsg && (
+        <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center justify-between shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center space-x-2">
+            <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
+            <span>Profile and bio updated successfully!</span>
+          </div>
+          <button onClick={() => setSaveSuccessMsg(false)} className="text-zinc-400 hover:text-white">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* 2-COLUMN LEETCODE DASHBOARD GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
@@ -134,59 +260,93 @@ export const ProgressView: React.FC<Props> = ({
         <div className="lg:col-span-4 space-y-6">
           
           {/* Main Profile Card */}
-          <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 sm:p-7 space-y-6 shadow-xl">
+          <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 sm:p-7 space-y-6 shadow-xl relative overflow-hidden group">
+            {/* Edit Profile Action Button */}
+            <div className="absolute top-5 right-5 z-10">
+              <button
+                onClick={handleOpenEditModal}
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.08] hover:border-[#00f2a9]/50 text-xs font-semibold text-zinc-300 hover:text-[#00f2a9] transition-all shadow-sm group"
+                title="Edit bio and profile info"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-[#00f2a9]" />
+                <span>Edit Bio</span>
+              </button>
+            </div>
+
             {/* Avatar & Identifiers */}
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#111827] to-[#1e293b] border border-white/[0.12] flex items-center justify-center text-xl font-bold text-[#00f2a9] shadow-inner">
-                  AP
-                </div>
+            <div className="flex items-center space-x-4 pr-16">
+              <div className="relative shrink-0">
+                {displayPhoto ? (
+                  <img
+                    src={displayPhoto}
+                    alt={displayName}
+                    className="w-16 h-16 rounded-2xl object-cover border border-white/[0.12] shadow-inner"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#111827] to-[#1e293b] border border-white/[0.12] flex items-center justify-center text-xl font-bold text-[#00f2a9] shadow-inner font-display">
+                    {initials}
+                  </div>
+                )}
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#00f2a9] border-2 border-[#0b0f17] flex items-center justify-center">
                   <Check className="w-3 h-3 text-black stroke-[3]" />
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <h1 className="text-xl font-bold text-white tracking-tight">
-                  Backend Engineer
+              <div className="space-y-1 min-w-0">
+                <h1 className="text-xl font-bold text-white tracking-tight font-display truncate">
+                  {displayName}
                 </h1>
-                <div className="text-xs text-slate-400">@apirun_developer</div>
+                <div className="text-xs text-slate-400 font-sans truncate">{handle}</div>
                 <div className="text-xs text-[#00f2a9] font-medium flex items-center space-x-1.5 pt-0.5">
-                  <Shield className="w-3.5 h-3.5" />
-                  <span>Rank: #1,248 · Level 3 Architect</span>
+                  <Shield className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">
+                    {profileTitle} · {solvedCount > 3 ? 'Level 3 Architect' : solvedCount > 0 ? 'Level 2 Engineer' : 'Level 1 Initiate'}
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Quick Profile Summary */}
-            <p className="text-sm text-slate-300 leading-relaxed">
-              Practicing production-grade backend engineering with Express, Go, and Python. Focused on resilient APIs, clean validation, and sub-20ms SLAs.
-            </p>
+            {/* Custom Bio Section */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+                <span>About Developer</span>
+              </div>
+              <p className="text-sm text-slate-300 leading-relaxed font-sans bg-white/[0.02] p-3.5 rounded-xl border border-white/[0.04]">
+                {profileBio}
+              </p>
+            </div>
 
             {/* Bio Metadata */}
             <div className="space-y-2.5 pt-4 border-t border-white/[0.08] text-xs text-slate-400">
               <div className="flex items-center space-x-2.5">
-                <MapPin className="w-4 h-4 text-slate-500" />
-                <span>San Francisco, CA</span>
+                <MapPin className="w-4 h-4 text-slate-500 shrink-0" />
+                <span>{profileLocation}</span>
               </div>
               <div className="flex items-center space-x-2.5">
-                <Code2 className="w-4 h-4 text-slate-500" />
-                <span className="text-slate-300 hover:text-white transition-colors cursor-pointer">github.com/apirun-user</span>
+                <Code2 className="w-4 h-4 text-slate-500 shrink-0" />
+                <a
+                  href={`https://github.com/${(profileGithub || handle).replace(/^@/, '')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-slate-300 hover:text-[#00f2a9] transition-colors cursor-pointer truncate"
+                >
+                  github.com/{(profileGithub || handle).replace(/^@/, '')}
+                </a>
               </div>
               <div className="flex items-center space-x-2.5">
-                <Calendar className="w-4 h-4 text-slate-500" />
-                <span>Joined September 2026</span>
+                <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
+                <span>Joined APIRun Beta</span>
               </div>
             </div>
 
             {/* Community Stats */}
             <div className="grid grid-cols-3 gap-2.5 pt-4 border-t border-white/[0.08] text-center">
               <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-                <div className="text-lg font-bold text-white">4</div>
+                <div className="text-lg font-bold text-white">{solvedCount > 0 ? solvedCount + 3 : 4}</div>
                 <div className="text-xs text-slate-400 font-medium">Submissions</div>
               </div>
               <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-                <div className="text-lg font-bold text-[#00f2a9]">100%</div>
+                <div className="text-lg font-bold text-[#00f2a9]">{solvedPercent > 0 ? `${solvedPercent}%` : '100%'}</div>
                 <div className="text-xs text-slate-400 font-medium">Pass Rate</div>
               </div>
               <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
@@ -618,6 +778,157 @@ export const ProgressView: React.FC<Props> = ({
         </div>
 
       </div>
+
+      {/* ========================================================================= */}
+      {/* EDIT DEVELOPER BIO & PROFILE MODAL                                         */}
+      {/* ========================================================================= */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="rounded-3xl bg-[#0b0f17] border border-white/[0.12] p-6 sm:p-8 max-w-lg w-full space-y-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#00f2a9]/10 border border-[#00f2a9]/20 flex items-center justify-center text-[#00f2a9]">
+                  <Edit3 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white font-display">Edit Developer Bio &amp; Profile</h3>
+                  <p className="text-xs text-zinc-400">Personalize your public backend developer card</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsEditModalOpen(false)}
+                className="w-7 h-7 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-zinc-400 hover:text-white flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Profile Form */}
+            <form onSubmit={handleSaveProfile} className="space-y-4 text-xs sm:text-sm">
+              
+              {/* Display Name */}
+              <div className="space-y-1.5">
+                <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
+                  <UserIcon className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>Display Name</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.displayName}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, displayName: e.target.value }))}
+                  placeholder="e.g. Alex Rivera"
+                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs sm:text-sm"
+                />
+              </div>
+
+              {/* Professional Title */}
+              <div className="space-y-1.5">
+                <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
+                  <Shield className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>Role / Headline</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.title}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="e.g. Senior Backend Engineer / Distributed Systems"
+                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs sm:text-sm"
+                />
+              </div>
+
+              {/* Bio Description */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#00f2a9]" />
+                    <span>Bio / Summary</span>
+                  </label>
+                  <span className="text-[10px] text-zinc-500 font-mono">
+                    {editForm.bio.length}/320
+                  </span>
+                </div>
+                <textarea
+                  rows={3}
+                  maxLength={320}
+                  required
+                  value={editForm.bio}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
+                  placeholder="Tell the community about your backend engineering stack, distributed systems experience, or what challenges you are mastering..."
+                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs sm:text-sm resize-none leading-relaxed"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {/* Location */}
+                <div className="space-y-1.5">
+                  <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-zinc-400" />
+                    <span>Location</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.location}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
+                    placeholder="e.g. San Francisco, CA"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs"
+                  />
+                </div>
+
+                {/* GitHub Username */}
+                <div className="space-y-1.5">
+                  <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
+                    <Code2 className="w-3.5 h-3.5 text-zinc-400" />
+                    <span>GitHub Username</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.github}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, github: e.target.value }))}
+                    placeholder="e.g. alexrivera"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Form Action Buttons */}
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-white/[0.08]">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  disabled={isSavingProfile}
+                  className="px-4 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 hover:text-white text-xs font-semibold transition-all"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isSavingProfile}
+                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-[#00f2a9] hover:bg-[#00d696] text-black font-bold text-xs font-display shadow-[0_4px_20px_rgba(0,242,169,0.25)] transition-all active:scale-[0.98] disabled:opacity-50"
+                >
+                  {isSavingProfile ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving Profile...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Save Changes</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { HeroBackground } from '@/components/hero/HeroBackground';
-import { ArrowLeft, CheckCircle2, Lock, Mail, AlertCircle, ArrowRight, Server, Check } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Lock, Mail, AlertCircle, ArrowRight, Server, Check, Loader2 } from 'lucide-react';
 
-export default function SignInPage() {
+function SignInContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawRedirect = searchParams.get('redirect');
+  const redirectTarget = rawRedirect && rawRedirect.startsWith('/') ? rawRedirect : '/challenges';
+
   const { signInWithEmail, signInWithGoogle, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,9 +21,9 @@ export default function SignInPage() {
 
   useEffect(() => {
     if (user) {
-      router.push('/challenges');
+      router.push(redirectTarget);
     }
-  }, [user, router]);
+  }, [user, router, redirectTarget]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +36,7 @@ export default function SignInPage() {
       setLoading(true);
       setError(null);
       await signInWithEmail(email, password);
-      router.push('/challenges');
+      router.push(redirectTarget);
     } catch (err: any) {
       console.error('Sign in error:', err);
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
@@ -54,7 +58,7 @@ export default function SignInPage() {
       setLoading(true);
       setError(null);
       await signInWithGoogle();
-      router.push('/challenges');
+      router.push(redirectTarget);
     } catch (err: any) {
       console.error('Google sign in error:', err);
       if (err.code === 'auth/configuration-not-found') {
@@ -274,7 +278,10 @@ export default function SignInPage() {
 
             <div className="pt-1 text-center text-xs text-zinc-400">
               Don&apos;t have an account?{' '}
-              <Link href="/sign-up" className="text-[#00f2a9] hover:underline font-semibold">
+              <Link 
+                href={rawRedirect ? `/sign-up?redirect=${encodeURIComponent(rawRedirect)}` : '/sign-up'} 
+                className="text-[#00f2a9] hover:underline font-semibold"
+              >
                 Sign Up
               </Link>
             </div>
@@ -288,5 +295,22 @@ export default function SignInPage() {
         APIRun Backend Engineering Platform &bull; Real Labs &bull; Production Ready
       </footer>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#050708] flex items-center justify-center text-white">
+          <div className="flex items-center space-x-2 text-xs font-mono text-zinc-400">
+            <Loader2 className="w-4 h-4 animate-spin text-[#00f2a9]" />
+            <span>Loading authentication...</span>
+          </div>
+        </div>
+      }
+    >
+      <SignInContent />
+    </Suspense>
   );
 }

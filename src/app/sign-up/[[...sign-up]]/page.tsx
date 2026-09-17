@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { HeroBackground } from '@/components/hero/HeroBackground';
-import { ArrowLeft, CheckCircle2, Lock, Mail, AlertCircle, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Lock, Mail, AlertCircle, ArrowRight, Check, Loader2 } from 'lucide-react';
 
-export default function SignUpPage() {
+function SignUpContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawRedirect = searchParams.get('redirect');
+  const redirectTarget = rawRedirect && rawRedirect.startsWith('/') ? rawRedirect : '/challenges';
+
   const { signUpWithEmail, signInWithGoogle, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,9 +22,9 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (user) {
-      router.push('/challenges');
+      router.push(redirectTarget);
     }
-  }, [user, router]);
+  }, [user, router, redirectTarget]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +47,7 @@ export default function SignUpPage() {
       setLoading(true);
       setError(null);
       await signUpWithEmail(email, password);
-      router.push('/challenges');
+      router.push(redirectTarget);
     } catch (err: any) {
       console.error('Sign up error:', err);
       if (err.code === 'auth/email-already-in-use') {
@@ -67,7 +71,7 @@ export default function SignUpPage() {
       setLoading(true);
       setError(null);
       await signInWithGoogle();
-      router.push('/challenges');
+      router.push(redirectTarget);
     } catch (err: any) {
       console.error('Google sign in error:', err);
       if (err.code === 'auth/configuration-not-found') {
@@ -300,7 +304,10 @@ export default function SignUpPage() {
 
             <div className="pt-1 text-center text-xs text-zinc-400">
               Already have an account?{' '}
-              <Link href="/sign-in" className="text-[#00f2a9] hover:underline font-semibold">
+              <Link 
+                href={rawRedirect ? `/sign-in?redirect=${encodeURIComponent(rawRedirect)}` : '/sign-in'} 
+                className="text-[#00f2a9] hover:underline font-semibold"
+              >
                 Sign In
               </Link>
             </div>
@@ -314,5 +321,22 @@ export default function SignUpPage() {
         APIRun Backend Engineering Platform &bull; Real Labs &bull; Production Ready
       </footer>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#050708] flex items-center justify-center text-white">
+          <div className="flex items-center space-x-2 text-xs font-mono text-zinc-400">
+            <Loader2 className="w-4 h-4 animate-spin text-[#00f2a9]" />
+            <span>Loading registration...</span>
+          </div>
+        </div>
+      }
+    >
+      <SignUpContent />
+    </Suspense>
   );
 }
