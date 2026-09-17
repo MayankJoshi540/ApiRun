@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Server, Check, Info } from 'lucide-react';
+import { X, Server, Check, Info } from '@/components/ui/GoogleIcon';
 
 interface Props {
   isOpen: boolean;
