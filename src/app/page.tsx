@@ -21,9 +21,11 @@ export default function HomePage() {
     router.push(`/challenges/${challenge.slug}`);
   };
 
-  const handleNavigate = (route: 'landing' | 'challenges' | 'progress') => {
+  const handleNavigate = (route: 'landing' | 'challenges' | 'progress' | 'feedback') => {
     if (route === 'landing') {
       router.push('/');
+    } else if (route === 'feedback') {
+      router.push('/feedback');
     } else {
       if (!user) {
         router.push(`/sign-in?redirect=${encodeURIComponent(`/${route}`)}`);

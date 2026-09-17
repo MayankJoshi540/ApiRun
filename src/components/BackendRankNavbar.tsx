@@ -5,8 +5,8 @@ import { CheckCircle2 } from 'lucide-react';
 import { AuthControls } from './AuthControls';
 
 interface Props {
-  activeTab: 'landing' | 'challenges' | 'progress' | 'dashboard';
-  onSelectTab: (tab: 'landing' | 'challenges' | 'progress' | 'dashboard') => void;
+  activeTab: 'landing' | 'challenges' | 'progress' | 'feedback' | 'dashboard';
+  onSelectTab: (tab: 'landing' | 'challenges' | 'progress' | 'feedback' | 'dashboard') => void;
   solvedCount: number;
   totalCount: number;
   onOpenSearch?: () => void;
@@ -43,7 +43,7 @@ export const BackendRankNavbar: React.FC<Props> = ({
           <nav className="hidden md:flex items-center p-1 rounded-full bg-[#0c1017] border border-white/[0.08]">
             <button
               onClick={() => onSelectTab('challenges')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 activeTab === 'challenges' || activeTab === 'dashboard'
                   ? 'bg-white/[0.1] text-white' 
                   : 'text-[#94a3b8] hover:text-white'
@@ -53,13 +53,23 @@ export const BackendRankNavbar: React.FC<Props> = ({
             </button>
             <button
               onClick={() => onSelectTab('progress')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 activeTab === 'progress'
                   ? 'bg-white/[0.1] text-white'
                   : 'text-[#94a3b8] hover:text-white'
               }`}
             >
               Progress
+            </button>
+            <button
+              onClick={() => onSelectTab('feedback')}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                activeTab === 'feedback'
+                  ? 'bg-white/[0.1] text-[#00f2a9]'
+                  : 'text-[#94a3b8] hover:text-[#00f2a9]'
+              }`}
+            >
+              Feedback
             </button>
           </nav>
         </div>

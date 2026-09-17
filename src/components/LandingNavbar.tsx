@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AuthControls } from './AuthControls';
 
 interface Props {
-  onNavigate: (route: 'landing' | 'challenges' | 'progress') => void;
+  onNavigate: (route: 'landing' | 'challenges' | 'progress' | 'feedback') => void;
   onStartBuilding?: () => void;
 }
 
@@ -55,15 +55,21 @@ export const LandingNavbar: React.FC<Props> = ({ onNavigate }) => {
         >
           <button
             onClick={() => onNavigate('challenges')}
-            className="px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-white transition-all duration-200 hover:bg-white/[0.08]"
+            className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-white transition-all duration-200 hover:bg-white/[0.08]"
           >
             Challenges
           </button>
           <button
             onClick={() => onNavigate('progress')}
-            className="px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-white transition-all duration-200 hover:bg-white/[0.08]"
+            className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-white transition-all duration-200 hover:bg-white/[0.08]"
           >
             Progress
+          </button>
+          <button
+            onClick={() => onNavigate('feedback')}
+            className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#cbd5e1] hover:text-[#00f2a9] transition-all duration-200 hover:bg-white/[0.08]"
+          >
+            Feedback
           </button>
         </nav>
 

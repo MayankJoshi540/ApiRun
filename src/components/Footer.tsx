@@ -113,6 +113,11 @@ export const Footer: React.FC<FooterProps> = ({
                 </Link>
               </li>
               <li>
+                <Link href="/feedback" className="hover:text-white transition-colors flex items-center space-x-1.5 text-[#00f2a9]">
+                  <span>Drop Feedback</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/sign-in" className="hover:text-white transition-colors">
                   Sign In
                 </Link>
