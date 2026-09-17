@@ -34,7 +34,7 @@ export default {
         display: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'sans-serif'],
         heading: ['"Plus Jakarta Sans"', 'Outfit', 'sans-serif'],
         grotesk: ['"Space Grotesk"', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SFMono-Regular', 'Menlo', 'monospace']
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Fira Code', 'Cascadia Code', 'monospace']
       }
     },
   },
