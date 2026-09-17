@@ -10,7 +10,7 @@ import { TerminalLogViewer, LogEntry } from './TerminalLogViewer';
 import { SubmissionModal } from './SubmissionModal';
 import { MockServerSettingsModal } from './MockServerSettingsModal';
 import { CodeEditorPanel } from './CodeEditorPanel';
-import { CheckCheck, Code2, Terminal, Layers, FileText } from 'lucide-react';
+import { CheckCheck, Code2, Terminal, Layers, FileText } from '@/components/ui/GoogleIcon';
 import { runChallengeTests } from '../utils/challengeRunner';
 
 interface Props {
@@ -216,7 +216,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
                     <ul className="space-y-1.5 text-xs text-[#94a3b8]">
                       {challenge.constraints.map((c, i) => (
                         <li key={i} className="flex items-start space-x-2">
-                          <span className="text-[#00f2a9] font-mono mt-0.5">•</span>
+                          <span className="text-[#10b981] font-mono mt-0.5">•</span>
                           <span>{c}</span>
                         </li>
                       ))}
@@ -272,7 +272,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
                         onClick={() => setSelectedStarterLang(lang)}
                         className={`px-3 py-1 rounded font-mono uppercase transition-colors ${
                           selectedStarterLang === lang
-                            ? 'bg-white/[0.1] text-[#00f2a9] font-bold'
+                            ? 'bg-white/[0.1] text-[#10b981] font-bold'
                             : 'text-[#94a3b8] hover:text-white'
                         }`}
                       >
@@ -338,7 +338,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
                       onClick={() => setSelectedEditorLang(lang)}
                       className={`px-2 py-0.5 rounded transition-colors ${
                         selectedEditorLang === lang
-                          ? 'bg-[#00f2a9]/15 text-[#00f2a9] font-bold'
+                          ? 'bg-[#10b981]/15 text-[#10b981] font-bold'
                           : 'text-[#64748b] hover:text-white'
                       }`}
                     >
