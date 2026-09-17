@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, ArrowRight, Clock, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Clock, ShieldCheck } from '@/components/ui/GoogleIcon';
 import { Challenge } from '../types';
 import { DifficultyBadge } from './DifficultyBadge';
 import { ConceptBadge } from './ConceptBadge';
@@ -34,7 +34,7 @@ export const ChallengeCard: React.FC<Props> = ({
         <div className="flex-1 space-y-2.5">
           {/* Header Row: Title & Badges */}
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-base font-bold text-white group-hover:text-[#00f2a9] transition-colors flex items-center tracking-tight">
+            <h3 className="text-base font-bold text-white group-hover:text-[#10b981] transition-colors flex items-center tracking-tight">
               {challenge.title}
             </h3>
 
@@ -46,7 +46,7 @@ export const ChallengeCard: React.FC<Props> = ({
             
             {isSolved && (
               <span className="inline-flex items-center space-x-1 text-[11px] font-medium text-emerald-400 bg-emerald-950/40 border border-emerald-800/50 px-2 py-0.5 rounded">
-                <CheckCircle2 className="w-3 h-3" />
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                 <span>SOLVED</span>
               </span>
             )}
@@ -116,11 +116,11 @@ export const ChallengeCard: React.FC<Props> = ({
             className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-tight transition-colors active:scale-98 ${
               isSolved
                 ? 'bg-white/[0.05] text-emerald-400 border border-emerald-500/30 hover:bg-white/[0.08]'
-                : 'bg-[#00f2a9] text-black hover:bg-[#20fbb7]'
+                : 'bg-[#10b981] text-black hover:bg-[#059669] shadow-sm'
             }`}
           >
             <span>{isSolved ? 'View Solution' : isInProgress ? 'Resume Lab' : 'Start Challenge'}</span>
-            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
