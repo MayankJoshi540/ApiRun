@@ -17,9 +17,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        />
+      </head>
       <body
         suppressHydrationWarning
-        className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased selection:bg-[#F8B81F] selection:text-black"
+        className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased selection:bg-[#10b981] selection:text-black"
       >
         <AuthProvider>
           {children}
