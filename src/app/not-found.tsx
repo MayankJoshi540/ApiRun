@@ -1,6 +1,6 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Terminal, Compass, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Compass, ArrowRight } from '@/components/ui/GoogleIcon';
 import { Footer } from '@/components/Footer';
 
 export const metadata = {
@@ -10,17 +10,17 @@ export const metadata = {
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans selection:bg-[#00f2a9] selection:text-black flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans selection:bg-[#10b981] selection:text-white flex flex-col justify-between">
       {/* Top Header */}
       <header className="w-full px-6 py-5 flex items-center justify-between border-b border-white/[0.08] bg-[#070a10]/80 backdrop-blur-xl">
         <Link 
           href="/"
           className="flex items-center space-x-2 transition-transform hover:scale-105"
         >
-          <span className="font-mono text-base font-extrabold text-[#00f2a9]">&#123;&bull;&gt;&#125;</span>
+          <span className="font-mono text-base font-extrabold text-[#10b981]">&#123;&bull;&gt;&#125;</span>
           <span className="font-bold text-lg tracking-tight">
             <span className="text-white">API</span>
-            <span className="text-[#00f2a9]">Run</span>
+            <span className="text-[#10b981]">Run</span>
           </span>
         </Link>
 
@@ -28,7 +28,7 @@ export default function NotFound() {
           href="/challenges"
           className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
         >
-          <Compass className="w-3.5 h-3.5 text-[#00f2a9]" />
+          <Compass className="w-3.5 h-3.5 text-[#10b981]" />
           <span>Explore Challenges</span>
         </Link>
       </header>
@@ -45,7 +45,7 @@ export default function NotFound() {
         {/* Big Headline */}
         <div className="space-y-3 max-w-lg">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-mono font-black text-white tracking-tight">
-            4<span className="text-[#00f2a9]">0</span>4
+            4<span className="text-[#10b981]">0</span>4
           </h1>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-200 tracking-tight">
             Endpoint Does Not Exist
@@ -61,7 +61,7 @@ export default function NotFound() {
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
               <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#00f2a9]/80" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#10b981]/80" />
               <span className="text-slate-400 font-sans ml-1.5">gateway error dispatch</span>
             </div>
             <span className="text-amber-400">404</span>
@@ -80,10 +80,10 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             href="/challenges"
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#00f2a9] hover:bg-[#22fbb9] text-black font-extrabold text-xs transition-all flex items-center justify-center space-x-2 active:scale-95 shadow-md"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-bold text-xs transition-all flex items-center justify-center space-x-2 active:scale-95 shadow-md"
           >
             <span>Browse Challenges</span>
-            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
 
           <Link
