@@ -164,11 +164,11 @@
 @keyframes glow-pulse {
   0%, 100% {
     opacity: 0.7;
-    filter: drop-shadow(0 0 10px rgba(0, 242, 169, 0.4));
+    filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.35));
   }
   50% {
     opacity: 1;
-    filter: drop-shadow(0 0 20px rgba(0, 242, 169, 0.8));
+    filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.65));
   }
 }
 
