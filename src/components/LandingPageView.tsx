@@ -616,31 +616,31 @@ export const LandingPageView: React.FC<Props> = ({
             {engineeringTracks.map((track, i) => (
               <div
                 key={i}
-                className="p-6 rounded-2xl bg-white/[0.03] border border-white/[0.1] hover:border-emerald-400/40 transition-all space-y-4 backdrop-blur-xl group hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+                className="p-6 rounded-2xl bg-[#0b0f17] border border-white/[0.08] hover:border-emerald-500/40 transition-all duration-300 space-y-4 backdrop-blur-xl group hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(16,185,129,0.08)] cursor-pointer"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-md">
+                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg">
                     TRACK {track.number}
                   </span>
-                  <span className="text-[11px] text-[#94a3b8] font-medium">
+                  <span className="text-[11px] text-slate-400 font-medium">
                     {track.badge}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors">
+                  <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors tracking-tight">
                     {track.title}
                   </h3>
-                  <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  <p className="text-xs text-slate-400 leading-relaxed font-sans">
                     {track.description}
                   </p>
                 </div>
 
-                <div className="pt-2 flex flex-wrap gap-1.5 border-t border-white/[0.08]">
+                <div className="pt-3 flex flex-wrap gap-1.5 border-t border-white/[0.06]">
                   {track.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="text-[10px] px-2 py-0.5 rounded bg-white/[0.04] text-[#cbd5e1] border border-white/[0.08]"
+                      className="text-[10px] px-2 py-0.5 rounded-md bg-white/[0.04] text-slate-300 border border-white/[0.06] font-mono"
                     >
                       {skill}
                     </span>
