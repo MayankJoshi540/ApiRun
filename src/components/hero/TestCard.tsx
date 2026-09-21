@@ -11,8 +11,8 @@ export const TestCard: React.FC = () => {
           <div className="space-y-1.5">
             {/* Header with dot */}
             <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-[#10b981]" />
-              <span className="text-xs sm:text-sm font-bold text-[#10b981] tracking-tight">
+              <span className="w-2 h-2 rounded-full bg-teal-400" />
+              <span className="text-xs sm:text-sm font-bold text-white tracking-tight">
                 All tests passed
               </span>
             </div>
@@ -26,7 +26,7 @@ export const TestCard: React.FC = () => {
           </div>
 
           {/* Right Clean Check Circle Badge */}
-          <div className="w-9 h-9 2xl:w-10 2xl:h-10 rounded-full bg-[#10b981]/15 border border-[#10b981]/60 flex items-center justify-center text-[#10b981] shrink-0 group-hover:scale-110 transition-transform duration-300">
+          <div className="w-9 h-9 2xl:w-10 2xl:h-10 rounded-full bg-teal-500/15 border border-teal-500/35 flex items-center justify-center text-teal-400 shrink-0 group-hover:scale-110 transition-transform duration-300">
             <Check className="text-lg font-bold" />
           </div>
         </div>
