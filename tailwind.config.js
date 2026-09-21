@@ -18,15 +18,19 @@ export default {
           subtle: '#1b202a',
           main: '#262d3a',
           light: '#374151',
-          accent: 'rgba(16, 185, 129, 0.35)'
+          accent: 'rgba(99, 102, 241, 0.3)'
         },
         accent: {
           DEFAULT: '#10b981',
           emerald: '#10b981',
-          bright: '#34d399',
-          glow: 'rgba(16, 185, 129, 0.12)',
+          primary: '#059669',
+          pine: '#047857',
+          mint: '#34d399',
+          sky: '#38bdf8',
+          amber: '#f59e0b',
+          rose: '#f43f5e',
           dark: '#064e3b',
-          subtle: '#022c22'
+          subtle: '#065f46'
         }
       },
       fontFamily: {
