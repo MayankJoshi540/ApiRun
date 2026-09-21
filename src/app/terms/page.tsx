@@ -1,134 +1,139 @@
+'use client';
+
 import React from 'react';
-import Link from 'next/link';
-import { ArrowLeft, Scale, CheckCircle2, AlertTriangle } from '@/components/ui/GoogleIcon';
+import { useRouter } from 'next/navigation';
+import { Scale, Code2, Shield, Lock } from '@/components/ui/GoogleIcon';
+import { BackendRankNavbar } from '@/components/BackendRankNavbar';
 import { Footer } from '@/components/Footer';
 
-export const metadata = {
-  title: 'Terms of Service — APIRun',
-  description: 'Terms of service, acceptable sandbox usage, and developer guidelines for APIRun.',
-};
-
 export default function TermsPage() {
-  return (
-    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans selection:bg-[#10b981] selection:text-white flex flex-col justify-between">
-      {/* Top Header */}
-      <header className="w-full px-6 py-5 flex items-center justify-between border-b border-white/[0.08] bg-[#070a10]/80 backdrop-blur-xl sticky top-0 z-40">
-        <Link 
-          href="/"
-          className="flex items-center space-x-2 transition-transform hover:scale-105"
-        >
-          <span className="font-mono text-base font-extrabold text-[#10b981]">&#123;&bull;&gt;&#125;</span>
-          <span className="font-bold text-lg tracking-tight">
-            <span className="text-white">API</span>
-            <span className="text-[#10b981]">Run</span>
-          </span>
-        </Link>
+  const router = useRouter();
 
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/challenges"
-            className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 text-[#10b981]" />
-            <span>Back to Challenges</span>
-          </Link>
-        </div>
-      </header>
+  const handleNavigate = (tab: 'landing' | 'challenges' | 'progress' | 'feedback' | 'dashboard') => {
+    if (tab === 'landing') router.push('/');
+    else if (tab === 'challenges' || tab === 'dashboard') router.push('/challenges');
+    else if (tab === 'progress') router.push('/progress');
+    else router.push('/feedback');
+  };
+
+  return (
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+      
+      {/* Floating Top Navbar */}
+      <BackendRankNavbar
+        activeTab="feedback"
+        onSelectTab={handleNavigate}
+        solvedCount={0}
+        totalCount={12}
+      />
 
       {/* Main Document Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-12">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14 pb-20 space-y-8 relative z-10 flex-grow w-full">
+        
         {/* Header Hero */}
-        <div className="space-y-4 border-b border-white/[0.08] pb-8">
-          <div className="text-xs font-mono text-emerald-400 uppercase tracking-wider font-semibold">
-            TERMS & AGREEMENTS
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider font-mono">
+            <Scale className="w-3.5 h-3.5" />
+            <span>TERMS &amp; AGREEMENTS</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display tracking-tight">
             Terms of Service
           </h1>
-          <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-2xl">
-            Please review these terms before practicing on APIRun, deploying code into our ephemeral sandboxes, or executing automated adversarial test suites.
+
+          <p className="text-sm text-zinc-400 max-w-xl mx-auto leading-relaxed">
+            Please review these terms before practicing on APIRun, deploying code into our ephemeral sandboxes, or executing automated test suites.
           </p>
-          <div className="text-xs font-mono text-slate-500 pt-1">
+
+          <div className="text-xs font-mono text-zinc-500 pt-1">
             Last Updated: September 2026 &bull; Effective Immediately
           </div>
         </div>
 
-        {/* Content Sections */}
-        <div className="space-y-10 text-sm text-slate-300 leading-relaxed">
-          {/* Section 1 */}
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#10b981] font-mono">01.</span>
+        {/* Feature Highlights Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs">
+          <div className="p-4 rounded-xl bg-[#0a0f16] border border-white/[0.08] space-y-1.5">
+            <div className="flex items-center space-x-2 text-emerald-400 font-bold">
+              <Code2 className="w-4 h-4 text-emerald-400" />
+              <span>100% Code Ownership</span>
+            </div>
+            <p className="text-zinc-400 leading-relaxed">
+              You retain full intellectual property rights to all code, APIs, and algorithms you write.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#0a0f16] border border-white/[0.08] space-y-1.5">
+            <div className="flex items-center space-x-2 text-sky-400 font-bold">
+              <Shield className="w-4 h-4 text-sky-400" />
+              <span>Fair Sandbox Use</span>
+            </div>
+            <p className="text-zinc-400 leading-relaxed">
+              Execution environments are provided for educational evaluation and system verification.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#0a0f16] border border-white/[0.08] space-y-1.5">
+            <div className="flex items-center space-x-2 text-amber-400 font-bold">
+              <Lock className="w-4 h-4 text-amber-400" />
+              <span>Adversarial Bounds</span>
+            </div>
+            <p className="text-zinc-400 leading-relaxed">
+              Automated tests adhere strictly to RFC-9110 HTTP specifications without OS-level exploits.
+            </p>
+          </div>
+        </div>
+
+        {/* Policy Document Card */}
+        <div className="rounded-2xl bg-[#0a0f16] border border-white/[0.08] p-6 sm:p-9 space-y-7 leading-relaxed text-sm text-zinc-300">
+          
+          <section className="space-y-2.5">
+            <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center space-x-2">
+              <span className="text-emerald-400 font-mono">01.</span>
               <span>Acceptance of Terms</span>
             </h2>
-            <p className="text-slate-400">
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
               By accessing or using APIRun, creating a developer account, or triggering automated test executions against local or remote endpoints, you agree to comply with and be bound by these Terms of Service.
             </p>
           </section>
 
-          {/* Section 2 */}
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#10b981] font-mono">02.</span>
-              <span>Acceptable Sandbox & Execution Use</span>
+          <section className="space-y-2.5">
+            <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center space-x-2">
+              <span className="text-emerald-400 font-mono">02.</span>
+              <span>Acceptable Sandbox &amp; Execution Use</span>
             </h2>
-            <p className="text-slate-400">
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
               APIRun provides ephemeral in-memory sandboxes and automated attack harnesses for educational and engineering evaluation purposes. You agree NOT to:
             </p>
-            <ul className="list-disc list-inside space-y-1.5 text-slate-400 pl-2">
-              <li>Use the testing engine to initiate denial-of-service (DDoS) attacks against third-party endpoints or infrastructure not owned by you.</li>
-              <li>Inject malware, malicious binaries, cryptominers, or unauthorized egress probes into execution sandboxes.</li>
-              <li>Attempt to break container boundaries, circumvent memory quotas, or exploit container host operating systems.</li>
-              <li>Reverse engineer or scrape APIRun challenge test suites for unauthorized commercial redistribution.</li>
+            <ul className="list-disc list-inside space-y-1.5 text-zinc-400 text-xs sm:text-sm pl-2">
+              <li>Use the testing engine to initiate denial-of-service (DDoS) attacks against third-party endpoints.</li>
+              <li>Inject malware, cryptominers, or unauthorized egress probes into execution sandboxes.</li>
+              <li>Attempt to circumvent memory quotas or exploit host operating systems.</li>
             </ul>
           </section>
 
-          {/* Section 3 */}
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#10b981] font-mono">03.</span>
-              <span>Intellectual Property & Code Ownership</span>
+          <section className="space-y-2.5">
+            <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center space-x-2">
+              <span className="text-emerald-400 font-mono">03.</span>
+              <span>Intellectual Property</span>
             </h2>
-            <p className="text-slate-400">
-              <strong className="text-white">Your code is yours.</strong> You retain 100% ownership, copyright, and intellectual property rights to any solutions, algorithms, and microservice implementations you write or submit to APIRun.
-            </p>
-            <p className="text-slate-400">
-              APIRun retains all rights to the platform interface, test runners, challenge problem descriptions, scoring heuristics, and automated fuzzing test vectors.
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+              <strong className="text-white">Your code is yours.</strong> You retain 100% copyright to any solutions and microservice implementations you write. APIRun retains all rights to the platform interface, test harnesses, and problem descriptions.
             </p>
           </section>
 
-          {/* Section 4 */}
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#10b981] font-mono">04.</span>
-              <span>Account Responsibility</span>
+          <section className="space-y-2.5">
+            <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center space-x-2">
+              <span className="text-emerald-400 font-mono">04.</span>
+              <span>Contact Legal</span>
             </h2>
-            <p className="text-slate-400">
-              You are responsible for maintaining the confidentiality of your authentication credentials. We reserve the right to suspend or terminate accounts that repeatedly violate rate-limit policies or initiate automated abusive traffic against our test harnesses.
-            </p>
-          </section>
-
-          {/* Section 5 */}
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span className="text-[#10b981] font-mono">05.</span>
-              <span>Disclaimer of Warranties</span>
-            </h2>
-            <p className="text-slate-400">
-              APIRun is provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind. While our automated test assertions adhere strictly to RFC-9110 and production backend standards, APIRun does not guarantee that passing our challenges eliminates all potential bugs in your production environment.
-            </p>
-          </section>
-
-          {/* Section 6 */}
-          <div className="p-5 rounded-2xl bg-[#080c14] border border-white/[0.08] space-y-2">
-            <h3 className="font-bold text-white text-sm">Need Help with Terms?</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
               If you have questions regarding these terms or enterprise licensing agreements, please reach out to{' '}
-              <a href="mailto:legal@apirun.dev" className="text-[#10b981] hover:underline">
+              <a href="mailto:legal@apirun.dev" className="text-emerald-400 underline hover:text-emerald-300">
                 legal@apirun.dev
               </a>.
             </p>
-          </div>
+          </section>
+
         </div>
       </main>
 
