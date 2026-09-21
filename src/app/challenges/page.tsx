@@ -6,6 +6,7 @@ import { challenges as defaultChallenges, initialUserStats } from '@/data/challe
 import { BackendRankNavbar } from '@/components/BackendRankNavbar';
 import { Sidebar } from '@/components/Sidebar';
 import { DashboardView } from '@/components/DashboardView';
+import { Footer } from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { loadUserProgress, applyUserProgressToChallenges } from '@/lib/userProgress';
 import { Challenge, UserStats } from '@/types';
@@ -53,7 +54,8 @@ export default function ChallengesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased relative">
+    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased relative selection:bg-white selection:text-black flex flex-col justify-between">
+      
       <BackendRankNavbar
         activeTab="challenges"
         onSelectTab={handleNavigate}
@@ -61,7 +63,7 @@ export default function ChallengesPage() {
         totalCount={challengesList.length}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex gap-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-16 flex flex-col lg:flex-row gap-8 relative z-10 flex-grow w-full">
         <Sidebar
           activeTab="challenges"
           onSelectTab={tab => handleNavigate(tab as any)}
@@ -74,16 +76,21 @@ export default function ChallengesPage() {
           solvedCount={solvedCount}
         />
 
-        <DashboardView
-          challenges={challengesList}
-          onSelectChallenge={handleSelectChallenge}
-          selectedDifficulty={selectedDifficulty}
-          onSelectDifficulty={setSelectedDifficulty}
-          selectedConcept={selectedConcept}
-          onSelectConcept={setSelectedConcept}
-          userStats={userStats}
-        />
-      </div>
+        <div className="flex-1 min-w-0">
+          <DashboardView
+            challenges={challengesList}
+            onSelectChallenge={handleSelectChallenge}
+            selectedDifficulty={selectedDifficulty}
+            onSelectDifficulty={setSelectedDifficulty}
+            selectedConcept={selectedConcept}
+            onSelectConcept={setSelectedConcept}
+            userStats={userStats}
+          />
+        </div>
+      </main>
+
+      {/* Global Footer */}
+      <Footer />
     </div>
   );
 }
