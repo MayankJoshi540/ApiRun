@@ -52,7 +52,7 @@ export const TestResultsPanel: React.FC<Props> = ({
               className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 isRunning
                   ? 'bg-white/[0.06] text-[#8b949e] cursor-not-allowed'
-                  : 'bg-[#10b981] text-black hover:bg-[#059669] active:scale-95 shadow-sm'
+                  : 'bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95 shadow-md shadow-emerald-950/40'
               }`}
             >
               {isRunning ? <Loader2 className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}

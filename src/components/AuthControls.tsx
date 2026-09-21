@@ -56,7 +56,7 @@ export const AuthControls: React.FC<AuthControlsProps> = ({ variant = 'navbar' }
               className="w-6 h-6 rounded-lg object-cover border border-white/[0.1]"
             />
           ) : (
-            <div className="w-6 h-6 rounded-lg bg-[#10b981]/20 border border-[#10b981]/40 flex items-center justify-center text-[#10b981] text-xs font-bold font-display">
+            <div className="w-6 h-6 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs font-bold font-display">
               {initial}
             </div>
           )}
@@ -83,7 +83,7 @@ export const AuthControls: React.FC<AuthControlsProps> = ({ variant = 'navbar' }
               onClick={() => setDropdownOpen(false)}
               className="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-white/[0.05] text-zinc-300 hover:text-white transition-colors"
             >
-              <User className="w-3.5 h-3.5 text-[#10b981]" />
+              <User className="w-3.5 h-3.5 text-emerald-400" />
               <span>My Progress &amp; Solves</span>
             </Link>
 
@@ -108,13 +108,13 @@ export const AuthControls: React.FC<AuthControlsProps> = ({ variant = 'navbar' }
         href="/sign-in"
         className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-zinc-200 hover:text-white border border-white/[0.08] transition-all"
       >
-        <LogIn className="w-3.5 h-3.5 text-[#10b981]" />
+        <LogIn className="w-3.5 h-3.5 text-emerald-400" />
         <span>Sign In</span>
       </Link>
 
       <Link
         href="/sign-up"
-        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#10b981] hover:bg-[#059669] text-black transition-all shadow-sm"
+        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-sm shadow-emerald-950/40"
       >
         <UserPlus className="w-3.5 h-3.5" />
         <span>Sign Up</span>

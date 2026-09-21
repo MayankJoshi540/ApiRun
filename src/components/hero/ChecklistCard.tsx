@@ -16,7 +16,7 @@ export const ChecklistCard: React.FC = () => {
         <div className="space-y-2.5">
           {items.map((item, idx) => (
             <div key={idx} className="flex items-center space-x-2.5">
-              <div className="w-4 h-4 rounded-full bg-[#10b981]/15 border border-[#10b981]/60 flex items-center justify-center text-[#10b981] shrink-0">
+              <div className="w-4 h-4 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
                 <Check className="text-[11px]" />
               </div>
               <span className="text-[11px] 2xl:text-xs font-medium text-[#f1f5f9] tracking-tight">

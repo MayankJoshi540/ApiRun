@@ -44,13 +44,13 @@ export const LandingNavbar: React.FC<Props> = ({ onNavigate }) => {
             aria-label="API Run home"
           >
             {/* Custom Terminal Code Icon */}
-            <div className="flex items-center font-mono text-sm sm:text-base font-extrabold text-[#10b981] tracking-tighter">
+            <div className="flex items-center font-mono text-sm sm:text-base font-extrabold text-emerald-400 tracking-tighter">
               &#123;&bull;&gt;&#125;
             </div>
             {/* Logo Text */}
             <span className="font-extrabold text-base sm:text-lg tracking-tight font-sans">
               <span className="text-white">API</span>
-              <span className="text-[#10b981]">Run</span>
+              <span className="text-emerald-400">Run</span>
             </span>
           </Link>
         </div>

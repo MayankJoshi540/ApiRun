@@ -44,6 +44,8 @@ import { DifficultyBadge } from './DifficultyBadge';
 import { ConceptBadge } from './ConceptBadge';
 import { Hero } from './hero/Hero';
 import { Footer } from './Footer';
+import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
+import { ScrollProgress } from './ui/ScrollProgress';
 
 interface Props {
   challenges: Challenge[];
@@ -310,7 +312,10 @@ export const LandingPageView: React.FC<Props> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans selection:bg-[#10b981] selection:text-black relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans selection:bg-emerald-500/30 selection:text-white relative overflow-x-hidden">
+      {/* Scroll Progress Indicator Bar */}
+      <ScrollProgress />
+
       {/* 1. Global Page Technical Background Atmosphere (Extends down the entire page) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {/* Continuous Technical Dot Matrix */}
@@ -347,24 +352,25 @@ export const LandingPageView: React.FC<Props> = ({
         {/* HERO VISUAL: LIVE INTERACTIVE TEST RUNNER & ATTACK MATRIX */}
         {/* ========================================================= */}
         <section className="pt-8 sm:pt-12 pb-20 px-4 sm:px-6 max-w-5xl mx-auto relative z-10">
-          <div className="rounded-2xl border border-white/[0.15] bg-[#0c1017]/90 shadow-[0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden text-xs backdrop-blur-2xl font-sans">
-            {/* Terminal Window Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-5 py-3.5 bg-white/[0.04] border-b border-white/[0.1] gap-3">
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2">
-                  <span className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-                  <span className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-                  <span className="w-3 h-3 rounded-full bg-[#27c93f]" />
+          <ScrollReveal variant="scale" duration={600} threshold={0.08}>
+            <div className="rounded-2xl border border-white/[0.15] bg-[#0c1017]/90 shadow-[0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden text-xs backdrop-blur-2xl font-sans">
+              {/* Terminal Window Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-5 py-3.5 bg-white/[0.04] border-b border-white/[0.1] gap-3">
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+                    <span className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                    <span className="w-3 h-3 rounded-full bg-[#27c93f]" />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-sans text-[#94a3b8] text-xs font-semibold tracking-wider uppercase">
+                      ADVERSARIAL ATTACK HARNESS
+                    </span>
+                    <span className="hidden md:inline text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                      HTTP/1.1 RFC-9110
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="font-sans text-[#94a3b8] text-xs font-semibold tracking-wider uppercase">
-                    ADVERSARIAL ATTACK HARNESS
-                  </span>
-                  <span className="hidden md:inline text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                    HTTP/1.1 RFC-9110
-                  </span>
-                </div>
-              </div>
 
               {/* Attack Vector Tabs */}
               <div className="flex items-center space-x-1.5 p-1 rounded-xl bg-black/40 border border-white/[0.1] font-sans overflow-x-auto">
@@ -534,113 +540,120 @@ export const LandingPageView: React.FC<Props> = ({
               </div>
             </div>
           </div>
+          </ScrollReveal>
         </section>
 
         {/* ========================================================= */}
         {/* THE LEETCODE VS APIRUN COMPARISON MATRIX */}
         {/* ========================================================= */}
         <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-10 font-sans">
-          <div className="text-center space-y-3">
-            <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
-              PARADIGM SHIFT
+          <ScrollReveal variant="fade-up" duration={600}>
+            <div className="text-center space-y-3">
+              <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
+                PARADIGM SHIFT
+              </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+                Why LeetCode doesn't prepare you for real backend outages
+              </h2>
+              <p className="text-sm sm:text-base text-[#94a3b8] max-w-3xl mx-auto font-normal leading-relaxed">
+                Algorithms test whether you memorized dynamic programming. APIRun tests whether your API can survive 50 concurrent double-spend requests, Redis rate limits, and database rollback locks.
+              </p>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-              Why LeetCode doesn't prepare you for real backend outages
-            </h2>
-            <p className="text-sm sm:text-base text-[#94a3b8] max-w-3xl mx-auto font-normal leading-relaxed">
-              Algorithms test whether you memorized dynamic programming. APIRun tests whether your API can survive 50 concurrent double-spend requests, Redis rate limits, and database rollback locks.
-            </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="rounded-2xl border border-white/[0.12] bg-[#0c1017]/90 backdrop-blur-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs sm:text-sm">
-                <thead>
-                  <tr className="border-b border-white/[0.1] bg-white/[0.03]">
-                    <th className="p-4 sm:p-5 font-bold text-[#8b949e] w-1/4">Engineering Vector</th>
-                    <th className="p-4 sm:p-5 font-bold text-[#94a3b8] w-3/8">
-                      <span className="flex items-center space-x-2">
-                        <XCircle className="w-4 h-4 text-red-400/80" />
-                        <span>Traditional DSA Platforms</span>
-                      </span>
-                    </th>
-                    <th className="p-4 sm:p-5 font-bold text-emerald-400 w-3/8 bg-emerald-500/[0.06]">
-                      <span className="flex items-center space-x-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span>APIRun Backend Arena</span>
-                      </span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/[0.08]">
-                  {comparisonRows.map((row, idx) => (
-                    <tr 
-                      key={idx} 
-                      className={`hover:bg-white/[0.02] transition-colors ${row.highlight ? 'bg-white/[0.01]' : ''}`}
-                    >
-                      <td className="p-4 sm:p-5 font-semibold text-white">
-                        {row.feature}
-                      </td>
-                      <td className="p-4 sm:p-5 text-[#94a3b8] leading-relaxed">
-                        {row.traditional}
-                      </td>
-                      <td className="p-4 sm:p-5 text-[#e2e8f0] font-medium bg-emerald-500/[0.04] leading-relaxed">
-                        <span className="text-emerald-400 font-semibold mr-1.5">✓</span>
-                        {row.apirun}
-                      </td>
+          <ScrollReveal variant="fade-up" delay={150} duration={650}>
+            <div className="rounded-2xl border border-white/[0.12] bg-[#0c1017]/90 backdrop-blur-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs sm:text-sm">
+                  <thead>
+                    <tr className="border-b border-white/[0.1] bg-white/[0.03]">
+                      <th className="p-4 sm:p-5 font-bold text-[#8b949e] w-1/4">Engineering Vector</th>
+                      <th className="p-4 sm:p-5 font-bold text-[#94a3b8] w-3/8">
+                        <span className="flex items-center space-x-2">
+                          <XCircle className="w-4 h-4 text-red-400/80" />
+                          <span>Traditional DSA Platforms</span>
+                        </span>
+                      </th>
+                      <th className="p-4 sm:p-5 font-bold text-emerald-400 w-3/8 bg-emerald-500/[0.06]">
+                        <span className="flex items-center space-x-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                          <span>APIRun Backend Arena</span>
+                        </span>
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-white/[0.08]">
+                    {comparisonRows.map((row, idx) => (
+                      <tr 
+                        key={idx} 
+                        className={`hover:bg-white/[0.02] transition-colors ${row.highlight ? 'bg-white/[0.01]' : ''}`}
+                      >
+                        <td className="p-4 sm:p-5 font-semibold text-white">
+                          {row.feature}
+                        </td>
+                        <td className="p-4 sm:p-5 text-[#94a3b8] leading-relaxed">
+                          {row.traditional}
+                        </td>
+                        <td className="p-4 sm:p-5 text-[#e2e8f0] font-medium bg-emerald-500/[0.04] leading-relaxed">
+                          <span className="text-emerald-400 font-semibold mr-1.5">✓</span>
+                          {row.apirun}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         </section>
 
         {/* ========================================================= */}
         {/* 6 PRODUCTION ENGINEERING TRACKS */}
         {/* ========================================================= */}
         <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans">
-          <div className="text-center space-y-3">
-            <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
-              CURRICULUM & DOMAIN MASTERY
+          <ScrollReveal variant="fade-up" duration={600}>
+            <div className="text-center space-y-3">
+              <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
+                CURRICULUM & DOMAIN MASTERY
+              </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+                6 Core Backend Engineering Domains
+              </h2>
+              <p className="text-sm sm:text-base text-[#94a3b8] max-w-2xl mx-auto leading-relaxed">
+                Every track simulates real production architecture patterns required at Staff & Senior levels.
+              </p>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-              6 Core Backend Engineering Domains
-            </h2>
-            <p className="text-sm sm:text-base text-[#94a3b8] max-w-2xl mx-auto leading-relaxed">
-              Every track simulates real production architecture patterns required at Staff & Senior levels.
-            </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" staggerDelay={80}>
             {engineeringTracks.map((track, i) => (
               <div
                 key={i}
-                className="p-6 rounded-2xl bg-white/[0.03] border border-white/[0.1] hover:border-emerald-400/40 transition-all space-y-4 backdrop-blur-xl group hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+                className="p-6 rounded-2xl bg-[#0b0f17] border border-white/[0.08] hover:border-emerald-500/40 transition-all duration-300 space-y-4 backdrop-blur-xl group hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(16,185,129,0.08)] cursor-pointer"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-md">
+                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg">
                     TRACK {track.number}
                   </span>
-                  <span className="text-[11px] text-[#94a3b8] font-medium">
+                  <span className="text-[11px] text-slate-400 font-medium">
                     {track.badge}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors">
+                  <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors tracking-tight">
                     {track.title}
                   </h3>
-                  <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  <p className="text-xs text-slate-400 leading-relaxed font-sans">
                     {track.description}
                   </p>
                 </div>
 
-                <div className="pt-2 flex flex-wrap gap-1.5 border-t border-white/[0.08]">
+                <div className="pt-3 flex flex-wrap gap-1.5 border-t border-white/[0.06]">
                   {track.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="text-[10px] px-2 py-0.5 rounded bg-white/[0.04] text-[#cbd5e1] border border-white/[0.08]"
+                      className="text-[10px] px-2 py-0.5 rounded-md bg-white/[0.04] text-slate-300 border border-white/[0.06] font-mono"
                     >
                       {skill}
                     </span>
@@ -648,26 +661,28 @@ export const LandingPageView: React.FC<Props> = ({
                 </div>
               </div>
             ))}
-          </div>
+          </StaggerContainer>
         </section>
 
         {/* ========================================================= */}
         {/* HOW WE EVALUATE (PRODUCTION TEST PIPELINE) */}
         {/* ========================================================= */}
         <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans">
-          <div className="text-center space-y-3">
-            <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
-              VERIFICATION ENGINE
+          <ScrollReveal variant="fade-up" duration={600}>
+            <div className="text-center space-y-3">
+              <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
+                VERIFICATION ENGINE
+              </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+                Production evaluation, zero mock fluff
+              </h2>
+              <p className="text-sm sm:text-base text-[#94a3b8] max-w-2xl mx-auto font-normal leading-relaxed">
+                Every submission runs in an isolated ephemeral execution sandbox tested by our automated adversarial harness.
+              </p>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-              Production evaluation, zero mock fluff
-            </h2>
-            <p className="text-sm sm:text-base text-[#94a3b8] max-w-2xl mx-auto font-normal leading-relaxed">
-              Every submission runs in an isolated ephemeral execution sandbox tested by our automated adversarial harness.
-            </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-4 gap-4" staggerDelay={90}>
             {/* Step 1 */}
             <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-emerald-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
               <div className="font-mono text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-md w-fit">
@@ -711,72 +726,76 @@ export const LandingPageView: React.FC<Props> = ({
                 Generates a detailed execution scorecard with latency p99 distributions and assertion diffs.
               </p>
             </div>
-          </div>
+          </StaggerContainer>
         </section>
 
         {/* ========================================================= */}
         {/* CLI QUICK-START TERMINAL WIDGET */}
         {/* ========================================================= */}
         <section className="px-4 sm:px-6 max-w-4xl mx-auto pb-20 font-sans">
-          <div className="p-6 sm:p-8 rounded-2xl bg-[#0d1117] border border-white/[0.12] space-y-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 font-sans text-xs text-white font-bold">
-                <TerminalSquare className="w-4 h-4 text-emerald-400" />
-                <span>CLI & LOCAL RUNNER COMPATIBLE</span>
+          <ScrollReveal variant="fade-up" duration={600}>
+            <div className="p-6 sm:p-8 rounded-2xl bg-[#0d1117] border border-white/[0.12] space-y-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 font-sans text-xs text-white font-bold">
+                  <TerminalSquare className="w-4 h-4 text-emerald-400" />
+                  <span>CLI & LOCAL RUNNER COMPATIBLE</span>
+                </div>
+                <div className="flex items-center space-x-1 bg-black/40 p-0.5 rounded-lg border border-white/[0.08] font-sans text-xs">
+                  {(['nodejs', 'go', 'python'] as const).map(lang => (
+                    <button
+                      key={lang}
+                      onClick={() => setSelectedCliLang(lang)}
+                      className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                        selectedCliLang === lang ? 'bg-white/[0.1] text-emerald-400 font-semibold' : 'text-[#94a3b8]'
+                      }`}
+                    >
+                      {lang === 'nodejs' ? 'TypeScript' : lang === 'go' ? 'Go' : 'Python'}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="flex items-center space-x-1 bg-black/40 p-0.5 rounded-lg border border-white/[0.08] font-sans text-xs">
-                {(['nodejs', 'go', 'python'] as const).map(lang => (
-                  <button
-                    key={lang}
-                    onClick={() => setSelectedCliLang(lang)}
-                    className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                      selectedCliLang === lang ? 'bg-white/[0.1] text-emerald-400 font-semibold' : 'text-[#94a3b8]'
-                    }`}
-                  >
-                    {lang === 'nodejs' ? 'TypeScript' : lang === 'go' ? 'Go' : 'Python'}
-                  </button>
-                ))}
+
+              <p className="text-xs text-[#94a3b8] leading-relaxed">
+                Prefer your local IDE? Test your local Express, FastAPI, or Gin server against our test suites using your custom endpoint:
+              </p>
+
+              <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/60 border border-white/[0.1] font-mono text-xs">
+                <span className="text-emerald-400 select-all">
+                  $ npx apirun test --target http://localhost:8000 --challenge create-user-api
+                </span>
+                <button
+                  onClick={handleCopyCli}
+                  className="flex items-center space-x-1 px-2.5 py-1 rounded bg-white/[0.08] hover:bg-white/[0.14] text-white text-xs font-sans font-medium transition-colors"
+                >
+                  {copiedCli ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedCli ? 'Copied' : 'Copy'}</span>
+                </button>
               </div>
             </div>
-
-            <p className="text-xs text-[#94a3b8] leading-relaxed">
-              Prefer your local IDE? Test your local Express, FastAPI, or Gin server against our test suites using your custom endpoint:
-            </p>
-
-            <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/60 border border-white/[0.1] font-mono text-xs">
-              <span className="text-emerald-400 select-all">
-                $ npx apirun test --target http://localhost:8000 --challenge create-user-api
-              </span>
-              <button
-                onClick={handleCopyCli}
-                className="flex items-center space-x-1 px-2.5 py-1 rounded bg-white/[0.08] hover:bg-white/[0.14] text-white text-xs font-sans font-medium transition-colors"
-              >
-                {copiedCli ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedCli ? 'Copied' : 'Copy'}</span>
-              </button>
-            </div>
-          </div>
+          </ScrollReveal>
         </section>
 
         {/* ========================================================= */}
         {/* POPULAR CHALLENGES SHOWCASE */}
         {/* ========================================================= */}
         <section className="py-16 px-4 sm:px-6 max-w-6xl mx-auto space-y-10 font-sans">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <div>
-              <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">CHALLENGE REPOSITORY</div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Popular API Challenges</h2>
+          <ScrollReveal variant="fade-up" duration={600}>
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">CHALLENGE REPOSITORY</div>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Popular API Challenges</h2>
+              </div>
+              <button
+                onClick={onExploreChallenges}
+                className="flex items-center space-x-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                <span>View all challenges</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <button
-              onClick={onExploreChallenges}
-              className="flex items-center space-x-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors"
-            >
-              <span>View all challenges</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6" staggerDelay={100}>
             {previewChallenges.map((challenge) => (
               <div
                 key={challenge.id}
@@ -803,70 +822,74 @@ export const LandingPageView: React.FC<Props> = ({
                 </div>
               </div>
             ))}
-          </div>
+          </StaggerContainer>
         </section>
 
         {/* ========================================================= */}
         {/* ACTIVE DEVELOPMENT & COMMUNITY FEEDBACK BANNER */}
         {/* ========================================================= */}
         <section className="py-8 px-4 sm:px-6 max-w-5xl mx-auto font-sans">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/40 via-[#080d14] to-slate-900/40 border border-emerald-500/30 p-6 sm:p-8 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_15px_40px_rgba(0,0,0,0.6)]">
-            <div className="flex items-start sm:items-center space-x-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner">
-                <MessageSquarePlus className="w-6 h-6" />
-              </div>
-              <div className="space-y-1 text-left">
-                <div className="flex items-center space-x-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold uppercase tracking-wider border border-emerald-500/30">
-                    Live Early Preview
-                  </span>
-                  <span className="text-xs text-slate-400 hidden sm:inline">Actively expanding challenge library</span>
+          <ScrollReveal variant="scale" duration={650}>
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/40 via-[#080d14] to-slate-900/40 border border-emerald-500/30 p-6 sm:p-8 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_15px_40px_rgba(0,0,0,0.6)]">
+              <div className="flex items-start sm:items-center space-x-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner">
+                  <MessageSquarePlus className="w-6 h-6" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                  We&apos;re in active development &mdash; accepting developer feedback!
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-400 max-w-xl leading-relaxed">
-                  Have a real-world API scenario, edge-case challenge idea, or runner suggestion? Help shape APIRun for backend engineers worldwide.
-                </p>
+                <div className="space-y-1 text-left">
+                  <div className="flex items-center space-x-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold uppercase tracking-wider border border-emerald-500/30">
+                      Live Early Preview
+                    </span>
+                    <span className="text-xs text-slate-400 hidden sm:inline">Actively expanding challenge library</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                    We&apos;re in active development &mdash; accepting developer feedback!
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-400 max-w-xl leading-relaxed">
+                    Have a real-world API scenario, edge-case challenge idea, or runner suggestion? Help shape APIRun for backend engineers worldwide.
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <Link
-              href="/feedback"
-              className="shrink-0 w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-all shadow-md active:scale-95"
-            >
-              <span>Share Feedback</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+              <Link
+                href="/feedback"
+                className="shrink-0 w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-all shadow-md active:scale-95"
+              >
+                <span>Share Feedback</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </ScrollReveal>
         </section>
 
         {/* ========================================================= */}
         {/* FINAL CALL TO ACTION */}
         {/* ========================================================= */}
         <section className="py-24 px-4 sm:px-6 max-w-4xl mx-auto text-center space-y-8 font-sans">
-          <div className="p-10 rounded-3xl bg-white/[0.04] border border-white/[0.15] backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] space-y-6">
-            <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-              Ready to master production backend engineering?
-            </h2>
-            <p className="text-sm sm:text-base text-[#94a3b8] max-w-xl mx-auto leading-relaxed">
-              Join thousands of backend engineers practicing distributed locking, rate limiting, and RFC-strict APIs.
-            </p>
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button
-                onClick={() => onSelectChallenge(challenges[0] || challenges[1])}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-sm transition-all active:scale-[0.98]"
-              >
-                Start Free Challenge
-              </button>
-              <button
-                onClick={onExploreChallenges}
-                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-white border border-white/[0.15] font-semibold text-sm transition-all"
-              >
-                Explore Problem Sets
-              </button>
+          <ScrollReveal variant="scale" duration={650}>
+            <div className="p-10 rounded-3xl bg-white/[0.04] border border-white/[0.15] backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] space-y-6">
+              <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                Ready to master production backend engineering?
+              </h2>
+              <p className="text-sm sm:text-base text-[#94a3b8] max-w-xl mx-auto leading-relaxed">
+                Join thousands of backend engineers practicing distributed locking, rate limiting, and RFC-strict APIs.
+              </p>
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button
+                  onClick={() => onSelectChallenge(challenges[0] || challenges[1])}
+                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-sm transition-all active:scale-[0.98]"
+                >
+                  Start Free Challenge
+                </button>
+                <button
+                  onClick={onExploreChallenges}
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-white border border-white/[0.15] font-semibold text-sm transition-all"
+                >
+                  Explore Problem Sets
+                </button>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         </section>
 
         {/* Global Footer */}

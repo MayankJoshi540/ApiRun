@@ -10,17 +10,17 @@ export const metadata = {
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans selection:bg-[#10b981] selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
       {/* Top Header */}
       <header className="w-full px-6 py-5 flex items-center justify-between border-b border-white/[0.08] bg-[#070a10]/80 backdrop-blur-xl">
         <Link 
           href="/"
           className="flex items-center space-x-2 transition-transform hover:scale-105"
         >
-          <span className="font-mono text-base font-extrabold text-[#10b981]">&#123;&bull;&gt;&#125;</span>
+          <span className="font-mono text-base font-extrabold text-emerald-400">&#123;&bull;&gt;&#125;</span>
           <span className="font-bold text-lg tracking-tight">
             <span className="text-white">API</span>
-            <span className="text-[#10b981]">Run</span>
+            <span className="text-emerald-400">Run</span>
           </span>
         </Link>
 
@@ -28,7 +28,7 @@ export default function NotFound() {
           href="/challenges"
           className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white px-3.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
         >
-          <Compass className="w-3.5 h-3.5 text-[#10b981]" />
+          <Compass className="w-3.5 h-3.5 text-emerald-400" />
           <span>Explore Challenges</span>
         </Link>
       </header>
@@ -45,7 +45,7 @@ export default function NotFound() {
         {/* Big Headline */}
         <div className="space-y-3 max-w-lg">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-mono font-black text-white tracking-tight">
-            4<span className="text-[#10b981]">0</span>4
+            4<span className="text-emerald-400">0</span>4
           </h1>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-200 tracking-tight">
             Endpoint Does Not Exist
@@ -61,7 +61,7 @@ export default function NotFound() {
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
               <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#10b981]/80" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
               <span className="text-slate-400 font-sans ml-1.5">gateway error dispatch</span>
             </div>
             <span className="text-amber-400">404</span>
@@ -80,7 +80,7 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             href="/challenges"
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-bold text-xs transition-all flex items-center justify-center space-x-2 active:scale-95 shadow-md"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all flex items-center justify-center space-x-2 active:scale-95 shadow-md shadow-emerald-950/40"
           >
             <span>Browse Challenges</span>
             <ArrowRight className="w-3.5 h-3.5" />

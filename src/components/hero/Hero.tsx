@@ -41,15 +41,15 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
         {/* Active Development & Feedback Announcement Pill */}
         <Link
           href="/feedback"
-          className="animate-hero-1 inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 text-xs font-medium text-emerald-400 transition-all duration-300 group shadow-[0_0_25px_rgba(16,185,129,0.18)] hover:scale-[1.02] active:scale-[0.98]"
+          className="animate-hero-1 inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/25 text-xs font-medium text-emerald-300 transition-all duration-200 group hover:scale-[1.02] active:scale-[0.98]"
         >
           <span className="flex h-2 w-2 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
           <span className="text-slate-300 font-normal">Active Development</span>
-          <span className="text-emerald-500/40 hidden sm:inline">&bull;</span>
-          <span className="font-semibold text-emerald-400">Accepting Feedback &amp; Ideas</span>
+          <span className="text-emerald-400/40 hidden sm:inline">&bull;</span>
+          <span className="font-semibold text-emerald-300">Accepting Feedback &amp; Ideas</span>
           <ArrowRight className="w-3.5 h-3.5 text-emerald-400 transition-transform duration-200 group-hover:translate-x-0.5" />
         </Link>
 
@@ -61,7 +61,7 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
           <h1 className="animate-hero-2 text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-[#f1f5f9]">
             Defend Edge Cases.
           </h1>
-          <h1 className="animate-hero-3 text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-[#10b981]">
+          <h1 className="animate-hero-3 text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-emerald-400">
             Master Production Systems.
           </h1>
         </div>
@@ -82,7 +82,7 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
 
       {/* 5. Bottom Horizon Arc & Scroll Indicator */}
       <div className="relative z-20 flex flex-col items-center justify-center pt-2 space-y-1 opacity-85 hover:opacity-100 transition-opacity animate-hero-cta">
-        <ChevronDown className="w-4 h-4 text-[#10b981] animate-bounce" />
+        <ChevronDown className="w-4 h-4 text-emerald-400 animate-bounce" />
         <span className="text-[10px] sm:text-[11px] font-mono font-medium tracking-[0.25em] text-[#94a3b8] uppercase">
           Scroll to explore
         </span>
