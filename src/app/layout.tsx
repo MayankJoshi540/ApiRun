@@ -35,7 +35,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased selection:bg-[#10b981] selection:text-black"
+        className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased selection:bg-white selection:text-black"
       >
         <AuthProvider>
           {children}
