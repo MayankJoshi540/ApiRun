@@ -71,7 +71,7 @@ function SignInContent() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased overflow-hidden selection:bg-[#10b981] selection:text-white flex flex-col justify-between">
+    <div className="relative min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased overflow-hidden selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
       {/* Fine Technical Grid Texture Overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.035] z-0"
@@ -92,12 +92,12 @@ function SignInContent() {
             href="/"
             className="flex items-center space-x-2 text-left transition-transform hover:scale-105 active:scale-95 group"
           >
-            <div className="flex items-center font-mono text-base sm:text-lg font-extrabold text-[#10b981] tracking-tighter">
+            <div className="flex items-center font-mono text-base sm:text-lg font-extrabold text-emerald-400 tracking-tighter">
               &#123;&bull;&gt;&#125;
             </div>
             <span className="font-extrabold text-base sm:text-lg tracking-tight font-sans">
               <span className="text-white">API</span>
-              <span className="text-[#10b981]">Run</span>
+              <span className="text-emerald-400">Run</span>
             </span>
           </Link>
 
@@ -106,7 +106,7 @@ function SignInContent() {
             href="/challenges"
             className="inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium text-slate-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-[#10b981]" />
+            <ArrowLeft className="w-3.5 h-3.5 text-emerald-400" />
             <span>Explore Challenges</span>
           </Link>
         </div>
@@ -118,8 +118,8 @@ function SignInContent() {
         {/* Left Column: Home-styled Hero Copy & Live Test Preview Card */}
         <div className="lg:col-span-6 space-y-6 sm:space-y-8">
           {/* Eyebrow Pill */}
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/25 text-[#10b981] text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>BACKEND PRACTICE PLATFORM</span>
           </div>
 
@@ -128,7 +128,7 @@ function SignInContent() {
             <h1 className="text-3xl sm:text-4xl md:text-5xl text-white">
               Practice Real Backends.
             </h1>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl text-[#10b981]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl text-emerald-400">
               Level Up Your Skills.
             </h1>
           </div>
@@ -141,25 +141,25 @@ function SignInContent() {
           <div className="rounded-2xl bg-[#090d14]/90 border border-white/[0.1] backdrop-blur-xl p-5 shadow-2xl space-y-3 font-sans text-xs max-w-lg">
             <div className="flex items-center justify-between border-b border-white/[0.06] pb-2.5">
               <div className="flex items-center space-x-2">
-                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold font-mono text-[11px] border border-emerald-500/20">
+                <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-bold font-mono text-[11px] border border-emerald-500/30">
                   POST
                 </span>
                 <span className="font-mono text-zinc-300">/api/v1/users</span>
               </div>
-              <span className="text-[11px] text-[#10b981] font-mono font-semibold">201 CREATED &bull; 12.4ms</span>
+              <span className="text-[11px] text-sky-400 font-mono font-semibold">201 CREATED &bull; 12.4ms</span>
             </div>
 
             <div className="space-y-1.5 pt-1">
               <div className="flex items-center space-x-2 text-zinc-300 text-[11px]">
-                <Check className="w-3.5 h-3.5 text-[#10b981] stroke-[3]" />
+                <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
                 <span>RFC-5322 payload schema validated</span>
               </div>
               <div className="flex items-center space-x-2 text-zinc-300 text-[11px]">
-                <Check className="w-3.5 h-3.5 text-[#10b981] stroke-[3]" />
+                <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
                 <span>Deterministic duplicate email collision handling</span>
               </div>
               <div className="flex items-center space-x-2 text-zinc-300 text-[11px]">
-                <Check className="w-3.5 h-3.5 text-[#10b981] stroke-[3]" />
+                <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
                 <span>Response contract headers verified</span>
               </div>
             </div>
@@ -234,7 +234,7 @@ function SignInContent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="developer@apirun.dev"
-                    className="w-full pl-10 pr-3.5 py-2.5 bg-[#05070a]/90 border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981] transition-all text-xs sm:text-sm"
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-[#05070a]/90 border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs sm:text-sm"
                   />
                 </div>
               </div>
@@ -251,7 +251,7 @@ function SignInContent() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-3.5 py-2.5 bg-[#05070a]/90 border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981] transition-all text-xs sm:text-sm"
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-[#05070a]/90 border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs sm:text-sm"
                   />
                 </div>
               </div>
@@ -259,7 +259,7 @@ function SignInContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-bold font-display text-xs sm:text-sm transition-all shadow-md flex items-center justify-center space-x-2 active:scale-[0.99] disabled:opacity-50"
+                className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold font-display text-xs sm:text-sm transition-all shadow-md shadow-emerald-950/40 flex items-center justify-center space-x-2 active:scale-[0.99] disabled:opacity-50"
               >
                 {loading ? (
                   <span>Signing in...</span>
@@ -276,7 +276,7 @@ function SignInContent() {
               Don&apos;t have an account?{' '}
               <Link 
                 href={rawRedirect ? `/sign-up?redirect=${encodeURIComponent(rawRedirect)}` : '/sign-up'} 
-                className="text-[#10b981] hover:underline font-semibold"
+                className="text-emerald-400 hover:underline font-semibold"
               >
                 Sign Up
               </Link>
@@ -300,7 +300,7 @@ export default function SignInPage() {
       fallback={
         <div className="min-h-screen bg-[#050708] flex items-center justify-center text-white">
           <div className="flex items-center space-x-2 text-xs font-mono text-zinc-400">
-            <Loader2 className="w-4 h-4 animate-spin text-[#10b981]" />
+            <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
             <span>Loading authentication...</span>
           </div>
         </div>
