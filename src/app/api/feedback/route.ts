@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
-interface FeedbackItem {
+export interface FeedbackItem {
   id: string;
   timestamp: string;
   name: string;
@@ -15,7 +18,34 @@ interface FeedbackItem {
   userAgent?: string;
 }
 
-const FEEDBACK_FILE_PATH = path.join(process.cwd(), 'feedbacks.json');
+// Fallback path in /tmp for environments where filesystem writes are needed (Vercel serverless /tmp is writable)
+const FALLBACK_TMP_PATH = path.join(os.tmpdir(), 'apirun_feedbacks.json');
+
+function saveToFallbackFile(feedback: FeedbackItem) {
+  try {
+    let list: FeedbackItem[] = [];
+    if (fs.existsSync(FALLBACK_TMP_PATH)) {
+      list = JSON.parse(fs.readFileSync(FALLBACK_TMP_PATH, 'utf-8'));
+      if (!Array.isArray(list)) list = [];
+    }
+    list.unshift(feedback);
+    fs.writeFileSync(FALLBACK_TMP_PATH, JSON.stringify(list, null, 2), 'utf-8');
+  } catch (err) {
+    console.warn('Fallback file write failed:', err);
+  }
+}
+
+function getFromFallbackFile(): FeedbackItem[] {
+  try {
+    if (fs.existsSync(FALLBACK_TMP_PATH)) {
+      const list = JSON.parse(fs.readFileSync(FALLBACK_TMP_PATH, 'utf-8'));
+      if (Array.isArray(list)) return list;
+    }
+  } catch (err) {
+    console.warn('Fallback file read failed:', err);
+  }
+  return [];
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,36 +72,34 @@ export async function POST(req: NextRequest) {
       userAgent: req.headers.get('user-agent') || undefined,
     };
 
-    // Read existing feedbacks from local machine file
-    let feedbacks: FeedbackItem[] = [];
-    if (fs.existsSync(FEEDBACK_FILE_PATH)) {
+    let savedStorage = 'Firestore Database';
+
+    // 1. Save to Firestore if initialized
+    if (db) {
       try {
-        const fileData = fs.readFileSync(FEEDBACK_FILE_PATH, 'utf-8');
-        feedbacks = JSON.parse(fileData);
-        if (!Array.isArray(feedbacks)) feedbacks = [];
-      } catch (err) {
-        console.warn('Could not parse existing feedbacks.json, initializing new array', err);
-        feedbacks = [];
+        const docRef = await addDoc(collection(db, 'feedbacks'), newFeedback);
+        newFeedback.id = docRef.id;
+      } catch (firestoreErr) {
+        console.warn('Firestore write failed, falling back to temp file storage:', firestoreErr);
+        saveToFallbackFile(newFeedback);
+        savedStorage = 'Temporary Storage (/tmp)';
       }
+    } else {
+      saveToFallbackFile(newFeedback);
+      savedStorage = 'Temporary Storage (/tmp)';
     }
-
-    // Append new feedback at the beginning (newest first)
-    feedbacks.unshift(newFeedback);
-
-    // Save directly to local machine filesystem
-    fs.writeFileSync(FEEDBACK_FILE_PATH, JSON.stringify(feedbacks, null, 2), 'utf-8');
 
     return NextResponse.json(
       {
         success: true,
         message: 'Thank you for your feedback! It has been saved successfully.',
         feedbackId: newFeedback.id,
-        savedTo: FEEDBACK_FILE_PATH,
+        savedTo: savedStorage,
       },
       { status: 201 }
     );
   } catch (error: any) {
-    console.error('Error saving feedback to local filesystem:', error);
+    console.error('Error saving feedback:', error);
     return NextResponse.json(
       { error: error?.message || 'Failed to save feedback on server.' },
       { status: 500 }
@@ -82,17 +110,32 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     let feedbacks: FeedbackItem[] = [];
-    if (fs.existsSync(FEEDBACK_FILE_PATH)) {
-      const fileData = fs.readFileSync(FEEDBACK_FILE_PATH, 'utf-8');
-      feedbacks = JSON.parse(fileData);
+
+    if (db) {
+      try {
+        const q = query(collection(db, 'feedbacks'), orderBy('timestamp', 'desc'), limit(100));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data() as FeedbackItem;
+          feedbacks.push({
+            ...data,
+            id: docSnap.id,
+          });
+        });
+      } catch (err) {
+        console.warn('Firestore getDocs failed, checking fallback file:', err);
+        feedbacks = getFromFallbackFile();
+      }
+    } else {
+      feedbacks = getFromFallbackFile();
     }
 
     return NextResponse.json({
       total: feedbacks.length,
       feedbacks,
-      filePath: FEEDBACK_FILE_PATH,
     });
   } catch (error: any) {
+    console.error('Error reading feedbacks:', error);
     return NextResponse.json(
       { error: 'Failed to read feedback list.' },
       { status: 500 }
