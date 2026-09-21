@@ -37,13 +37,13 @@ export const BackendRankNavbar: React.FC<Props> = ({
             aria-label="API Run home"
           >
             {/* Code Bracket Icon */}
-            <div className="flex items-center font-mono text-sm sm:text-base font-extrabold text-[#10b981] tracking-tighter">
+            <div className="flex items-center font-mono text-sm sm:text-base font-extrabold text-emerald-400 tracking-tighter">
               &#123;&bull;&gt;&#125;
             </div>
             {/* Brand Text */}
             <span className="font-extrabold text-base sm:text-lg tracking-tight font-sans">
               <span className="text-white">API</span>
-              <span className="text-[#10b981]">Run</span>
+              <span className="text-emerald-400">Run</span>
             </span>
           </Link>
 
@@ -73,7 +73,7 @@ export const BackendRankNavbar: React.FC<Props> = ({
                         isHovered 
                           ? 'bg-white/[0.1] border border-white/[0.12]' 
                           : isCurrentActive 
-                          ? 'bg-white/[0.08] border border-white/[0.1]' 
+                          ? 'bg-emerald-500/15 border border-emerald-500/30' 
                           : 'bg-transparent'
                       }`}
                       style={{
@@ -81,7 +81,7 @@ export const BackendRankNavbar: React.FC<Props> = ({
                       }}
                     />
                   )}
-                  <span className={isCurrentActive || isHovered ? 'text-white' : 'text-[#94a3b8]'}>
+                  <span className={isCurrentActive ? 'text-emerald-300 font-bold' : isHovered ? 'text-white' : 'text-[#94a3b8]'}>
                     {tab.label}
                   </span>
                 </Link>
@@ -94,7 +94,7 @@ export const BackendRankNavbar: React.FC<Props> = ({
         <div className="flex items-center space-x-3">
           {/* Solved Progress Counter */}
           <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs font-mono transition-transform hover:scale-105">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981]" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
             <span className="text-white font-bold">{solvedCount}</span>
             <span className="text-[#64748b]">/{totalCount}</span>
           </div>
