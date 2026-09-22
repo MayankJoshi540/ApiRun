@@ -10,7 +10,6 @@ import {
   Star, 
   Send, 
   CheckCircle2, 
-  Sparkles, 
   Layers, 
   Bug, 
   Zap, 
@@ -48,7 +47,7 @@ const ADMIN_EMAILS = ['joshimayank646@gmail.com'];
 
 const CATEGORIES = [
   { id: 'Challenge Suggestion', label: 'New Challenge Idea', icon: Layers, desc: 'Suggest a real-world backend scenario, idempotency edge case, or system contract' },
-  { id: 'Feature Request', label: 'Feature Request', icon: Sparkles, desc: 'Propose new features for the test harness, CLI runner, or Monaco editor' },
+  { id: 'Feature Request', label: 'Feature Request', icon: Code2, desc: 'Propose new features for the test harness, CLI runner, or Monaco editor' },
   { id: 'Bug Report', label: 'Bug Report', icon: Bug, desc: 'Report an issue with challenge assertions, runner execution, or UI' },
   { id: 'Performance', label: 'Harness & Performance', icon: Zap, desc: 'Suggest optimizations for runner latency, sandbox overhead, or streaming logs' },
   { id: 'General Feedback', label: 'General Experience', icon: MessageCircle, desc: 'Share your thoughts, praise, or ideas for improving the platform' },
@@ -191,7 +190,7 @@ export default function FeedbackPage() {
       />
 
       {/* Main Feedback Container */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14 pb-20 space-y-8 relative z-10 flex-grow w-full">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-20 space-y-8 relative z-10 flex-grow w-full">
         
         {/* Admin Switcher Bar (Visible only for joshimayank646@gmail.com) */}
         {isAdmin && (
