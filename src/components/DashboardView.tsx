@@ -76,17 +76,12 @@ export const DashboardView: React.FC<Props> = ({
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
           {/* Title and Intro */}
           <div className="space-y-1.5 max-w-2xl">
-            <div className="text-[11px] font-mono font-medium tracking-wider text-emerald-400 uppercase flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>PRODUCTION BACKEND LABS</span>
-            </div>
-
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Backend Challenges
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Build and test real RESTful API endpoints against RFC-9110 HTTP specifications, concurrency locks, and defensive payload validations.
+              Explore and solve real-world API challenges covering authentication, rate limiting, distributed caching, and database transactions.
             </p>
           </div>
 
