@@ -12,7 +12,7 @@ export const EndpointCard: React.FC = () => {
     <div className="relative group animate-card-float-4 transition-all duration-500 hover:scale-105 hover:!rotate-0">
       {/* Clean Technical Card Container */}
       <div className="relative w-[220px] 2xl:w-[250px] rounded-2xl bg-[#080d14] border border-white/[0.12] p-3.5 2xl:p-4.5 shadow-xl text-left select-none">
-        <div className="space-y-2 font-mono text-[10px] sm:text-[11px]">
+        <div className="space-y-2 font-sans text-[10px] sm:text-[11px] font-medium">
           {endpoints.map((ep, idx) => (
             <div key={idx} className="flex items-center space-x-2.5">
               <span className={`w-12 text-center px-1 py-0.5 rounded font-bold border ${ep.color}`}>
