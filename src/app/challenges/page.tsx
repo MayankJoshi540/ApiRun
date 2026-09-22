@@ -54,7 +54,7 @@ export default function ChallengesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased relative selection:bg-white selection:text-black flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
       
       <BackendRankNavbar
         activeTab="challenges"
@@ -63,7 +63,7 @@ export default function ChallengesPage() {
         totalCount={challengesList.length}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-16 flex flex-col lg:flex-row gap-8 relative z-10 flex-grow w-full">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-16 flex flex-col lg:flex-row gap-8 relative z-10 flex-grow w-full">
         <Sidebar
           activeTab="challenges"
           onSelectTab={tab => handleNavigate(tab as any)}
