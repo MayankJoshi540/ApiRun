@@ -12,8 +12,8 @@ export const FloatingCodeCard: React.FC = () => {
           <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]" />
         </div>
 
-        {/* Syntax-Highlighted Monospace Code Snippet */}
-        <div className="font-mono text-[12px] sm:text-[13px] leading-relaxed tracking-normal space-y-1">
+        {/* Syntax-Highlighted Code Snippet in Plus Jakarta Sans */}
+        <div className="font-sans text-[12px] sm:text-[13px] leading-relaxed tracking-normal space-y-1 font-medium">
           <div className="text-emerald-400 font-medium">
             // Build
           </div>
