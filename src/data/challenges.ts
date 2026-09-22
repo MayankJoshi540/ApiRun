@@ -3,7 +3,7 @@ import { Challenge, UserStats } from '../types';
 export const initialUserStats: UserStats = {
   solvedCount: 0,
   challengesSolved: 0,
-  totalChallenges: 8,
+  totalChallenges: 11,
   totalTestsPassed: 0,
   totalSubmissions: 0,
   averageLatencyMs: 0,
@@ -12,6 +12,708 @@ export const initialUserStats: UserStats = {
 };
 
 export const challenges: Challenge[] = [
+  {
+    id: 'ping-health-api',
+    title: 'Ping & Health Check API',
+    slug: 'ping-health-api',
+    difficulty: 'BEGINNER',
+    category: 'HTTP Fundamentals',
+    summary: 'Build your first API endpoints: a ping responder and a service health status check.',
+    estimatedMinutes: 5,
+    concepts: ['HTTP', 'REST'],
+    status: 'UNSOLVED',
+    problemStatement: `Welcome to APIRun! In this introductory challenge, you will implement standard diagnostic endpoints found in every production backend service.
+
+Your service must expose two GET routes:
+1. \`GET /ping\` &mdash; Responds with a simple JSON message \`{ "message": "pong" }\` with HTTP status **200 OK**.
+2. \`GET /health\` &mdash; Responds with the service status \`{ "status": "ok", "uptime": 100 }\` with HTTP status **200 OK**.`,
+    requirements: [
+      {
+        id: 'p-req-1',
+        title: 'GET /ping implementation',
+        detail: 'Return HTTP status 200 OK with JSON body: {"message": "pong"}.',
+        isCritical: true,
+        badge: 'HTTP GET'
+      },
+      {
+        id: 'p-req-2',
+        title: 'GET /health implementation',
+        detail: 'Return HTTP status 200 OK with JSON body: {"status": "ok", "uptime": 100}.',
+        isCritical: true,
+        badge: 'JSON'
+      }
+    ],
+    constraints: [
+      'Content-Type must be application/json',
+      'Both endpoints must return HTTP 200 OK'
+    ],
+    endpoints: [
+      {
+        id: 'ep-get-ping',
+        method: 'GET',
+        path: '/ping',
+        summary: 'Ping heartbeat check',
+        description: 'Returns a pong response confirming the server is alive.',
+        responses: [
+          {
+            statusCode: 200,
+            statusText: 'OK',
+            description: 'Heartbeat response',
+            exampleJson: JSON.stringify({ message: 'pong' }, null, 2)
+          }
+        ],
+        curlExample: 'curl -X GET http://localhost:8000/ping'
+      },
+      {
+        id: 'ep-get-health',
+        method: 'GET',
+        path: '/health',
+        summary: 'Service health check',
+        description: 'Returns operational status of the service.',
+        responses: [
+          {
+            statusCode: 200,
+            statusText: 'OK',
+            description: 'Health status response',
+            exampleJson: JSON.stringify({ status: 'ok', uptime: 100 }, null, 2)
+          }
+        ],
+        curlExample: 'curl -X GET http://localhost:8000/health'
+      }
+    ],
+    testCases: [
+      {
+        id: 'p-tc1',
+        name: 'GET /ping returns 200 OK with pong',
+        category: 'Contract',
+        description: 'Calling GET /ping returns 200 OK with {"message": "pong"}.',
+        endpoint: '/ping',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"message": "pong"'
+      },
+      {
+        id: 'p-tc2',
+        name: 'GET /health returns 200 OK with status ok',
+        category: 'Contract',
+        description: 'Calling GET /health returns 200 OK with {"status": "ok"}.',
+        endpoint: '/health',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"status": "ok"'
+      },
+      {
+        id: 'p-tc3',
+        name: 'Returns proper JSON Content-Type [Hidden]',
+        category: 'Edge Case',
+        description: 'Ensures JSON content type header is returned.',
+        endpoint: '/ping',
+        method: 'GET',
+        isHidden: true,
+        expectedStatus: 200,
+        expectedResponseSnippet: '"message": "pong"'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+// TODO 1: Implement GET /ping
+// - Return HTTP 200 with JSON: { message: 'pong' }
+app.get('/ping', (_req: Request, res: Response) => {
+  // TODO: Your implementation here
+  return res.status(200).json({ message: 'pong' });
+});
+
+// TODO 2: Implement GET /health
+// - Return HTTP 200 with JSON: { status: 'ok', uptime: 100 }
+app.get('/health', (_req: Request, res: Response) => {
+  // TODO: Your implementation here
+  return res.status(200).json({ status: 'ok', uptime: 100 });
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"net/http"
+)
+
+func main() {
+	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"message": "pong"})
+	})
+
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{"status": "ok", "uptime": 100})
+	})
+
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI
+
+app = FastAPI(title="Ping & Health Check API")
+
+@app.get("/ping")
+def ping():
+    return {"message": "pong"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "uptime": 100}
+`
+    }
+  },
+  {
+    id: 'echo-validation-api',
+    title: 'Echo & Request Body Validation',
+    slug: 'echo-validation-api',
+    difficulty: 'BEGINNER',
+    category: 'REST API',
+    summary: 'Learn how to parse JSON request bodies and return 200 OK vs 400 Bad Request.',
+    estimatedMinutes: 10,
+    concepts: ['HTTP', 'REST', 'Validation'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement a POST endpoint that parses an incoming JSON payload and performs validation.
+
+Your service must expose:
+\`POST /api/v1/echo\`
+
+**Behavior:**
+- If the body contains a valid non-empty \`message\` string: Return **HTTP 200 OK** with:
+  \`{ "echo": "<message>", "length": <number of characters> }\`
+- If \`message\` is missing, null, or empty string: Return **HTTP 400 Bad Request** with:
+  \`{ "error": "missing_message", "message": "Field 'message' is required." }\``,
+    requirements: [
+      {
+        id: 'e-req-1',
+        title: 'POST /api/v1/echo valid payload',
+        detail: 'Return 200 OK with echo string and character length.',
+        isCritical: true,
+        badge: 'HTTP POST'
+      },
+      {
+        id: 'e-req-2',
+        title: '400 Bad Request on missing message',
+        detail: 'Return 400 Bad Request when message field is omitted or empty.',
+        isCritical: true,
+        badge: 'Validation'
+      }
+    ],
+    constraints: [
+      'Reject empty or whitespace-only messages with 400 Bad Request',
+      'Content-Type must be application/json'
+    ],
+    endpoints: [
+      {
+        id: 'ep-post-echo',
+        method: 'POST',
+        path: '/api/v1/echo',
+        summary: 'Echo inbound message',
+        requestBody: {
+          contentType: 'application/json',
+          exampleJson: JSON.stringify({ message: 'Hello Backend' }, null, 2),
+          fields: [
+            { name: 'message', type: 'string', required: true, description: 'Text message to echo back' }
+          ]
+        },
+        responses: [
+          {
+            statusCode: 200,
+            statusText: 'OK',
+            description: 'Message echoed successfully',
+            exampleJson: JSON.stringify({ echo: 'Hello Backend', length: 13 }, null, 2)
+          },
+          {
+            statusCode: 400,
+            statusText: 'Bad Request',
+            description: 'Missing or empty message field',
+            exampleJson: JSON.stringify({ error: 'missing_message', message: "Field 'message' is required." }, null, 2)
+          }
+        ],
+        curlExample: 'curl -X POST http://localhost:8000/api/v1/echo -H "Content-Type: application/json" -d \'{"message": "Hello Backend"}\''
+      }
+    ],
+    testCases: [
+      {
+        id: 'e-tc1',
+        name: 'Echoes valid message with 200 OK',
+        category: 'Contract',
+        description: 'POST with message "Hello APIRun" returns 200 with echo and length 11.',
+        endpoint: '/api/v1/echo',
+        method: 'POST',
+        requestPayload: JSON.stringify({ message: 'Hello APIRun' }),
+        expectedStatus: 200,
+        expectedResponseSnippet: '"echo": "Hello APIRun"'
+      },
+      {
+        id: 'e-tc2',
+        name: 'Rejects missing message with 400 Bad Request',
+        category: 'Validation',
+        description: 'POST with empty payload returns 400 Bad Request with error missing_message.',
+        endpoint: '/api/v1/echo',
+        method: 'POST',
+        requestPayload: JSON.stringify({}),
+        expectedStatus: 400,
+        expectedResponseSnippet: '"error": "missing_message"'
+      },
+      {
+        id: 'e-tc3',
+        name: 'Rejects empty string message with 400 [Hidden]',
+        category: 'Edge Case',
+        description: 'POST with message "" must return 400 Bad Request.',
+        endpoint: '/api/v1/echo',
+        method: 'POST',
+        isHidden: true,
+        requestPayload: JSON.stringify({ message: '' }),
+        expectedStatus: 400,
+        expectedResponseSnippet: 'missing_message'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+// TODO: Implement POST /api/v1/echo
+// - Read req.body.message
+// - If message is missing or empty string: return 400 with { error: 'missing_message', message: "Field 'message' is required." }
+// - If valid: return 200 with { echo: message, length: message.length }
+app.post('/api/v1/echo', (req: Request, res: Response) => {
+  const { message } = req.body || {};
+
+  if (!message || typeof message !== 'string' || message.trim() === '') {
+    return res.status(400).json({
+      error: 'missing_message',
+      message: "Field 'message' is required."
+    });
+  }
+
+  return res.status(200).json({
+    echo: message,
+    length: message.length
+  });
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"strings"
+)
+
+type EchoRequest struct {
+	Message string \`json:"message"\`
+}
+
+func main() {
+	http.HandleFunc("/api/v1/echo", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var body EchoRequest
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || strings.TrimSpace(body.Message) == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "missing_message"})
+			return
+		}
+		json.NewEncoder(w).Encode(map[string]interface{}{"echo": body.Message, "length": len(body.Message)})
+	})
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
+
+app = FastAPI(title="Echo & Validation API")
+
+class EchoPayload(BaseModel):
+    message: str
+
+@app.post("/api/v1/echo")
+def echo(payload: EchoPayload):
+    if not payload.message.strip():
+        raise HTTPException(status_code=400, detail={"error": "missing_message"})
+    return {"echo": payload.message, "length": len(payload.message)}
+`
+    }
+  },
+  {
+    id: 'greeting-query-api',
+    title: 'Greeting API with Query Parameters',
+    slug: 'greeting-query-api',
+    difficulty: 'BEGINNER',
+    category: 'HTTP Fundamentals',
+    summary: 'Learn how to read URL query parameters and provide clean fallback defaults.',
+    estimatedMinutes: 10,
+    concepts: ['HTTP', 'REST'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement a dynamic greeting endpoint that extracts query parameters from the URL.
+
+Your service must expose:
+\`GET /api/v1/greet\`
+
+**Behavior:**
+- If query parameter \`name\` is passed (e.g. \`GET /api/v1/greet?name=Mayank\`):
+  Return **HTTP 200 OK** with:
+  \`{ "greeting": "Hello, Mayank!", "timestamp": "<ISO 8601 string>" }\`
+- If query parameter \`name\` is omitted (e.g. \`GET /api/v1/greet\`):
+  Default to "Guest" and return **HTTP 200 OK** with:
+  \`{ "greeting": "Hello, Guest!", "timestamp": "<ISO 8601 string>" }\``,
+    requirements: [
+      {
+        id: 'g-req-1',
+        title: 'Extract name from query string',
+        detail: 'Extract req.query.name and greet the user.',
+        isCritical: true,
+        badge: 'Query Params'
+      },
+      {
+        id: 'g-req-2',
+        title: 'Fallback default when name omitted',
+        detail: 'Default name to "Guest" when omitted.',
+        isCritical: true,
+        badge: 'Defaults'
+      }
+    ],
+    constraints: [
+      'Return HTTP 200 OK for all valid GET requests',
+      'Format greeting exactly as "Hello, <name>!"'
+    ],
+    endpoints: [
+      {
+        id: 'ep-get-greet',
+        method: 'GET',
+        path: '/api/v1/greet',
+        summary: 'Dynamic greeting endpoint',
+        responses: [
+          {
+            statusCode: 200,
+            statusText: 'OK',
+            description: 'Greeting response',
+            exampleJson: JSON.stringify({ greeting: 'Hello, Mayank!', timestamp: '2026-09-22T10:00:00.000Z' }, null, 2)
+          }
+        ],
+        curlExample: 'curl -X GET "http://localhost:8000/api/v1/greet?name=Mayank"'
+      }
+    ],
+    testCases: [
+      {
+        id: 'g-tc1',
+        name: 'Greets specified name from query parameter',
+        category: 'Contract',
+        description: 'GET /api/v1/greet?name=Mayank returns "Hello, Mayank!".',
+        endpoint: '/api/v1/greet?name=Mayank',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"greeting": "Hello, Mayank!"'
+      },
+      {
+        id: 'g-tc2',
+        name: 'Defaults to Guest when name query param omitted',
+        category: 'Contract',
+        description: 'GET /api/v1/greet returns "Hello, Guest!".',
+        endpoint: '/api/v1/greet',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"greeting": "Hello, Guest!"'
+      },
+      {
+        id: 'g-tc3',
+        name: 'Greets custom name [Hidden]',
+        category: 'Edge Case',
+        description: 'GET /api/v1/greet?name=Sarah returns "Hello, Sarah!".',
+        endpoint: '/api/v1/greet?name=Sarah',
+        method: 'GET',
+        isHidden: true,
+        expectedStatus: 200,
+        expectedResponseSnippet: '"greeting": "Hello, Sarah!"'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+// TODO: Implement GET /api/v1/greet
+// - Read req.query.name
+// - If name is provided: greet "Hello, <name>!"
+// - If name is omitted: default to "Hello, Guest!"
+// - Return HTTP 200 with { greeting: "...", timestamp: new Date().toISOString() }
+app.get('/api/v1/greet', (req: Request, res: Response) => {
+  const name = (req.query.name as string) || 'Guest';
+
+  return res.status(200).json({
+    greeting: \`Hello, \${name}!\`,
+    timestamp: new Date().toISOString()
+  });
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"time"
+)
+
+func main() {
+	http.HandleFunc("/api/v1/greet", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		name := r.URL.Query().Get("name")
+		if name == "" {
+			name = "Guest"
+		}
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"greeting":  fmt.Sprintf("Hello, %s!", name),
+			"timestamp": time.Now().Format(time.RFC3339),
+		})
+	})
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI
+from datetime import datetime
+from typing import Optional
+
+app = FastAPI(title="Greeting API")
+
+@app.get("/api/v1/greet")
+def greet(name: Optional[str] = "Guest"):
+    return {
+        "greeting": f"Hello, {name}!",
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    }
+`
+    }
+  },
+  {
+    id: 'key-value-store',
+    title: 'In-Memory Key-Value Store',
+    slug: 'key-value-store',
+    difficulty: 'BEGINNER',
+    category: 'Data Structures',
+    summary: 'Build a lightweight in-memory cache API with key-value set, get, and 404 handling.',
+    estimatedMinutes: 15,
+    concepts: ['HTTP', 'REST', 'Cache'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement an in-memory key-value cache API that allows storing and fetching string values by key.
+
+Your service must expose:
+1. \`POST /api/v1/kv/set\` &mdash; Body \`{ "key": "...", "value": "..." }\`. Saves the key-value pair and returns **HTTP 201 Created** with \`{ "success": true, "key": "..." }\`.
+2. \`GET /api/v1/kv/get/:key\` &mdash; Retrieves the value for the given key. Returns **HTTP 200 OK** with \`{ "key": "...", "value": "..." }\`. If key doesn't exist, return **HTTP 404 Not Found** with \`{ "error": "key_not_found" }\`.`,
+    requirements: [
+      {
+        id: 'kv-req-1',
+        title: 'POST /api/v1/kv/set',
+        detail: 'Persist key-value pair in memory and return 201 Created.',
+        isCritical: true,
+        badge: 'POST'
+      },
+      {
+        id: 'kv-req-2',
+        title: 'GET /api/v1/kv/get/:key',
+        detail: 'Return 200 OK with value if found, or 404 Not Found if missing.',
+        isCritical: true,
+        badge: 'GET'
+      }
+    ],
+    constraints: [
+      'Reject missing key or value on set with HTTP 400 Bad Request',
+      'Return HTTP 404 Not Found for missing keys'
+    ],
+    endpoints: [
+      {
+        id: 'ep-post-kv',
+        method: 'POST',
+        path: '/api/v1/kv/set',
+        summary: 'Set key value',
+        requestBody: {
+          contentType: 'application/json',
+          exampleJson: JSON.stringify({ key: 'city', value: 'Delhi' }, null, 2),
+          fields: [
+            { name: 'key', type: 'string', required: true, description: 'Store identifier key' },
+            { name: 'value', type: 'string', required: true, description: 'Value to persist' }
+          ]
+        },
+        responses: [
+          {
+            statusCode: 201,
+            statusText: 'Created',
+            description: 'Key saved successfully',
+            exampleJson: JSON.stringify({ success: true, key: 'city' }, null, 2)
+          }
+        ]
+      },
+      {
+        id: 'ep-get-kv',
+        method: 'GET',
+        path: '/api/v1/kv/get/:key',
+        summary: 'Get value by key',
+        responses: [
+          {
+            statusCode: 200,
+            statusText: 'OK',
+            description: 'Key found',
+            exampleJson: JSON.stringify({ key: 'city', value: 'Delhi' }, null, 2)
+          },
+          {
+            statusCode: 404,
+            statusText: 'Not Found',
+            description: 'Key does not exist in store',
+            exampleJson: JSON.stringify({ error: 'key_not_found' }, null, 2)
+          }
+        ]
+      }
+    ],
+    testCases: [
+      {
+        id: 'kv-tc1',
+        name: 'Sets key-value pair with 201 Created',
+        category: 'Contract',
+        description: 'POST /api/v1/kv/set with valid key and value returns 201 Created.',
+        endpoint: '/api/v1/kv/set',
+        method: 'POST',
+        requestPayload: JSON.stringify({ key: 'session_user', value: 'mayank' }),
+        expectedStatus: 201,
+        expectedResponseSnippet: '"success": true'
+      },
+      {
+        id: 'kv-tc2',
+        name: 'Gets existing key with 200 OK',
+        category: 'Contract',
+        description: 'GET /api/v1/kv/get/session_user returns 200 with stored value.',
+        endpoint: '/api/v1/kv/get/session_user',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"value": "mayank"'
+      },
+      {
+        id: 'kv-tc3',
+        name: 'Returns 404 Not Found for non-existent key',
+        category: 'Edge Case',
+        description: 'GET /api/v1/kv/get/non_existent_key returns 404 Not Found.',
+        endpoint: '/api/v1/kv/get/non_existent_key',
+        method: 'GET',
+        expectedStatus: 404,
+        expectedResponseSnippet: '"error": "key_not_found"'
+      },
+      {
+        id: 'kv-tc4',
+        name: 'Rejects missing key on set with 400 [Hidden]',
+        category: 'Validation',
+        description: 'POST /api/v1/kv/set without key returns 400 Bad Request.',
+        endpoint: '/api/v1/kv/set',
+        method: 'POST',
+        isHidden: true,
+        requestPayload: JSON.stringify({ value: 'orphan' }),
+        expectedStatus: 400,
+        expectedResponseSnippet: 'missing_key_or_value'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+// In-memory key-value dictionary store
+const kvStore: Record<string, any> = {};
+
+// TODO 1: Implement POST /api/v1/kv/set
+// - Validate key and value are present. If missing, return 400 ({ error: 'missing_key_or_value' }).
+// - Save kvStore[key] = value.
+// - Return 201 Created with { success: true, key }
+app.post('/api/v1/kv/set', (req: Request, res: Response) => {
+  const { key, value } = req.body || {};
+
+  if (!key || value === undefined) {
+    return res.status(400).json({ error: 'missing_key_or_value' });
+  }
+
+  kvStore[key] = value;
+  return res.status(201).json({ success: true, key });
+});
+
+// TODO 2: Implement GET /api/v1/kv/get/:key
+// - Read req.params.key
+// - If key exists in kvStore: return 200 with { key, value: kvStore[key] }
+// - If key does not exist: return 404 with { error: 'key_not_found' }
+app.get('/api/v1/kv/get/:key', (req: Request, res: Response) => {
+  const { key } = req.params;
+
+  if (!(key in kvStore)) {
+    return res.status(404).json({ error: 'key_not_found' });
+  }
+
+  return res.status(200).json({ key, value: kvStore[key] });
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"strings"
+	"sync"
+)
+
+var (
+	store = make(map[string]string)
+	mu    sync.RWMutex
+)
+
+func main() {
+	http.HandleFunc("/api/v1/kv/set", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var body map[string]string
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body["key"] == "" || body["value"] == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "missing_key_or_value"})
+			return
+		}
+		mu.Lock()
+		store[body["key"]] = body["value"]
+		mu.Unlock()
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "key": body["key"]})
+	})
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
+
+app = FastAPI(title="Key-Value Store API")
+
+kv_store = {}
+
+class SetPayload(BaseModel):
+    key: str
+    value: str
+
+@app.post("/api/v1/kv/set", status_code=status.HTTP_201_CREATED)
+def set_kv(payload: SetPayload):
+    if not payload.key:
+        raise HTTPException(status_code=400, detail={"error": "missing_key_or_value"})
+    kv_store[payload.key] = payload.value
+    return {"success": True, "key": payload.key}
+
+@app.get("/api/v1/kv/get/{key}")
+def get_kv(key: str):
+    if key not in kv_store:
+        raise HTTPException(status_code=404, detail={"error": "key_not_found"})
+    return {"key": key, "value": kv_store[key]}
+`
+    }
+  },
   {
     id: 'create-user-api',
     title: 'Create a User API',
