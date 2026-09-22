@@ -10,7 +10,6 @@ import { ChecklistCard } from './ChecklistCard';
 import { TestCard } from './TestCard';
 import { EndpointCard } from './EndpointCard';
 import { gsap } from '@/lib/gsap';
-import { GsapTilt } from '@/components/gsap/GsapTilt';
 
 interface HeroProps {
   onLaunchArena: () => void;
@@ -40,53 +39,52 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
 
       tl.fromTo(
         pillRef.current,
-        { opacity: 0, y: -20, scale: 0.95 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.6, delay: 0.1 }
+        { opacity: 0, y: -16, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, delay: 0.1 }
       )
       .fromTo(
         [title1Ref.current, title2Ref.current, title3Ref.current],
-        { opacity: 0, y: 35, rotateX: 12 },
-        { opacity: 1, y: 0, rotateX: 0, duration: 0.8, stagger: 0.12, ease: 'expo.out' },
-        '-=0.3'
+        { opacity: 0, y: 36, filter: 'blur(10px)', scale: 0.97 },
+        { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: 0.8, stagger: 0.12, ease: 'power3.out' },
+        '-=0.25'
       )
       .fromTo(
         subRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.6 },
+        { opacity: 0, y: 16, filter: 'blur(6px)' },
+        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.6 },
         '-=0.4'
       )
       .fromTo(
         ctaRef.current,
-        { opacity: 0, y: 20, scale: 0.96 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.4)' },
+        { opacity: 0, y: 16, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'power2.out' },
         '-=0.3'
       )
       .fromTo(
         scrollIndRef.current,
-        { opacity: 0, y: 10 },
-        { opacity: 0.85, y: 0, duration: 0.5 },
+        { opacity: 0, y: 8 },
+        { opacity: 0.85, y: 0, duration: 0.4 },
         '-=0.2'
       );
 
-      // 2. Entrance for Floating Side Cards
+      // 2. Smooth, natural entrance for side framing cards
       gsap.fromTo(
         [cardLeft1Ref.current, cardLeft2Ref.current],
-        { opacity: 0, x: -60, scale: 0.92 },
-        { opacity: 1, x: 0, scale: 1, duration: 1.1, stagger: 0.2, ease: 'expo.out', delay: 0.3 }
+        { opacity: 0, x: -30 },
+        { opacity: 1, x: 0, duration: 0.8, stagger: 0.1, ease: 'power2.out', delay: 0.2 }
       );
 
       gsap.fromTo(
         [cardRight1Ref.current, cardRight2Ref.current],
-        { opacity: 0, x: 60, scale: 0.92 },
-        { opacity: 1, x: 0, scale: 1, duration: 1.1, stagger: 0.2, ease: 'expo.out', delay: 0.4 }
+        { opacity: 0, x: 30 },
+        { opacity: 1, x: 0, duration: 0.8, stagger: 0.1, ease: 'power2.out', delay: 0.25 }
       );
 
-      // 3. Continuous Organic Floating Physics for each card with distinct periods
+      // 3. Gentle, calm floating physics (only vertical translation, no conflicting rotation or jitter)
       if (cardLeft1Ref.current) {
         gsap.to(cardLeft1Ref.current, {
-          y: '+=10',
-          rotation: 0.6,
-          duration: 3.4,
+          y: -8,
+          duration: 3.2,
           repeat: -1,
           yoyo: true,
           ease: 'sine.inOut',
@@ -94,61 +92,33 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
       }
       if (cardLeft2Ref.current) {
         gsap.to(cardLeft2Ref.current, {
-          y: '-=12',
-          rotation: -0.8,
-          duration: 4.2,
+          y: 8,
+          duration: 3.8,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          delay: 0.4,
+        });
+      }
+      if (cardRight1Ref.current) {
+        gsap.to(cardRight1Ref.current, {
+          y: -7,
+          duration: 3.5,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          delay: 0.2,
+        });
+      }
+      if (cardRight2Ref.current) {
+        gsap.to(cardRight2Ref.current, {
+          y: 7,
+          duration: 4.0,
           repeat: -1,
           yoyo: true,
           ease: 'sine.inOut',
           delay: 0.6,
         });
-      }
-      if (cardRight1Ref.current) {
-        gsap.to(cardRight1Ref.current, {
-          y: '+=14',
-          rotation: -0.5,
-          duration: 3.8,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: 0.3,
-        });
-      }
-      if (cardRight2Ref.current) {
-        gsap.to(cardRight2Ref.current, {
-          y: '-=10',
-          rotation: 0.7,
-          duration: 4.5,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: 0.9,
-        });
-      }
-
-      // 4. Subtle Interactive Mouse Parallax on Hero
-      const hero = heroRef.current;
-      if (hero && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-        const leftX = gsap.quickTo([cardLeft1Ref.current, cardLeft2Ref.current], 'x', { duration: 1.2, ease: 'power2.out' });
-        const leftY = gsap.quickTo([cardLeft1Ref.current, cardLeft2Ref.current], 'y', { duration: 1.2, ease: 'power2.out' });
-        const rightX = gsap.quickTo([cardRight1Ref.current, cardRight2Ref.current], 'x', { duration: 1.2, ease: 'power2.out' });
-        const rightY = gsap.quickTo([cardRight1Ref.current, cardRight2Ref.current], 'y', { duration: 1.2, ease: 'power2.out' });
-
-        const handleMouseMove = (e: MouseEvent) => {
-          const rect = hero.getBoundingClientRect();
-          const normX = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
-          const normY = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
-
-          leftX(normX * -15);
-          leftY(normY * -12);
-          rightX(normX * 15);
-          rightY(normY * 12);
-        };
-
-        hero.addEventListener('mousemove', handleMouseMove);
-        return () => {
-          hero.removeEventListener('mousemove', handleMouseMove);
-        };
       }
     }, heroRef);
 
@@ -158,49 +128,41 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
   return (
     <section 
       ref={heroRef}
-      className="relative min-h-[780px] lg:min-h-[850px] w-full flex flex-col justify-between items-center pt-28 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 overflow-visible select-none bg-[#050708]"
+      className="relative w-full flex flex-col justify-center items-center pt-24 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-6 overflow-visible select-none bg-[#050708]"
     >
       {/* 1. High-Resolution Background Artwork with Globe */}
       <HeroBackground />
 
-      {/* 2. Left Floating Cards with GSAP Physics & Tilt */}
+      {/* 2. Left Floating Cards (Calm, stable, framed positioning) */}
       <div 
         ref={cardLeft1Ref} 
-        className="hidden xl:block absolute left-2 2xl:left-8 top-[24%] z-10 pointer-events-auto will-change-transform"
+        className="hidden lg:block absolute left-2 xl:left-6 2xl:left-12 top-[18%] z-10 pointer-events-auto will-change-transform scale-[0.85] xl:scale-100 origin-left transition-transform hover:scale-105 duration-200"
       >
-        <GsapTilt maxTilt={7} scale={1.03}>
-          <FloatingCodeCard />
-        </GsapTilt>
+        <FloatingCodeCard />
       </div>
       <div 
         ref={cardLeft2Ref} 
-        className="hidden xl:block absolute left-3 2xl:left-10 bottom-[18%] z-10 pointer-events-auto will-change-transform"
+        className="hidden lg:block absolute left-2 xl:left-6 2xl:left-14 bottom-[12%] z-10 pointer-events-auto will-change-transform scale-[0.85] xl:scale-100 origin-left transition-transform hover:scale-105 duration-200"
       >
-        <GsapTilt maxTilt={7} scale={1.03}>
-          <ChecklistCard />
-        </GsapTilt>
+        <ChecklistCard />
       </div>
 
-      {/* 3. Right Floating Cards with GSAP Physics & Tilt */}
+      {/* 3. Right Floating Cards (Calm, stable, framed positioning) */}
       <div 
         ref={cardRight1Ref} 
-        className="hidden xl:block absolute right-2 2xl:right-8 top-[24%] z-10 pointer-events-auto will-change-transform"
+        className="hidden lg:block absolute right-2 xl:right-6 2xl:right-12 top-[18%] z-10 pointer-events-auto will-change-transform scale-[0.85] xl:scale-100 origin-right transition-transform hover:scale-105 duration-200"
       >
-        <GsapTilt maxTilt={7} scale={1.03}>
-          <TestCard />
-        </GsapTilt>
+        <TestCard />
       </div>
       <div 
         ref={cardRight2Ref} 
-        className="hidden xl:block absolute right-3 2xl:right-10 bottom-[16%] z-10 pointer-events-auto will-change-transform"
+        className="hidden lg:block absolute right-2 xl:right-6 2xl:right-14 bottom-[12%] z-10 pointer-events-auto will-change-transform scale-[0.85] xl:scale-100 origin-right transition-transform hover:scale-105 duration-200"
       >
-        <GsapTilt maxTilt={7} scale={1.03}>
-          <EndpointCard />
-        </GsapTilt>
+        <EndpointCard />
       </div>
 
-      {/* 4. Central Hero Content Container with GSAP Timeline */}
-      <div className="relative z-20 max-w-xl sm:max-w-2xl lg:max-w-3xl 2xl:max-w-4xl mx-auto flex flex-col items-center text-center space-y-5 sm:space-y-6 my-auto pt-2 pb-4 px-4">
+      {/* 4. Central Hero Content Container */}
+      <div className="relative z-20 w-full max-w-lg sm:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto flex flex-col items-center text-center space-y-4 sm:space-y-5 my-auto pt-2 pb-2 px-4">
         
         {/* Active Development & Feedback Announcement Pill */}
         <Link
@@ -218,26 +180,26 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
           <ArrowRight className="w-3.5 h-3.5 text-emerald-400 transition-transform duration-200 group-hover:translate-x-0.5" />
         </Link>
 
-        {/* 3-Line Headline with GSAP 3D Entrance */}
-        <div className="space-y-1 font-display font-black tracking-tight leading-[0.98] sm:leading-[0.94] max-w-lg sm:max-w-xl lg:max-w-2xl 2xl:max-w-3xl mx-auto">
-          <h1 ref={title1Ref} className="text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-white">
+        {/* 3-Line Headline with Balanced Width and Bold Typography */}
+        <div className="w-full max-w-md sm:max-w-lg lg:max-w-2xl xl:max-w-3xl mx-auto space-y-1 sm:space-y-1.5 font-sans font-black tracking-tight leading-[0.98] sm:leading-[0.95]">
+          <h1 ref={title1Ref} className="text-[34px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-white font-black drop-shadow-sm">
             Practice Real Backends.
           </h1>
-          <h1 ref={title2Ref} className="text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-[#f1f5f9]">
+          <h1 ref={title2Ref} className="text-[34px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-[#f1f5f9] font-black drop-shadow-sm">
             Defend Edge Cases.
           </h1>
-          <h1 ref={title3Ref} className="text-[32px] sm:text-5xl md:text-[52px] lg:text-[56px] xl:text-[62px] 2xl:text-[72px] text-emerald-400">
+          <h1 ref={title3Ref} className="text-[34px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-emerald-400 font-black drop-shadow-[0_0_24px_rgba(16,185,129,0.3)]">
             Master Production Systems.
           </h1>
         </div>
 
         {/* Subtitle */}
-        <p ref={subRef} className="max-w-md sm:max-w-lg lg:max-w-xl 2xl:max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-[#94a3b8] font-normal leading-relaxed pt-0.5 px-2">
+        <p ref={subRef} className="max-w-md sm:max-w-lg lg:max-w-xl mx-auto text-sm sm:text-base md:text-[17px] text-[#94a3b8] font-normal leading-relaxed pt-0.5 px-2">
           Hands-on backend challenges, real-world scenarios, automated verification, and a path to production-ready skills.
         </p>
 
         {/* Action Buttons */}
-        <div ref={ctaRef} className="pt-2 pb-2">
+        <div ref={ctaRef} className="pt-2 pb-1">
           <HeroButtons 
             onLaunchArena={onLaunchArena}
             onBrowseTracks={onBrowseTracks}
@@ -246,9 +208,9 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
       </div>
 
       {/* 5. Bottom Horizon Arc & Scroll Indicator */}
-      <div ref={scrollIndRef} className="relative z-20 flex flex-col items-center justify-center pt-2 space-y-1 opacity-85 hover:opacity-100 transition-opacity">
+      <div ref={scrollIndRef} className="relative z-20 flex flex-col items-center justify-center pt-3 space-y-1 opacity-80 hover:opacity-100 transition-opacity">
         <ChevronDown className="w-4 h-4 text-emerald-400 animate-bounce" />
-        <span className="text-[10px] sm:text-[11px] font-mono font-medium tracking-[0.25em] text-[#94a3b8] uppercase">
+        <span className="text-[11px] font-sans font-medium tracking-[0.2em] text-[#94a3b8] uppercase">
           Scroll to explore
         </span>
       </div>
