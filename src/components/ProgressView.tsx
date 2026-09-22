@@ -35,7 +35,6 @@ import {
   Edit3,
   X,
   Loader2,
-  Sparkles,
   Save,
   Globe,
   User as UserIcon
@@ -786,7 +785,7 @@ export const ProgressView: React.FC<Props> = ({
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                    <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Bio / Summary</span>
                   </label>
                   <span className="text-[10px] text-zinc-500 font-mono">
