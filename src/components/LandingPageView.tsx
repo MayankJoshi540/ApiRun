@@ -46,6 +46,10 @@ import { Hero } from './hero/Hero';
 import { Footer } from './Footer';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { ScrollProgress } from './ui/ScrollProgress';
+import { GsapTilt } from './gsap/GsapTilt';
+import { GsapMagnetic } from './gsap/GsapMagnetic';
+import { GsapCounter } from './gsap/GsapCounter';
+import { gsap } from '@/lib/gsap';
 
 interface Props {
   challenges: Challenge[];
@@ -349,9 +353,51 @@ export const LandingPageView: React.FC<Props> = ({
       <div className="relative z-10">
 
         {/* ========================================================= */}
+        {/* GSAP ANIMATED METRICS COUNTER STRIP */}
+        {/* ========================================================= */}
+        <section className="pt-10 pb-6 px-4 sm:px-6 max-w-5xl mx-auto">
+          <ScrollReveal variant="fade-up" duration={600}>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-[#090d14]/90 border border-white/[0.08] backdrop-blur-xl">
+              <div className="text-center p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <div className="text-xl sm:text-2xl font-black font-mono text-white flex items-center justify-center">
+                  <GsapCounter value={50000} duration={2} prefix="" suffix="+" />
+                </div>
+                <div className="text-[11px] font-sans font-medium text-[#94a3b8] uppercase tracking-wider mt-1">
+                  Adversarial Tests Run
+                </div>
+              </div>
+              <div className="text-center p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <div className="text-xl sm:text-2xl font-black font-mono text-emerald-400 flex items-center justify-center">
+                  <GsapCounter value={99.9} decimals={1} duration={1.8} prefix="" suffix="%" />
+                </div>
+                <div className="text-[11px] font-sans font-medium text-[#94a3b8] uppercase tracking-wider mt-1">
+                  RFC Test Precision
+                </div>
+              </div>
+              <div className="text-center p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <div className="text-xl sm:text-2xl font-black font-mono text-white flex items-center justify-center">
+                  <GsapCounter value={100} duration={1.6} prefix="" suffix="+" />
+                </div>
+                <div className="text-[11px] font-sans font-medium text-[#94a3b8] uppercase tracking-wider mt-1">
+                  Production Scenarios
+                </div>
+              </div>
+              <div className="text-center p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <div className="text-xl sm:text-2xl font-black font-mono text-sky-400 flex items-center justify-center">
+                  &lt;<GsapCounter value={15} duration={1.5} prefix="" suffix="ms" />
+                </div>
+                <div className="text-[11px] font-sans font-medium text-[#94a3b8] uppercase tracking-wider mt-1">
+                  Harness Feedback
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+        </section>
+
+        {/* ========================================================= */}
         {/* HERO VISUAL: LIVE INTERACTIVE TEST RUNNER & ATTACK MATRIX */}
         {/* ========================================================= */}
-        <section className="pt-8 sm:pt-12 pb-20 px-4 sm:px-6 max-w-5xl mx-auto relative z-10">
+        <section className="pt-4 pb-20 px-4 sm:px-6 max-w-5xl mx-auto relative z-10">
           <ScrollReveal variant="scale" duration={600} threshold={0.08}>
             <div className="rounded-2xl border border-white/[0.15] bg-[#0c1017]/90 shadow-[0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden text-xs backdrop-blur-2xl font-sans">
               {/* Terminal Window Header */}
@@ -627,39 +673,40 @@ export const LandingPageView: React.FC<Props> = ({
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" staggerDelay={80}>
             {engineeringTracks.map((track, i) => (
-              <div
-                key={i}
-                className="p-6 rounded-2xl bg-[#0b0f17] border border-white/[0.08] hover:border-emerald-500/40 transition-all duration-300 space-y-4 backdrop-blur-xl group hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(16,185,129,0.08)] cursor-pointer"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg">
-                    TRACK {track.number}
-                  </span>
-                  <span className="text-[11px] text-slate-400 font-medium">
-                    {track.badge}
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors tracking-tight">
-                    {track.title}
-                  </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                    {track.description}
-                  </p>
-                </div>
-
-                <div className="pt-3 flex flex-wrap gap-1.5 border-t border-white/[0.06]">
-                  {track.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="text-[10px] px-2 py-0.5 rounded-md bg-white/[0.04] text-slate-300 border border-white/[0.06] font-mono"
-                    >
-                      {skill}
+              <GsapTilt key={i} maxTilt={6} scale={1.02}>
+                <div
+                  className="h-full p-6 rounded-2xl bg-[#0b0f17] border border-white/[0.08] hover:border-emerald-500/40 transition-all duration-300 space-y-4 backdrop-blur-xl group hover:shadow-[0_15px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(16,185,129,0.08)] cursor-pointer"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg">
+                      TRACK {track.number}
                     </span>
-                  ))}
+                    <span className="text-[11px] text-slate-400 font-medium">
+                      {track.badge}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors tracking-tight">
+                      {track.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                      {track.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 flex flex-wrap gap-1.5 border-t border-white/[0.06]">
+                    {track.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-white/[0.04] text-slate-300 border border-white/[0.06] font-mono"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </GsapTilt>
             ))}
           </StaggerContainer>
         </section>
@@ -797,30 +844,31 @@ export const LandingPageView: React.FC<Props> = ({
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6" staggerDelay={100}>
             {previewChallenges.map((challenge) => (
-              <div
-                key={challenge.id}
-                onClick={() => onSelectChallenge(challenge)}
-                className="p-6 rounded-2xl bg-white/[0.04] border border-white/[0.1] hover:border-emerald-400/50 transition-all cursor-pointer space-y-4 backdrop-blur-xl group hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-sans text-xs text-[#94a3b8] uppercase tracking-wider font-semibold">{challenge.category}</span>
-                  <DifficultyBadge difficulty={challenge.difficulty} />
+              <GsapTilt key={challenge.id} maxTilt={5} scale={1.02}>
+                <div
+                  onClick={() => onSelectChallenge(challenge)}
+                  className="h-full p-6 rounded-2xl bg-white/[0.04] border border-white/[0.1] hover:border-emerald-400/50 transition-all cursor-pointer space-y-4 backdrop-blur-xl group hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-sans text-xs text-[#94a3b8] uppercase tracking-wider font-semibold">{challenge.category}</span>
+                    <DifficultyBadge difficulty={challenge.difficulty} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center space-x-2">
+                      <span>{challenge.title}</span>
+                      <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </h3>
+                    <p className="text-xs text-[#94a3b8] leading-relaxed line-clamp-2">
+                      {challenge.summary}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {challenge.concepts.map((c) => (
+                      <ConceptBadge key={c} concept={c} size="sm" />
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center space-x-2">
-                    <span>{challenge.title}</span>
-                    <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </h3>
-                  <p className="text-xs text-[#94a3b8] leading-relaxed line-clamp-2">
-                    {challenge.summary}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {challenge.concepts.map((c) => (
-                    <ConceptBadge key={c} concept={c} size="sm" />
-                  ))}
-                </div>
-              </div>
+              </GsapTilt>
             ))}
           </StaggerContainer>
         </section>
@@ -851,13 +899,15 @@ export const LandingPageView: React.FC<Props> = ({
                 </div>
               </div>
 
-              <Link
-                href="/feedback"
-                className="shrink-0 w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-all shadow-md active:scale-95"
-              >
-                <span>Share Feedback</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              <GsapMagnetic strength={0.3}>
+                <Link
+                  href="/feedback"
+                  className="shrink-0 w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-all shadow-md active:scale-95"
+                >
+                  <span>Share Feedback</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </GsapMagnetic>
             </div>
           </ScrollReveal>
         </section>
@@ -875,18 +925,22 @@ export const LandingPageView: React.FC<Props> = ({
                 Join thousands of backend engineers practicing distributed locking, rate limiting, and RFC-strict APIs.
               </p>
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <button
-                  onClick={() => onSelectChallenge(challenges[0] || challenges[1])}
-                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-sm transition-all active:scale-[0.98]"
-                >
-                  Start Free Challenge
-                </button>
-                <button
-                  onClick={onExploreChallenges}
-                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-white border border-white/[0.15] font-semibold text-sm transition-all"
-                >
-                  Explore Problem Sets
-                </button>
+                <GsapMagnetic strength={0.25}>
+                  <button
+                    onClick={() => onSelectChallenge(challenges[0] || challenges[1])}
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-sm transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    Start Free Challenge
+                  </button>
+                </GsapMagnetic>
+                <GsapMagnetic strength={0.2}>
+                  <button
+                    onClick={onExploreChallenges}
+                    className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-white border border-white/[0.15] font-semibold text-sm transition-all cursor-pointer"
+                  >
+                    Explore Problem Sets
+                  </button>
+                </GsapMagnetic>
               </div>
             </div>
           </ScrollReveal>
