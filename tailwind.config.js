@@ -6,6 +6,20 @@ export default {
   ],
   theme: {
     extend: {
+      fontSize: {
+        '2xs': ['15px', { lineHeight: '1.45' }],
+        'xs': ['16px', { lineHeight: '1.5' }],
+        'sm': ['17px', { lineHeight: '1.55' }],
+        'base': ['18px', { lineHeight: '1.6' }],
+        'lg': ['20px', { lineHeight: '1.55' }],
+        'xl': ['22px', { lineHeight: '1.4' }],
+        '2xl': ['26px', { lineHeight: '1.3' }],
+        '3xl': ['32px', { lineHeight: '1.25' }],
+        '4xl': ['40px', { lineHeight: '1.2' }],
+        '5xl': ['52px', { lineHeight: '1.15' }],
+        '6xl': ['64px', { lineHeight: '1.1' }],
+        '7xl': ['76px', { lineHeight: '1.05' }],
+      },
       colors: {
         bg: {
           main: '#08090c',
@@ -34,11 +48,11 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'sans-serif'],
-        heading: ['"Plus Jakarta Sans"', 'Outfit', 'sans-serif'],
-        grotesk: ['"Space Grotesk"', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Fira Code', 'Cascadia Code', 'monospace']
+        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+        grotesk: ['"Plus Jakarta Sans"', 'sans-serif'],
+        mono: ['"Plus Jakarta Sans"', 'sans-serif']
       }
     },
   },

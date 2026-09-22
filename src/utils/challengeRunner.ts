@@ -85,6 +85,72 @@ export function stripTypeScript(code: string): string {
 }
 
 /**
+ * Performs strict, robust validation against the expected response contract.
+ * Prevents substring false-positives (e.g. "pongg" matching "pong").
+ */
+export function validateResponsePayload(actualData: any, expectedSnippet?: string): boolean {
+  if (!expectedSnippet) return true;
+
+  // 1. If actualData is already parsed object
+  if (actualData && typeof actualData === 'object') {
+    // Try parsing expectedSnippet as full JSON
+    try {
+      const parsedExpected = JSON.parse(expectedSnippet);
+      if (typeof parsedExpected === 'object' && parsedExpected !== null) {
+        return Object.entries(parsedExpected).every(([k, v]) => {
+          if (typeof v === 'object' && v !== null) {
+            return JSON.stringify(actualData[k]) === JSON.stringify(v);
+          }
+          return actualData[k] === v;
+        });
+      }
+    } catch {
+      // Not full JSON object, proceed to key-value matching
+    }
+
+    // Try key: "value" or "key": "value" pattern match
+    const kvMatch = expectedSnippet.match(/"?([a-zA-Z0-9_-]+)"?\s*:\s*(?:"([^"]*)"|(\d+)|(true|false|null))/);
+    if (kvMatch) {
+      const key = kvMatch[1];
+      const strVal = kvMatch[2];
+      const numVal = kvMatch[3];
+      const boolVal = kvMatch[4];
+
+      if (key in actualData) {
+        const actualVal = actualData[key];
+        if (strVal !== undefined) {
+          return String(actualVal) === strVal;
+        }
+        if (numVal !== undefined) {
+          return Number(actualVal) === Number(numVal);
+        }
+        if (boolVal !== undefined) {
+          return String(actualVal) === boolVal;
+        }
+      }
+      return false;
+    }
+  }
+
+  // 2. String comparison
+  const actualStr = typeof actualData === 'object' ? JSON.stringify(actualData) : String(actualData ?? '');
+
+  // Try parsing actualStr as JSON
+  try {
+    const parsed = JSON.parse(actualStr);
+    if (typeof parsed === 'object' && parsed !== null) {
+      return validateResponsePayload(parsed, expectedSnippet);
+    }
+  } catch {}
+
+  // Strict word/token boundary match
+  const cleanSnippet = expectedSnippet.replace(/["']/g, '').trim();
+  const escaped = cleanSnippet.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const boundaryRegex = new RegExp(`(?:"|\\b)${escaped}(?:"|\\b)`, 'i');
+  return boundaryRegex.test(actualStr);
+}
+
+/**
  * Real In-Browser JavaScript/Node execution & contract evaluator
  */
 export async function runChallengeTests(options: RunTestOptions): Promise<RunTestOutput> {
@@ -124,23 +190,21 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
         });
 
         const durationMs = Math.round(performance.now() - startTime);
-        let actualBody = '';
+        let actualBody: any = '';
         try {
-          actualBody = await response.text();
+          const rawText = await response.text();
+          try {
+            actualBody = JSON.parse(rawText);
+          } catch {
+            actualBody = rawText;
+          }
         } catch {
           actualBody = '';
         }
 
         const actualStatus = response.status;
         const statusPassed = actualStatus === tc.expectedStatus;
-
-        let snippetPassed = true;
-        if (tc.expectedResponseSnippet) {
-          const cleanActual = actualBody.replace(/[\s"'{}\[\]]/g, '').toLowerCase();
-          const cleanSnippet = tc.expectedResponseSnippet.replace(/[\s"'{}\[\]]/g, '').toLowerCase();
-          snippetPassed = cleanActual.includes(cleanSnippet);
-        }
-
+        const snippetPassed = validateResponsePayload(actualBody, tc.expectedResponseSnippet);
         const passed = statusPassed && snippetPassed;
 
         results.push({
@@ -379,12 +443,21 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
       }
     }
 
+    const [pathname, queryString] = tc.endpoint.split('?');
+    const query: Record<string, string> = {};
+    if (queryString) {
+      const searchParams = new URLSearchParams(queryString);
+      searchParams.forEach((val, key) => {
+        query[key] = val;
+      });
+    }
+
     const req: any = {
       method: tc.method,
       url: tc.endpoint,
-      path: tc.endpoint.split('?')[0],
+      path: pathname,
       params,
-      query: {},
+      query,
       headers: { 'content-type': 'application/json', ...(tc.requestHeaders || {}) },
       header: (name: string) => (tc.requestHeaders || {})[name.toLowerCase()] || (req.headers || {})[name.toLowerCase()],
       get: (name: string) => (tc.requestHeaders || {})[name.toLowerCase()] || (req.headers || {})[name.toLowerCase()],
@@ -454,14 +527,7 @@ export async function runChallengeTests(options: RunTestOptions): Promise<RunTes
 
       const actualResponseStr = typeof responseData === 'object' ? JSON.stringify(responseData, null, 2) : String(responseData ?? '');
       const statusPassed = statusCode === tc.expectedStatus;
-
-      let snippetPassed = true;
-      if (tc.expectedResponseSnippet) {
-        const cleanActual = actualResponseStr.replace(/[\s"'{}\[\]]/g, '').toLowerCase();
-        const cleanSnippet = tc.expectedResponseSnippet.replace(/[\s"'{}\[\]]/g, '').toLowerCase();
-        snippetPassed = cleanActual.includes(cleanSnippet);
-      }
-
+      const snippetPassed = validateResponsePayload(responseData, tc.expectedResponseSnippet);
       const passed = statusPassed && snippetPassed;
 
       results.push({

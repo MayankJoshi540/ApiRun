@@ -18,7 +18,7 @@ export const TestCard: React.FC = () => {
             </div>
 
             {/* Test Details */}
-            <div className="space-y-0.5 font-mono text-[10px] sm:text-[11px] text-[#94a3b8]">
+            <div className="space-y-0.5 font-sans text-[10px] sm:text-[11px] text-[#94a3b8] font-medium">
               <div>12/12 test cases</div>
               <div>Verified response</div>
               <div>Edge cases covered</div>
