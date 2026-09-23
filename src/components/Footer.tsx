@@ -21,9 +21,13 @@ export const Footer: React.FC<FooterProps> = ({
           <div className="col-span-2 space-y-4 pr-0 lg:pr-8">
             <Link 
               href="/"
-              className="inline-flex items-center space-x-2 transition-opacity hover:opacity-90"
+              className="inline-flex items-center space-x-2.5 transition-opacity hover:opacity-90"
             >
-              <span className="font-mono text-base font-extrabold text-emerald-400">&#123;&bull;&gt;&#125;</span>
+              <img
+                src="/logo.png"
+                alt="APIRun"
+                className="w-6 h-6 object-contain rounded drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]"
+              />
               <span className="font-bold text-lg tracking-tight text-white">
                 API<span className="text-emerald-400">Run</span>
               </span>

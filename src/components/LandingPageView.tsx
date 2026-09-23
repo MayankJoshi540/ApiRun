@@ -272,7 +272,7 @@ export const LandingPageView: React.FC<Props> = ({
           <ScrollReveal variant="fade-up" delay={150} duration={650}>
             <div className="overflow-hidden rounded-2xl border border-white/[0.12] bg-[#090d15] shadow-2xl">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm sm:text-base border-collapse">
+                <table className="w-full min-w-[640px] text-left text-sm sm:text-base border-collapse">
                   <thead>
                     <tr className="border-b border-white/[0.1] bg-[#0e1420]">
                       <th className="p-5 sm:p-6 font-bold text-slate-300 w-1/4">

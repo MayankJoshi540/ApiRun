@@ -168,27 +168,28 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
         <Link
           ref={pillRef}
           href="/feedback"
-          className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/25 text-xs font-medium text-emerald-300 transition-all duration-200 group hover:scale-[1.02] active:scale-[0.98]"
+          className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/25 text-[11px] sm:text-xs font-medium text-emerald-300 transition-all duration-200 group hover:scale-[1.02] active:scale-[0.98] max-w-full"
         >
-          <span className="flex h-2 w-2 relative">
+          <span className="flex h-2 w-2 relative shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span className="text-slate-300 font-normal">Active Development</span>
+          <span className="text-slate-300 font-normal truncate">Active Development</span>
           <span className="text-emerald-400/40 hidden sm:inline">&bull;</span>
-          <span className="font-semibold text-emerald-300">Accepting Feedback &amp; Ideas</span>
-          <ArrowRight className="w-3.5 h-3.5 text-emerald-400 transition-transform duration-200 group-hover:translate-x-0.5" />
+          <span className="font-semibold text-emerald-300 truncate hidden xs:inline">Accepting Feedback &amp; Ideas</span>
+          <span className="font-semibold text-emerald-300 truncate xs:hidden">Feedback</span>
+          <ArrowRight className="w-3.5 h-3.5 text-emerald-400 transition-transform duration-200 group-hover:translate-x-0.5 shrink-0" />
         </Link>
 
         {/* 3-Line Headline with Balanced Width and Bold Typography */}
-        <div className="w-full max-w-md sm:max-w-lg lg:max-w-2xl xl:max-w-3xl mx-auto space-y-1 sm:space-y-1.5 font-sans font-black tracking-tight leading-[0.98] sm:leading-[0.95]">
-          <h1 ref={title1Ref} className="text-[34px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-white font-black drop-shadow-sm">
+        <div className="w-full max-w-md sm:max-w-lg lg:max-w-2xl xl:max-w-3xl mx-auto space-y-1 sm:space-y-1.5 font-sans font-black tracking-tight leading-[1.05] sm:leading-[0.95]">
+          <h1 ref={title1Ref} className="text-[29px] xs:text-[33px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-white font-black drop-shadow-sm">
             Practice Real Backends.
           </h1>
-          <h1 ref={title2Ref} className="text-[34px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-[#f1f5f9] font-black drop-shadow-sm">
+          <h1 ref={title2Ref} className="text-[29px] xs:text-[33px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-[#f1f5f9] font-black drop-shadow-sm">
             Defend Edge Cases.
           </h1>
-          <h1 ref={title3Ref} className="text-[34px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-emerald-400 font-black drop-shadow-[0_0_24px_rgba(16,185,129,0.3)]">
+          <h1 ref={title3Ref} className="text-[29px] xs:text-[33px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-emerald-400 font-black drop-shadow-[0_0_24px_rgba(16,185,129,0.3)]">
             Master Production Systems.
           </h1>
         </div>
