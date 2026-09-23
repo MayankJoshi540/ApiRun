@@ -58,10 +58,10 @@ export const ChallengeCard: React.FC<Props> = ({
       }}
       className={`group relative rounded-2xl bg-[#0b0f17] border p-5 sm:p-6 mb-3 cursor-pointer select-none overflow-hidden shadow-lg ${
         isSolved 
-          ? 'border-emerald-500/30 hover:border-emerald-500/60 hover:shadow-[0_15px_35px_rgba(16,185,129,0.12)]' 
+          ? 'border-emerald-500/30 hover:border-emerald-500/60 hover:shadow-2xl' 
           : isInProgress 
-          ? 'border-amber-500/30 hover:border-amber-500/60 hover:shadow-[0_15px_35px_rgba(245,158,11,0.12)]' 
-          : 'border-white/[0.08] hover:border-emerald-500/40 hover:shadow-[0_15px_35px_rgba(0,0,0,0.5)]'
+          ? 'border-amber-500/30 hover:border-amber-500/60 hover:shadow-2xl' 
+          : 'border-white/[0.08] hover:border-emerald-500/40 hover:shadow-2xl'
       }`}
     >
       {/* Dynamic 3D Specular Spotlight Reflection */}
@@ -69,7 +69,7 @@ export const ChallengeCard: React.FC<Props> = ({
         <div 
           className="pointer-events-none absolute -inset-px rounded-2xl opacity-60 transition-opacity duration-300"
           style={{
-            background: `radial-gradient(400px circle at ${tilt.spotlightX}% ${tilt.spotlightY}%, rgba(16, 185, 129, 0.12), transparent 70%)`
+            background: `radial-gradient(400px circle at ${tilt.spotlightX}% ${tilt.spotlightY}%, rgba(255, 255, 255, 0.06), transparent 70%)`
           }}
         />
       )}
@@ -83,7 +83,7 @@ export const ChallengeCard: React.FC<Props> = ({
               {challenge.title}
             </h3>
 
-            <span className="text-[11px] font-mono text-slate-400 py-0.5 px-2 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+            <span className="text-[11px] font-sans font-medium text-slate-400 py-0.5 px-2 rounded-lg bg-white/[0.04] border border-white/[0.06]">
               {challenge.category}
             </span>
 

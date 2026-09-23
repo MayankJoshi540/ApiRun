@@ -272,7 +272,7 @@ export const ProgressView: React.FC<Props> = ({
                     className="w-16 h-16 rounded-2xl object-cover border border-white/[0.12] shadow-inner"
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#111827] to-[#1e293b] border border-white/[0.12] flex items-center justify-center text-xl font-bold text-emerald-400 shadow-inner font-display">
+                  <div className="w-16 h-16 rounded-2xl bg-[#0f172a] border border-white/[0.12] flex items-center justify-center text-xl font-bold text-emerald-400 shadow-inner font-sans">
                     {initials}
                   </div>
                 )}
@@ -282,7 +282,7 @@ export const ProgressView: React.FC<Props> = ({
               </div>
 
               <div className="space-y-1 min-w-0">
-                <h1 className="text-xl font-bold text-white tracking-tight font-display truncate">
+                <h1 className="text-xl font-bold text-white tracking-tight font-sans truncate">
                   {displayName}
                 </h1>
                 <div className="text-xs text-slate-400 font-sans truncate">{handle}</div>

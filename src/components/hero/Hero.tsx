@@ -189,7 +189,7 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
           <h1 ref={title2Ref} className="text-[29px] xs:text-[33px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-[#f1f5f9] font-black drop-shadow-sm">
             Defend Edge Cases.
           </h1>
-          <h1 ref={title3Ref} className="text-[29px] xs:text-[33px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-emerald-400 font-black drop-shadow-[0_0_24px_rgba(16,185,129,0.3)]">
+          <h1 ref={title3Ref} className="text-[29px] xs:text-[33px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-emerald-400 font-black drop-shadow-[0_0_18px_rgba(52,211,153,0.35)]">
             Master Production Systems.
           </h1>
         </div>
