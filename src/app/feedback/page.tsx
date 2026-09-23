@@ -68,7 +68,6 @@ export default function FeedbackPage() {
   const [category, setCategory] = useState('Challenge Suggestion');
   const [rating, setRating] = useState(5);
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [name, setName] = useState(user?.displayName || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -134,7 +133,7 @@ export default function FeedbackPage() {
         body: JSON.stringify({
           category,
           rating,
-          subject: subject.trim() || `${category} from ${name || 'Developer'}`,
+          subject: category, // Category stored directly as summary/subject
           message: message.trim(),
           name: name.trim() || user?.displayName || 'Anonymous Developer',
           email: email.trim() || user?.email || 'developer@apirun.dev',
@@ -197,7 +196,6 @@ export default function FeedbackPage() {
 
   const handleResetForm = () => {
     setIsSuccess(false);
-    setSubject('');
     setMessage('');
     setRating(5);
     setCategory('Challenge Suggestion');
@@ -637,10 +635,6 @@ export default function FeedbackPage() {
           <>
             {/* Header Eyebrow & Title */}
             <div className="text-center space-y-3">
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
-                <MessageSquarePlus className="w-3.5 h-3.5" />
-                <span>DEVELOPER FEEDBACK</span>
-              </div>
 
               <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
                 Help Us Improve APIRun
@@ -763,25 +757,11 @@ export default function FeedbackPage() {
                     </div>
                   </div>
 
-                  {/* 3. Title / Subject */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                      3. Subject / Summary
-                    </label>
-                    <input
-                      type="text"
-                      value={subject}
-                      onChange={(e) => setSubject(e.target.value)}
-                      placeholder="e.g. Add distributed lock challenge / Editor shortcut feature"
-                      className="w-full px-4 py-2.5 bg-[#04060a] border border-white/[0.08] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs sm:text-sm transition-all"
-                    />
-                  </div>
-
-                  {/* 4. Detailed Message */}
+                  {/* 3. Detailed Message */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                        4. Detailed Message
+                        3. Detailed Message
                       </label>
                       <span className="text-[10px] text-slate-500 font-semibold">
                         {message.length} characters
@@ -797,7 +777,7 @@ export default function FeedbackPage() {
                     />
                   </div>
 
-                  {/* 5. User Details */}
+                  {/* 4. Contact Details (Optional) */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-white/[0.06]">
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-slate-300">Name (Optional)</label>

@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       email: (email || 'anonymous@apirun.dev').trim(),
       rating: typeof rating === 'number' ? rating : 5,
       category: (category || 'General Feedback').trim(),
-      subject: (subject || 'Platform Feedback').trim(),
+      subject: (subject || category || 'Platform Feedback').trim(),
       message: message.trim(),
       userId: userId || undefined,
       userAgent: req.headers.get('user-agent') || undefined,
