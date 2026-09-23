@@ -217,36 +217,36 @@ export const LandingPageView: React.FC<Props> = ({
         {/* ========================================================= */}
         <section className="pt-2 pb-12 px-4 sm:px-6 max-w-5xl mx-auto">
           <ScrollReveal variant="fade-up" duration={600}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-[#090d14]/90 border border-white/[0.08] backdrop-blur-xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-2xl bg-[#090d14]/90 border border-white/[0.08] backdrop-blur-xl">
               <div className="text-center p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-                <div className="text-xl sm:text-2xl font-black font-mono text-white flex items-center justify-center">
+                <div className="text-lg sm:text-2xl font-black font-sans text-white flex items-center justify-center">
                   <GsapCounter value={50000} duration={2} prefix="" suffix="+" />
                 </div>
-                <div className="text-[11px] font-sans font-medium text-[#94a3b8] uppercase tracking-wider mt-1">
+                <div className="text-[10px] sm:text-[11px] font-sans font-semibold text-[#94a3b8] uppercase tracking-wider mt-1">
                   Automated Tests Run
                 </div>
               </div>
               <div className="text-center p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-                <div className="text-xl sm:text-2xl font-black font-mono text-emerald-400 flex items-center justify-center">
+                <div className="text-lg sm:text-2xl font-black font-sans text-emerald-400 flex items-center justify-center">
                   <GsapCounter value={99.9} decimals={1} duration={1.8} prefix="" suffix="%" />
                 </div>
-                <div className="text-[11px] font-sans font-medium text-[#94a3b8] uppercase tracking-wider mt-1">
+                <div className="text-[10px] sm:text-[11px] font-sans font-semibold text-[#94a3b8] uppercase tracking-wider mt-1">
                   Spec Compliance
                 </div>
               </div>
               <div className="text-center p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-                <div className="text-xl sm:text-2xl font-black font-mono text-white flex items-center justify-center">
+                <div className="text-lg sm:text-2xl font-black font-sans text-white flex items-center justify-center">
                   <GsapCounter value={100} duration={1.6} prefix="" suffix="+" />
                 </div>
-                <div className="text-[11px] font-sans font-medium text-[#94a3b8] uppercase tracking-wider mt-1">
+                <div className="text-[10px] sm:text-[11px] font-sans font-semibold text-[#94a3b8] uppercase tracking-wider mt-1">
                   Backend Scenarios
                 </div>
               </div>
               <div className="text-center p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-                <div className="text-xl sm:text-2xl font-black font-mono text-sky-400 flex items-center justify-center">
+                <div className="text-lg sm:text-2xl font-black font-sans text-sky-400 flex items-center justify-center">
                   &lt;<GsapCounter value={15} duration={1.5} prefix="" suffix="ms" />
                 </div>
-                <div className="text-[11px] font-sans font-medium text-[#94a3b8] uppercase tracking-wider mt-1">
+                <div className="text-[10px] sm:text-[11px] font-sans font-semibold text-[#94a3b8] uppercase tracking-wider mt-1">
                   Test Feedback
                 </div>
               </div>
@@ -270,6 +270,9 @@ export const LandingPageView: React.FC<Props> = ({
           </ScrollReveal>
 
           <ScrollReveal variant="fade-up" delay={150} duration={650}>
+            <div className="sm:hidden text-right text-[11px] text-slate-400 pb-2 px-1">
+              &larr; Swipe table to compare &rarr;
+            </div>
             <div className="overflow-hidden rounded-2xl border border-white/[0.12] bg-[#090d15] shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px] text-left text-sm sm:text-base border-collapse">
@@ -450,42 +453,91 @@ export const LandingPageView: React.FC<Props> = ({
         {/* ========================================================= */}
         <section className="px-4 sm:px-6 max-w-4xl mx-auto pb-20 font-sans">
           <ScrollReveal variant="fade-up" duration={600}>
-            <div className="p-6 sm:p-8 rounded-2xl bg-[#0d1117] border border-white/[0.12] space-y-5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2 font-sans text-xs text-white font-bold">
-                  <TerminalSquare className="w-4 h-4 text-emerald-400" />
-                  <span>CLI & LOCAL RUNNER COMPATIBLE</span>
+            <div className="p-5 sm:p-8 rounded-3xl bg-[#080d16] border border-white/[0.12] space-y-5 shadow-2xl">
+              {/* Header: Title + Language Switcher */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center space-x-2 text-xs text-white font-bold">
+                  <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
+                    <TerminalSquare className="w-4 h-4" />
+                  </div>
+                  <span className="tracking-wide">LOCAL RUNNER &amp; CLI COMPATIBLE</span>
                 </div>
-                <div className="flex items-center space-x-1 bg-black/40 p-0.5 rounded-lg border border-white/[0.08] font-sans text-xs">
+
+                {/* Language Switcher Tabs */}
+                <div className="flex items-center space-x-1 bg-black/40 p-1 rounded-xl border border-white/[0.08] text-xs self-start sm:self-auto">
                   {(['nodejs', 'go', 'python'] as const).map(lang => (
                     <button
                       key={lang}
                       onClick={() => setSelectedCliLang(lang)}
-                      className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                        selectedCliLang === lang ? 'bg-white/[0.1] text-emerald-400 font-semibold' : 'text-[#94a3b8]'
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                        selectedCliLang === lang 
+                          ? 'bg-white/[0.1] text-emerald-300 shadow-sm' 
+                          : 'text-slate-400 hover:text-white'
                       }`}
                     >
-                      {lang === 'nodejs' ? 'TypeScript' : lang === 'go' ? 'Go' : 'Python'}
+                      {lang === 'nodejs' ? 'TypeScript / Node' : lang === 'go' ? 'Go' : 'Python'}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <p className="text-xs text-[#94a3b8] leading-relaxed">
-                Prefer your local IDE? Test your local Express, FastAPI, or Gin server against our test suites using your custom endpoint:
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
+                Prefer your local IDE? Test your live Express, FastAPI, or Gin server against our automated contract and concurrency suites using your local endpoint:
               </p>
 
-              <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/60 border border-white/[0.1] font-mono text-xs">
-                <span className="text-emerald-400 select-all">
-                  $ npx apirun test --target http://localhost:8000 --challenge create-user-api
-                </span>
-                <button
-                  onClick={handleCopyCli}
-                  className="flex items-center space-x-1 px-2.5 py-1 rounded bg-white/[0.08] hover:bg-white/[0.14] text-white text-xs font-sans font-medium transition-colors"
-                >
-                  {copiedCli ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedCli ? 'Copied' : 'Copy'}</span>
-                </button>
+              {/* Terminal Frame */}
+              <div className="rounded-2xl bg-[#04060a] border border-white/[0.1] overflow-hidden shadow-inner">
+                {/* Window Header */}
+                <div className="flex items-center justify-between px-4 py-2.5 bg-white/[0.03] border-b border-white/[0.06]">
+                  <div className="flex items-center space-x-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
+                    <span className="text-[11px] text-slate-500 pl-2 font-medium hidden xs:inline">bash &bull; apirun-runner</span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      const cmd = selectedCliLang === 'go'
+                        ? 'go run apirun.dev/cli@latest test --target http://localhost:8080 --challenge create-user-api'
+                        : selectedCliLang === 'python'
+                        ? 'python -m apirun test --target http://localhost:8000 --challenge create-user-api'
+                        : 'npx apirun test --target http://localhost:8000 --challenge create-user-api';
+                      navigator.clipboard.writeText(cmd);
+                      setCopiedCli(true);
+                      setTimeout(() => setCopiedCli(false), 2000);
+                    }}
+                    className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-white text-[11px] font-bold transition-all active:scale-95"
+                    aria-label="Copy CLI command"
+                  >
+                    {copiedCli ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-300" />}
+                    <span>{copiedCli ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
+
+                {/* Command & Output Content */}
+                <div className="p-4 space-y-2 overflow-x-auto text-xs sm:text-sm">
+                  <div className="flex items-start space-x-2 text-emerald-400 font-bold select-all">
+                    <span className="text-slate-500 shrink-0">$</span>
+                    <span className="break-all sm:break-normal">
+                      {selectedCliLang === 'go' 
+                        ? 'go run apirun.dev/cli@latest test --target http://localhost:8080 --challenge create-user-api'
+                        : selectedCliLang === 'python'
+                        ? 'python -m apirun test --target http://localhost:8000 --challenge create-user-api'
+                        : 'npx apirun test --target http://localhost:8000 --challenge create-user-api'}
+                    </span>
+                  </div>
+
+                  <div className="text-[11px] text-slate-400 pt-1 space-y-0.5 border-t border-white/[0.04]">
+                    <div className="text-emerald-400 font-semibold flex items-center space-x-1.5">
+                      <span>✔</span>
+                      <span>12/12 RFC-9110 assertions &amp; concurrency tests passed (0.04s)</span>
+                    </div>
+                    <div className="text-slate-400 text-[10px]">
+                      &rarr; 50 concurrent requests handled &bull; 0 race conditions &bull; 0 deadlocks
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </ScrollReveal>

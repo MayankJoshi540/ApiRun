@@ -142,7 +142,7 @@ export const Footer: React.FC<FooterProps> = ({
             <p className="text-xs text-slate-400 leading-relaxed">
               Test your local API server directly from terminal:
             </p>
-            <div className="px-3 py-2 rounded-lg bg-[#0c1017] border border-white/[0.08] font-mono text-xs text-zinc-200 select-all">
+            <div className="px-3 py-2 rounded-lg bg-[#0c1017] border border-white/[0.08] font-sans font-semibold text-xs text-zinc-200 select-all">
               npx apirun test
             </div>
             <p className="text-[11px] text-slate-500">
