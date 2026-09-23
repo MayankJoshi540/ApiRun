@@ -54,7 +54,7 @@ export const ChallengeHeader: React.FC<Props> = ({
               {challenge.category}
             </span>
             {isSolved && (
-              <span className="inline-flex items-center space-x-1 font-mono text-[11px] text-emerald-400 bg-emerald-950/40 border border-emerald-800/60 px-2.5 py-0.5 rounded-lg font-semibold">
+              <span className="inline-flex items-center space-x-1 font-sans text-[11px] text-emerald-400 bg-emerald-950/40 border border-emerald-800/60 px-2.5 py-0.5 rounded-lg font-semibold">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>SOLVED</span>
               </span>

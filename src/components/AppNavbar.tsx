@@ -142,20 +142,20 @@ export const AppNavbar: React.FC<Props> = ({
           ref={navContainerRef}
           className="max-w-5xl mx-auto flex flex-col items-center w-full"
         >
-          {/* Main Navbar Bar */}
+          {/* Main Navbar Bar - Glassmorphism */}
           <div 
             style={{
-              backdropFilter: 'blur(28px) saturate(190%)',
-              WebkitBackdropFilter: 'blur(28px) saturate(190%)',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
             }}
             className={`w-full pointer-events-auto flex items-center justify-between transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               // Mobile: Full width pinned clean top bar with bottom border
               // Desktop: Floating rounded-full pill
               mobileMenuOpen 
-                ? 'h-14 sm:h-16 px-4 sm:px-8 bg-[#070b12] border-b sm:border border-white/[0.18] sm:rounded-3xl shadow-2xl'
+                ? 'h-14 sm:h-16 px-4 sm:px-8 bg-[#070b14]/80 border-b sm:border border-white/[0.14] sm:rounded-3xl shadow-[inset_0_1px_1px_0_rgba(255,255,255,0.12),0_20px_40px_rgba(0,0,0,0.7)]'
                 : isScrolled
-                ? 'h-13 sm:h-14 px-4 sm:px-6 bg-[#070b12]/95 border-b sm:border border-white/[0.14] sm:rounded-full shadow-[0_15px_40px_rgba(0,0,0,0.8)] sm:scale-[0.99]'
-                : 'h-14 sm:h-16 px-4 sm:px-8 bg-[#070b12]/85 border-b sm:border border-white/[0.1] sm:rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.5)]'
+                ? 'h-13 sm:h-14 px-4 sm:px-6 bg-[#070b14]/70 border-b sm:border border-white/[0.14] sm:rounded-full shadow-[inset_0_1px_1px_0_rgba(255,255,255,0.15),0_16px_36px_rgba(0,0,0,0.6)] sm:scale-[0.99]'
+                : 'h-14 sm:h-16 px-4 sm:px-8 bg-[#070b14]/55 border-b sm:border border-white/[0.12] sm:rounded-full shadow-[inset_0_1px_1px_0_rgba(255,255,255,0.12),0_12px_32px_rgba(0,0,0,0.45)]'
             }`}
           >
             {/* Left: Brand Logo & Title */}
@@ -169,7 +169,7 @@ export const AppNavbar: React.FC<Props> = ({
                 <img
                   src="/logo.png"
                   alt="APIRun"
-                  className="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded drop-shadow-[0_0_12px_rgba(52,211,153,0.45)]"
+                  className="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded"
                 />
                 <span className="font-extrabold text-base sm:text-lg tracking-tight font-sans">
                   <span className="text-white">API</span>
@@ -206,9 +206,9 @@ export const AppNavbar: React.FC<Props> = ({
                       <span
                         className={`absolute inset-0 rounded-full -z-10 transition-all duration-200 ${
                           isHovered
-                            ? 'bg-white/[0.08] border border-white/[0.12]'
+                            ? 'bg-white/[0.09] border border-white/[0.14] backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]'
                             : isActive
-                            ? 'bg-emerald-500/15 border border-emerald-500/30'
+                            ? 'bg-emerald-500/15 border border-emerald-500/30 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(16,185,129,0.2)]'
                             : 'bg-transparent'
                         }`}
                         style={{
@@ -247,7 +247,7 @@ export const AppNavbar: React.FC<Props> = ({
                 ) : (
                   <Link
                     href="/sign-in"
-                    className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 bg-white/[0.06] border border-white/[0.1] hover:bg-white/[0.1] active:scale-95 transition-all"
+                    className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.12] backdrop-blur-md active:scale-95 transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]"
                   >
                     Sign In
                   </Link>
@@ -256,10 +256,10 @@ export const AppNavbar: React.FC<Props> = ({
                 {/* Mobile Menu Toggle Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className={`w-9 h-9 rounded-xl border transition-all duration-200 flex items-center justify-center active:scale-90 ${
+                  className={`w-9 h-9 rounded-xl border transition-all duration-200 flex items-center justify-center backdrop-blur-md active:scale-90 ${
                     mobileMenuOpen
                       ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
-                      : 'bg-white/[0.05] border-white/[0.1] text-zinc-300 hover:text-white'
+                      : 'bg-white/[0.06] border-white/[0.12] text-zinc-300 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]'
                   }`}
                   aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
                   aria-expanded={mobileMenuOpen}
@@ -274,14 +274,14 @@ export const AppNavbar: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Seamless Mobile Dropdown Drawer */}
+          {/* Seamless Mobile Dropdown Drawer - Glassmorphic */}
           {mobileMenuOpen && (
             <div 
               style={{
-                backdropFilter: 'blur(36px) saturate(200%)',
-                WebkitBackdropFilter: 'blur(36px) saturate(200%)',
+                backdropFilter: 'blur(28px) saturate(190%)',
+                WebkitBackdropFilter: 'blur(28px) saturate(190%)',
               }}
-              className="w-full pointer-events-auto bg-[#070b12]/98 border-b sm:border border-white/[0.14] sm:rounded-3xl sm:mt-2 shadow-[0_30px_90px_rgba(0,0,0,0.95)] p-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 md:hidden z-50 font-sans"
+              className="w-full pointer-events-auto bg-[#070b14]/85 border-b sm:border border-white/[0.14] sm:rounded-3xl sm:mt-2 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_24px_60px_rgba(0,0,0,0.85)] p-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 md:hidden z-50 font-sans"
             >
               {/* Navigation Items */}
               <div className="space-y-1.5">
@@ -384,7 +384,7 @@ export const AppNavbar: React.FC<Props> = ({
                     <Link
                       href="/sign-up"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold transition-all shadow-md shadow-emerald-950/40 active:scale-95 text-center"
+                      className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold border border-emerald-500/40 transition-all active:scale-95 text-center"
                     >
                       <UserPlus className="w-4 h-4" />
                       <span>Sign Up</span>
