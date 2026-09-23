@@ -76,9 +76,11 @@ export const AppNavbar: React.FC<Props> = ({
             className="inline-flex items-center space-x-2 text-left shrink-0 transition-transform duration-200 hover:scale-105 active:scale-[0.97] group"
             aria-label="API Run home"
           >
-            <div className="flex items-center font-mono text-sm sm:text-base font-extrabold text-emerald-400 tracking-tighter drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]">
-              &#123;&bull;&gt;&#125;
-            </div>
+            <img
+              src="/logo.png"
+              alt="APIRun"
+              className="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded-md drop-shadow-[0_0_12px_rgba(52,211,153,0.35)]"
+            />
             <span className="font-extrabold text-base sm:text-lg tracking-tight font-sans">
               <span className="text-white">API</span>
               <span className="text-emerald-400">Run</span>
