@@ -191,27 +191,27 @@ export const BackendTechMarquee: React.FC = () => {
       >
         {/* 3D Angled Plane */}
         <div 
-          className="space-y-4 sm:space-y-5 transition-transform duration-500 will-change-transform"
+          className="space-y-3 sm:space-y-5 transition-transform duration-500 will-change-transform"
           style={{
-            transform: 'rotateX(18deg) rotateZ(-3deg) skewX(3deg)',
+            transform: 'rotateX(14deg) rotateZ(-2.5deg) skewX(2deg)',
             transformStyle: 'preserve-3d'
           }}
         >
           {/* Row 1: Marquee Left */}
-          <div className="flex w-max animate-marquee-left space-x-3.5 sm:space-x-5 py-1">
+          <div className="flex w-max animate-marquee-left space-x-3 sm:space-x-5 py-1">
             {row1Duplicated.map((item, idx) => (
               <div
                 key={`r1-${idx}`}
-                className={`flex items-center space-x-3.5 px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-[#0a0e17]/95 border border-white/[0.1] ${item.glowColor} transition-all duration-300 hover:scale-[1.05] hover:bg-white/[0.05] shadow-[0_15px_35px_rgba(0,0,0,0.8)] backdrop-blur-xl group cursor-default shrink-0`}
+                className={`flex items-center space-x-3 sm:space-x-3.5 px-4 sm:px-6 py-2.5 sm:py-4 rounded-2xl bg-[#0a0e17]/95 border border-white/[0.1] ${item.glowColor} transition-all duration-300 hover:scale-[1.05] hover:bg-white/[0.05] shadow-[0_15px_35px_rgba(0,0,0,0.8)] backdrop-blur-xl group cursor-default shrink-0`}
               >
                 <div className="shrink-0 group-hover:scale-110 transition-transform duration-200">
                   {item.svg}
                 </div>
                 <div className="text-left font-sans">
-                  <div className="text-sm sm:text-base font-bold text-white tracking-tight leading-none group-hover:text-emerald-300 transition-colors">
+                  <div className="text-xs sm:text-base font-bold text-white tracking-tight leading-none group-hover:text-emerald-300 transition-colors">
                     {item.name}
                   </div>
-                  <div className="text-xs font-medium text-slate-400 tracking-normal mt-1 leading-none">
+                  <div className="text-[11px] sm:text-xs font-medium text-slate-400 tracking-normal mt-1 leading-none">
                     {item.runtime}
                   </div>
                 </div>
@@ -220,20 +220,20 @@ export const BackendTechMarquee: React.FC = () => {
           </div>
 
           {/* Row 2: Marquee Right */}
-          <div className="flex w-max animate-marquee-right space-x-3.5 sm:space-x-5 py-1">
+          <div className="flex w-max animate-marquee-right space-x-3 sm:space-x-5 py-1">
             {row2Duplicated.map((item, idx) => (
               <div
                 key={`r2-${idx}`}
-                className={`flex items-center space-x-3.5 px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-[#0a0e17]/95 border border-white/[0.1] ${item.glowColor} transition-all duration-300 hover:scale-[1.05] hover:bg-white/[0.05] shadow-[0_15px_35px_rgba(0,0,0,0.8)] backdrop-blur-xl group cursor-default shrink-0`}
+                className={`flex items-center space-x-3 sm:space-x-3.5 px-4 sm:px-6 py-2.5 sm:py-4 rounded-2xl bg-[#0a0e17]/95 border border-white/[0.1] ${item.glowColor} transition-all duration-300 hover:scale-[1.05] hover:bg-white/[0.05] shadow-[0_15px_35px_rgba(0,0,0,0.8)] backdrop-blur-xl group cursor-default shrink-0`}
               >
                 <div className="shrink-0 group-hover:scale-110 transition-transform duration-200">
                   {item.svg}
                 </div>
                 <div className="text-left font-sans">
-                  <div className="text-sm sm:text-base font-bold text-white tracking-tight leading-none group-hover:text-emerald-300 transition-colors">
+                  <div className="text-xs sm:text-base font-bold text-white tracking-tight leading-none group-hover:text-emerald-300 transition-colors">
                     {item.name}
                   </div>
-                  <div className="text-xs font-medium text-slate-400 tracking-normal mt-1 leading-none">
+                  <div className="text-[11px] sm:text-xs font-medium text-slate-400 tracking-normal mt-1 leading-none">
                     {item.runtime}
                   </div>
                 </div>
