@@ -274,6 +274,14 @@ export const Trash2: React.FC<IconProps> = (props) => (
   </BaseSvg>
 );
 
+export const Menu: React.FC<IconProps> = (props) => (
+  <BaseSvg {...props}>
+    <line x1="4" x2="20" y1="12" y2="12" />
+    <line x1="4" x2="20" y1="6" y2="6" />
+    <line x1="4" x2="20" y1="18" y2="18" />
+  </BaseSvg>
+);
+
 export const X: React.FC<IconProps> = (props) => (
   <BaseSvg {...props}>
     <path d="M18 6 6 18" />
