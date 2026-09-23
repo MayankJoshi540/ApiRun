@@ -259,7 +259,7 @@ export default function FeedbackPage() {
                 onClick={() => setActiveTab('submit')}
                 className={`flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
                   activeTab === 'submit'
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/40'
+                    ? 'bg-emerald-600 text-white border border-emerald-500'
                     : 'bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border border-white/[0.08]'
                 }`}
               >
@@ -274,7 +274,7 @@ export default function FeedbackPage() {
                 }}
                 className={`flex-1 sm:flex-initial flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
                   activeTab === 'inbox'
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/40'
+                    ? 'bg-emerald-600 text-white border border-emerald-500'
                     : 'bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1]'
                 }`}
               >
@@ -633,16 +633,32 @@ export default function FeedbackPage() {
         ) : (
           /* ----------------- SUBMIT FEEDBACK VIEW (FOR ALL USERS) ----------------- */
           <>
-            {/* Header Eyebrow & Title */}
-            <div className="text-center space-y-3">
+            {/* Page Header */}
+            <div className="text-center space-y-3 max-w-3xl mx-auto relative select-none">
+              <div className="space-y-1.5">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-[1.08]">
+                  Developer Feedback &amp; <span className="text-emerald-400">Requests</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed font-normal">
+                  Submit real-world backend challenge ideas, report test harness issues, or request new runtime frameworks.
+                </p>
+              </div>
 
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-                Help Us Improve APIRun
-              </h1>
-
-              <p className="text-sm text-slate-400 max-w-xl mx-auto leading-relaxed font-normal">
-                Suggest a backend challenge scenario, report an issue, or request API testing features.
-              </p>
+              {/* Technical Quick Tags */}
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px]">
+                <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-400 font-semibold">
+                  # Concurrency Bugs
+                </span>
+                <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-400 font-semibold">
+                  # Rate Limiters
+                </span>
+                <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-400 font-semibold">
+                  # Idempotency Replays
+                </span>
+                <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-400 font-semibold">
+                  # Harness Features
+                </span>
+              </div>
             </div>
 
             {/* Feedback Card Form / Success View */}
@@ -674,7 +690,7 @@ export default function FeedbackPage() {
 
                     <button
                       onClick={() => router.push('/challenges')}
-                      className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md shadow-emerald-950/40"
+                      className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all border border-emerald-500"
                     >
                       <span>Back to Challenges</span>
                       <ArrowRight className="w-4 h-4" />
@@ -707,17 +723,17 @@ export default function FeedbackPage() {
                           <div
                             key={cat.id}
                             onClick={() => setCategory(cat.id)}
-                            className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col space-y-1 text-left ${
+                            className={`p-3.5 rounded-2xl border transition-all duration-150 cursor-pointer flex flex-col space-y-1 text-left group active:scale-[0.98] ${
                               isSelected
-                                ? 'bg-emerald-500/10 border-emerald-500/40 text-white shadow-sm'
-                                : 'bg-[#04060a] border-white/[0.06] hover:border-white/[0.12] text-slate-400'
+                                ? 'bg-emerald-500/10 border-emerald-500 text-white'
+                                : 'bg-[#04060a] border-white/[0.08] hover:border-white/[0.22] hover:bg-white/[0.03] text-slate-400 hover:text-slate-200'
                             }`}
                           >
                             <div className="flex items-center space-x-2">
-                              <Icon className={`w-4 h-4 ${isSelected ? 'text-emerald-400' : 'text-slate-500'}`} />
-                              <span className="text-xs font-bold text-white">{cat.label}</span>
+                              <Icon className={`w-4 h-4 transition-colors duration-150 ${isSelected ? 'text-emerald-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
+                              <span className="text-xs font-bold text-white tracking-tight">{cat.label}</span>
                             </div>
-                            <p className="text-[11px] text-slate-500 leading-tight">
+                            <p className="text-[11px] text-slate-500 group-hover:text-slate-400 leading-tight transition-colors">
                               {cat.desc}
                             </p>
                           </div>
@@ -732,7 +748,7 @@ export default function FeedbackPage() {
                       2. Overall Rating
                     </label>
                     
-                    <div className="flex items-center space-x-3 p-3 rounded-2xl bg-[#04060a] border border-white/[0.08] w-fit">
+                    <div className="flex items-center space-x-3 p-3 rounded-2xl bg-[#04060a] border border-white/[0.08] hover:border-white/[0.16] transition-colors duration-200 w-fit">
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => {
                           const isLit = (hoveredRating || rating) >= star;
@@ -743,9 +759,10 @@ export default function FeedbackPage() {
                               onMouseEnter={() => setHoveredRating(star)}
                               onMouseLeave={() => setHoveredRating(0)}
                               onClick={() => setRating(star)}
-                              className="p-1 hover:scale-105 transition-transform text-amber-400"
+                              className="p-1 hover:scale-110 active:scale-95 transition-transform text-amber-400 cursor-pointer"
+                              aria-label={`Rate ${star} star`}
                             >
-                              <Star className={`w-4 h-4 ${isLit ? 'fill-amber-400 text-amber-400' : 'text-slate-700'}`} />
+                              <Star className={`w-4 h-4 transition-colors ${isLit ? 'fill-amber-400 text-amber-400' : 'text-slate-700 hover:text-slate-500'}`} />
                             </button>
                           );
                         })}
@@ -773,7 +790,7 @@ export default function FeedbackPage() {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Describe your suggestion, edge case, or feedback in detail..."
-                      className="w-full px-4 py-3 bg-[#04060a] border border-white/[0.08] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs sm:text-sm resize-y leading-relaxed transition-all"
+                      className="w-full px-4 py-3 bg-[#04060a] border border-white/[0.08] hover:border-white/[0.18] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40 text-xs sm:text-sm resize-y leading-relaxed transition-all duration-200"
                     />
                   </div>
 
@@ -786,7 +803,7 @@ export default function FeedbackPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. Mayank Joshi"
-                        className="w-full px-3.5 py-2.5 bg-[#04060a] border border-white/[0.08] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs transition-all"
+                        className="w-full px-3.5 py-2.5 bg-[#04060a] border border-white/[0.08] hover:border-white/[0.18] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs transition-all duration-200"
                       />
                     </div>
 
@@ -797,7 +814,7 @@ export default function FeedbackPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="e.g. developer@apirun.dev"
-                        className="w-full px-3.5 py-2.5 bg-[#04060a] border border-white/[0.08] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs transition-all"
+                        className="w-full px-3.5 py-2.5 bg-[#04060a] border border-white/[0.08] hover:border-white/[0.18] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs transition-all duration-200"
                       />
                     </div>
                   </div>
@@ -807,17 +824,17 @@ export default function FeedbackPage() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm transition-all shadow-md shadow-emerald-950/40 flex items-center justify-center space-x-2 disabled:opacity-50 active:scale-95 cursor-pointer"
+                      className="group relative w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm tracking-tight transition-all duration-150 border border-emerald-500/40 hover:border-emerald-400 flex items-center justify-center space-x-2.5 disabled:opacity-50 active:scale-[0.99] cursor-pointer shadow-sm"
                     >
                       {isSubmitting ? (
                         <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin text-white" />
                           <span>Submitting Feedback to Database...</span>
                         </>
                       ) : (
                         <>
-                          <Send className="w-4 h-4" />
                           <span>Submit Developer Feedback</span>
+                          <Send className="w-4 h-4 transition-transform duration-150 group-hover:translate-x-0.5" />
                         </>
                       )}
                     </button>
