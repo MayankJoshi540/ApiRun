@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  orderBy, 
+  limit, 
+  deleteDoc, 
+  doc 
+} from 'firebase/firestore';
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
 
 export interface FeedbackItem {
   id: string;
@@ -18,35 +26,31 @@ export interface FeedbackItem {
   userAgent?: string;
 }
 
-// Fallback path in /tmp for environments where filesystem writes are needed (Vercel serverless /tmp is writable)
-const FALLBACK_TMP_PATH = path.join(os.tmpdir(), 'apirun_feedbacks.json');
+const ADMIN_EMAIL = 'joshimayank646@gmail.com';
+const ROOT_FEEDBACKS_PATH = path.join(process.cwd(), 'feedbacks.json');
 
-function saveToFallbackFile(feedback: FeedbackItem) {
+function readLocalFeedbacks(): FeedbackItem[] {
   try {
-    let list: FeedbackItem[] = [];
-    if (fs.existsSync(FALLBACK_TMP_PATH)) {
-      list = JSON.parse(fs.readFileSync(FALLBACK_TMP_PATH, 'utf-8'));
-      if (!Array.isArray(list)) list = [];
-    }
-    list.unshift(feedback);
-    fs.writeFileSync(FALLBACK_TMP_PATH, JSON.stringify(list, null, 2), 'utf-8');
-  } catch (err) {
-    console.warn('Fallback file write failed:', err);
-  }
-}
-
-function getFromFallbackFile(): FeedbackItem[] {
-  try {
-    if (fs.existsSync(FALLBACK_TMP_PATH)) {
-      const list = JSON.parse(fs.readFileSync(FALLBACK_TMP_PATH, 'utf-8'));
+    if (fs.existsSync(ROOT_FEEDBACKS_PATH)) {
+      const data = fs.readFileSync(ROOT_FEEDBACKS_PATH, 'utf-8');
+      const list = JSON.parse(data);
       if (Array.isArray(list)) return list;
     }
   } catch (err) {
-    console.warn('Fallback file read failed:', err);
+    console.warn('Local feedbacks.json read notice:', err);
   }
   return [];
 }
 
+function writeLocalFeedbacks(feedbacks: FeedbackItem[]) {
+  try {
+    fs.writeFileSync(ROOT_FEEDBACKS_PATH, JSON.stringify(feedbacks, null, 2), 'utf-8');
+  } catch (err) {
+    console.warn('Local feedbacks.json write notice:', err);
+  }
+}
+
+// 1. POST: Submit and store new feedback in Database & Local JSON
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -59,8 +63,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const generatedId = `fb_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const newFeedback: FeedbackItem = {
-      id: `fb_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      id: generatedId,
       timestamp: new Date().toISOString(),
       name: (name || 'Anonymous Developer').trim(),
       email: (email || 'anonymous@apirun.dev').trim(),
@@ -72,29 +77,29 @@ export async function POST(req: NextRequest) {
       userAgent: req.headers.get('user-agent') || undefined,
     };
 
-    let savedStorage = 'Firestore Database';
+    let firestoreId = generatedId;
 
-    // 1. Save to Firestore if initialized
+    // Save to Firestore 'feedbacks' collection
     if (db) {
       try {
         const docRef = await addDoc(collection(db, 'feedbacks'), newFeedback);
-        newFeedback.id = docRef.id;
+        firestoreId = docRef.id;
+        newFeedback.id = firestoreId;
       } catch (firestoreErr) {
-        console.warn('Firestore write failed, falling back to temp file storage:', firestoreErr);
-        saveToFallbackFile(newFeedback);
-        savedStorage = 'Temporary Storage (/tmp)';
+        console.warn('Firestore write fallback:', firestoreErr);
       }
-    } else {
-      saveToFallbackFile(newFeedback);
-      savedStorage = 'Temporary Storage (/tmp)';
     }
+
+    // Also persist into root feedbacks.json
+    const existingList = readLocalFeedbacks();
+    existingList.unshift(newFeedback);
+    writeLocalFeedbacks(existingList);
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Thank you for your feedback! It has been saved successfully.',
+        message: 'Thank you! Your feedback has been securely stored in the database.',
         feedbackId: newFeedback.id,
-        savedTo: savedStorage,
       },
       { status: 201 }
     );
@@ -107,37 +112,131 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+// 2. GET: Read feedbacks — Restricted exclusively to joshimayank646@gmail.com
+export async function GET(req: NextRequest) {
   try {
-    let feedbacks: FeedbackItem[] = [];
+    const url = new URL(req.url);
+    const requestEmail = (
+      req.headers.get('x-admin-email') || 
+      url.searchParams.get('adminEmail') || 
+      ''
+    ).toLowerCase().trim();
 
+    // Security check: Only joshimayank646@gmail.com can fetch and view feedbacks
+    if (requestEmail !== ADMIN_EMAIL) {
+      return NextResponse.json(
+        { 
+          error: 'Unauthorized. Access to the feedback inbox is restricted exclusively to joshimayank646@gmail.com.' 
+        },
+        { status: 403 }
+      );
+    }
+
+    let feedbacksMap = new Map<string, FeedbackItem>();
+
+    // 1. Fetch from Firestore collection 'feedbacks'
     if (db) {
       try {
-        const q = query(collection(db, 'feedbacks'), orderBy('timestamp', 'desc'), limit(100));
+        const q = query(collection(db, 'feedbacks'), orderBy('timestamp', 'desc'), limit(200));
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data() as FeedbackItem;
-          feedbacks.push({
+          feedbacksMap.set(docSnap.id, {
             ...data,
             id: docSnap.id,
           });
         });
       } catch (err) {
-        console.warn('Firestore getDocs failed, checking fallback file:', err);
-        feedbacks = getFromFallbackFile();
+        console.warn('Firestore fetch notice, using local file:', err);
       }
-    } else {
-      feedbacks = getFromFallbackFile();
     }
 
+    // 2. Merge local records from feedbacks.json
+    const localList = readLocalFeedbacks();
+    for (const item of localList) {
+      if (!feedbacksMap.has(item.id)) {
+        feedbacksMap.set(item.id, item);
+      }
+    }
+
+    const feedbacks = Array.from(feedbacksMap.values()).sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+
     return NextResponse.json({
+      success: true,
       total: feedbacks.length,
       feedbacks,
     });
   } catch (error: any) {
     console.error('Error reading feedbacks:', error);
     return NextResponse.json(
-      { error: 'Failed to read feedback list.' },
+      { error: 'Failed to retrieve feedback list.' },
+      { status: 500 }
+    );
+  }
+}
+
+// 3. DELETE: Remove feedback entry from Firestore & local database
+export async function DELETE(req: NextRequest) {
+  try {
+    const url = new URL(req.url);
+    let id = url.searchParams.get('id');
+    let requestEmail = (
+      req.headers.get('x-admin-email') || 
+      url.searchParams.get('adminEmail') || 
+      ''
+    ).toLowerCase().trim();
+
+    // If payload passed in body
+    if (!id) {
+      try {
+        const body = await req.json();
+        id = body.id;
+        if (body.adminEmail) requestEmail = body.adminEmail.toLowerCase().trim();
+      } catch {}
+    }
+
+    // Security check: Only joshimayank646@gmail.com can delete feedbacks
+    if (requestEmail !== ADMIN_EMAIL) {
+      return NextResponse.json(
+        { 
+          error: 'Unauthorized. Only joshimayank646@gmail.com has permission to delete feedback records.' 
+        },
+        { status: 403 }
+      );
+    }
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Feedback ID is required to delete.' },
+        { status: 400 }
+      );
+    }
+
+    // 1. Delete from Firestore if db configured
+    if (db) {
+      try {
+        await deleteDoc(doc(db, 'feedbacks', id));
+      } catch (firestoreErr) {
+        console.warn('Firestore delete document notice:', firestoreErr);
+      }
+    }
+
+    // 2. Delete from local feedbacks.json
+    const currentList = readLocalFeedbacks();
+    const updatedList = currentList.filter(item => item.id !== id);
+    writeLocalFeedbacks(updatedList);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Feedback entry successfully deleted from database.',
+      deletedId: id,
+    });
+  } catch (error: any) {
+    console.error('Error deleting feedback:', error);
+    return NextResponse.json(
+      { error: error?.message || 'Failed to delete feedback entry.' },
       { status: 500 }
     );
   }
