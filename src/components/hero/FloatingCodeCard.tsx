@@ -12,9 +12,9 @@ export const FloatingCodeCard: React.FC = () => {
           <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]" />
         </div>
 
-        {/* Syntax-Highlighted Monospace Code Snippet */}
-        <div className="font-mono text-[12px] sm:text-[13px] leading-relaxed tracking-normal space-y-1">
-          <div className="text-emerald-400/70 font-medium">
+        {/* Syntax-Highlighted Code Snippet in Plus Jakarta Sans */}
+        <div className="font-sans text-[12px] sm:text-[13px] leading-relaxed tracking-normal space-y-1 font-medium">
+          <div className="text-emerald-400 font-medium">
             // Build
           </div>
           <div className="text-[#f1f5f9]">
@@ -35,7 +35,7 @@ export const FloatingCodeCard: React.FC = () => {
             <span className="text-blue-400">json</span>
             <span className="text-slate-300">(&#123; </span>
             <span className="text-slate-300">success: </span>
-            <span className="text-[#10b981] font-bold">true</span>
+            <span className="text-sky-400 font-bold">true</span>
             <span className="text-slate-300"> &#125;);</span>
           </div>
           <div className="text-slate-300">&#125;);</div>

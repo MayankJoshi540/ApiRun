@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { challenges as defaultChallenges, initialUserStats } from '@/data/challenges';
 import { BackendRankNavbar } from '@/components/BackendRankNavbar';
 import { ProgressView } from '@/components/ProgressView';
+import { Footer } from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { loadUserProgress, applyUserProgressToChallenges } from '@/lib/userProgress';
 import { Challenge, UserStats } from '@/types';
@@ -47,7 +48,8 @@ export default function ProgressPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+      
       <BackendRankNavbar
         activeTab="progress"
         onSelectTab={handleNavigate}
@@ -55,7 +57,7 @@ export default function ProgressPage() {
         totalCount={challengesList.length}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-20 relative z-10 flex-grow w-full">
         <ProgressView
           userStats={userStats}
           challenges={challengesList}
@@ -65,6 +67,9 @@ export default function ProgressPage() {
           userPhotoURL={user?.photoURL || null}
         />
       </main>
+
+      {/* Global Footer */}
+      <Footer />
     </div>
   );
 }

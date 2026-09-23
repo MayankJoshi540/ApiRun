@@ -21,11 +21,15 @@ export const Footer: React.FC<FooterProps> = ({
           <div className="col-span-2 space-y-4 pr-0 lg:pr-8">
             <Link 
               href="/"
-              className="inline-flex items-center space-x-2 transition-opacity hover:opacity-90"
+              className="inline-flex items-center space-x-2.5 transition-opacity hover:opacity-90"
             >
-              <span className="font-mono text-base font-extrabold text-[#10b981]">&#123;&bull;&gt;&#125;</span>
+              <img
+                src="/logo.png"
+                alt="APIRun"
+                className="w-6 h-6 object-contain rounded drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]"
+              />
               <span className="font-bold text-lg tracking-tight text-white">
-                API<span className="text-[#10b981]">Run</span>
+                API<span className="text-emerald-400">Run</span>
               </span>
             </Link>
 
@@ -113,7 +117,7 @@ export const Footer: React.FC<FooterProps> = ({
                 </Link>
               </li>
               <li>
-                <Link href="/feedback" className="hover:text-white transition-colors flex items-center space-x-1.5 text-[#10b981]">
+                <Link href="/feedback" className="hover:text-white transition-colors flex items-center space-x-1.5 text-zinc-300">
                   <span>Drop Feedback</span>
                 </Link>
               </li>
@@ -138,7 +142,7 @@ export const Footer: React.FC<FooterProps> = ({
             <p className="text-xs text-slate-400 leading-relaxed">
               Test your local API server directly from terminal:
             </p>
-            <div className="px-3 py-2 rounded-lg bg-[#0c1017] border border-white/[0.08] font-mono text-xs text-[#10b981] select-all">
+            <div className="px-3 py-2 rounded-lg bg-[#0c1017] border border-white/[0.08] font-sans font-semibold text-xs text-zinc-200 select-all">
               npx apirun test
             </div>
             <p className="text-[11px] text-slate-500">

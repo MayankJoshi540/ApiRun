@@ -8,7 +8,7 @@ import {
   Copy, 
   Check, 
   FileCode, 
-  Sparkles, 
+  Code2, 
   Maximize2, 
   Minimize2,
   Terminal,
@@ -184,6 +184,11 @@ declare module 'path';`,
   const handleResetCode = () => {
     if (window.confirm('Reset code to the original challenge template?')) {
       const defaultStarter = challenge.starterCode?.[selectedLang] || '';
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem(`apirun_code_${challenge.id}_${selectedLang}`);
+        } catch {}
+      }
       onChangeCode(defaultStarter);
       if (editorRef.current) {
         editorRef.current.setValue(defaultStarter);
@@ -236,7 +241,7 @@ declare module 'path';`,
             className="hidden sm:flex items-center space-x-1 px-2.5 py-1 rounded bg-[#12161f] hover:bg-[#171c26] text-[#8b949e] hover:text-[#e6edf3] border border-[#262d3a] transition-colors"
             title="Format Document"
           >
-            <Sparkles className="w-3 h-3 text-amber-400" />
+            <Code2 className="w-3 h-3 text-emerald-400" />
             <span className="text-[11px]">Format</span>
           </button>
 
@@ -301,8 +306,8 @@ declare module 'path';`,
           onMount={handleEditorDidMount}
           options={{
             fontFamily: "'Fira Code', 'Cascadia Code', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace",
-            fontSize: 13,
-            lineHeight: 22,
+            fontSize: 17,
+            lineHeight: 28,
             fontLigatures: true,
             tabSize: 2,
             insertSpaces: true,

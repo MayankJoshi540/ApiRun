@@ -35,7 +35,6 @@ import {
   Edit3,
   X,
   Loader2,
-  Sparkles,
   Save,
   Globe,
   User as UserIcon
@@ -206,7 +205,7 @@ export const ProgressView: React.FC<Props> = ({
   const badges = [
     { id: 'b1', name: 'First AC', desc: 'Solved 1st backend challenge', date: 'Sep 2026', unlocked: true, icon: Zap, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
     { id: 'b2', name: 'Validation Master', desc: 'Passed all input validation suites', date: 'Sep 2026', unlocked: true, icon: CheckCircle2, color: 'text-sky-400 bg-sky-500/10 border-sky-500/20' },
-    { id: 'b3', name: 'Sub-15ms Latency', desc: 'Average latency under 20ms', date: 'Active', unlocked: true, icon: Cpu, color: 'text-[#00f2a9] bg-[#00f2a9]/10 border-[#00f2a9]/20' },
+    { id: 'b3', name: 'Sub-15ms Latency', desc: 'Average latency under 20ms', date: 'Active', unlocked: true, icon: Cpu, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
     { id: 'b4', name: 'Idempotency Key', desc: 'Completed safe retry API', date: 'Locked', unlocked: false, icon: RefreshCw, color: 'text-zinc-500 bg-zinc-900/40 border-zinc-800/80' },
     { id: 'b5', name: 'JWT Auth Sentinel', desc: 'Bearer token crypto verify', date: 'Locked', unlocked: false, icon: Key, color: 'text-zinc-500 bg-zinc-900/40 border-zinc-800/80' },
     { id: 'b6', name: 'Production 50 AC', desc: '50 challenges completed', date: 'Locked', unlocked: false, icon: Award, color: 'text-zinc-500 bg-zinc-900/40 border-zinc-800/80' }
@@ -255,10 +254,10 @@ export const ProgressView: React.FC<Props> = ({
             <div className="absolute top-5 right-5 z-10">
               <button
                 onClick={handleOpenEditModal}
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.08] hover:border-[#00f2a9]/50 text-xs font-semibold text-zinc-300 hover:text-[#00f2a9] transition-all shadow-sm group"
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.08] hover:border-emerald-500/50 text-xs font-semibold text-zinc-300 hover:text-emerald-400 transition-all duration-150 active:scale-95 shadow-sm group"
                 title="Edit bio and profile info"
               >
-                <Edit3 className="w-3.5 h-3.5 text-[#00f2a9]" />
+                <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Edit Bio</span>
               </button>
             </div>
@@ -273,11 +272,11 @@ export const ProgressView: React.FC<Props> = ({
                     className="w-16 h-16 rounded-2xl object-cover border border-white/[0.12] shadow-inner"
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#111827] to-[#1e293b] border border-white/[0.12] flex items-center justify-center text-xl font-bold text-[#00f2a9] shadow-inner font-display">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#111827] to-[#1e293b] border border-white/[0.12] flex items-center justify-center text-xl font-bold text-emerald-400 shadow-inner font-display">
                     {initials}
                   </div>
                 )}
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#00f2a9] border-2 border-[#0b0f17] flex items-center justify-center">
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-[#0b0f17] flex items-center justify-center">
                   <Check className="w-3 h-3 text-black stroke-[3]" />
                 </div>
               </div>
@@ -287,7 +286,7 @@ export const ProgressView: React.FC<Props> = ({
                   {displayName}
                 </h1>
                 <div className="text-xs text-slate-400 font-sans truncate">{handle}</div>
-                <div className="text-xs text-[#00f2a9] font-medium flex items-center space-x-1.5 pt-0.5">
+                <div className="text-xs text-emerald-400 font-medium flex items-center space-x-1.5 pt-0.5">
                   <Shield className="w-3.5 h-3.5 shrink-0" />
                   <span className="truncate">
                     {profileTitle} · {solvedCount > 3 ? 'Level 3 Architect' : solvedCount > 0 ? 'Level 2 Engineer' : 'Level 1 Initiate'}
@@ -318,7 +317,7 @@ export const ProgressView: React.FC<Props> = ({
                   href={`https://github.com/${(profileGithub || handle).replace(/^@/, '')}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-slate-300 hover:text-[#00f2a9] transition-colors cursor-pointer truncate"
+                  className="text-slate-300 hover:text-emerald-400 transition-colors cursor-pointer truncate"
                 >
                   github.com/{(profileGithub || handle).replace(/^@/, '')}
                 </a>
@@ -336,7 +335,7 @@ export const ProgressView: React.FC<Props> = ({
                 <div className="text-xs text-slate-400 font-medium">Submissions</div>
               </div>
               <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-                <div className="text-lg font-bold text-[#00f2a9]">{solvedPercent > 0 ? `${solvedPercent}%` : '100%'}</div>
+                <div className="text-lg font-bold text-emerald-400">{solvedPercent > 0 ? `${solvedPercent}%` : '100%'}</div>
                 <div className="text-xs text-slate-400 font-medium">Pass Rate</div>
               </div>
               <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
@@ -350,7 +349,7 @@ export const ProgressView: React.FC<Props> = ({
           <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold text-white flex items-center space-x-2">
-                <Code2 className="w-4 h-4 text-[#00f2a9]" />
+                <Code2 className="w-4 h-4 text-emerald-400" />
                 <span>Languages Used</span>
               </h2>
               <span className="text-xs text-slate-400">3 Runtimes</span>
@@ -362,7 +361,7 @@ export const ProgressView: React.FC<Props> = ({
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                   <span className="text-white font-medium">TypeScript / Node.js</span>
                 </div>
-                <span className="text-[#00f2a9] font-bold">1 solved <span className="text-slate-500 font-normal">/ 11 tests</span></span>
+                <span className="text-emerald-400 font-bold">1 solved <span className="text-slate-500 font-normal">/ 11 tests</span></span>
               </div>
 
               <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
@@ -390,7 +389,7 @@ export const ProgressView: React.FC<Props> = ({
                 <Award className="w-4 h-4 text-amber-400" />
                 <span>Earned Badges</span>
               </h2>
-              <span className="text-xs text-[#00f2a9] font-semibold">3 Unlocked</span>
+              <span className="text-xs text-emerald-400 font-semibold">3 Unlocked</span>
             </div>
 
             <div className="grid grid-cols-3 gap-2.5">
@@ -443,7 +442,7 @@ export const ProgressView: React.FC<Props> = ({
                       cx="50"
                       cy="50"
                       r="40"
-                      stroke="#00f2a9"
+                      stroke="#10b981"
                       strokeWidth="8"
                       fill="transparent"
                       strokeDasharray="251.2"
@@ -457,7 +456,7 @@ export const ProgressView: React.FC<Props> = ({
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                     <span className="text-3xl font-extrabold text-white tracking-tight">{solvedCount}</span>
                     <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">Solved</span>
-                    <span className="text-xs text-[#00f2a9] font-semibold mt-0.5">{solvedPercent}% Total</span>
+                    <span className="text-xs text-emerald-400 font-semibold mt-0.5">{solvedPercent}% Total</span>
                   </div>
                 </div>
                 <div className="text-xs text-slate-400 mt-2 font-medium">
@@ -533,7 +532,7 @@ export const ProgressView: React.FC<Props> = ({
           <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 sm:p-7 space-y-5 shadow-xl">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center space-x-2">
-                <Tag className="w-4 h-4 text-[#00f2a9]" />
+                <Tag className="w-4 h-4 text-emerald-400" />
                 <h2 className="text-sm font-bold text-white">
                   Skills &amp; Concept Mastery
                 </h2>
@@ -545,9 +544,9 @@ export const ProgressView: React.FC<Props> = ({
                   <button
                     key={cat}
                     onClick={() => setSelectedSkillCategory(cat)}
-                    className={`px-3 py-1 rounded-lg font-medium text-xs transition-colors ${
+                    className={`px-3 py-1 rounded-lg font-medium text-xs transition-all duration-150 active:scale-95 ${
                       selectedSkillCategory === cat
-                        ? 'bg-white/[0.12] text-white font-bold'
+                        ? 'bg-white/[0.12] text-white font-bold shadow-sm'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -566,9 +565,9 @@ export const ProgressView: React.FC<Props> = ({
                 return (
                   <div
                     key={skill.name}
-                    className={`px-3.5 py-1.5 rounded-xl border flex items-center space-x-2 transition-all ${
+                    className={`px-3.5 py-1.5 rounded-xl border flex items-center space-x-2 transition-all duration-150 hover:scale-[1.02] ${
                       isCompleted
-                        ? 'bg-[#00f2a9]/15 border-[#00f2a9]/40 text-[#00f2a9] font-bold shadow-sm'
+                        ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 font-bold shadow-sm'
                         : isInProgress
                         ? 'bg-sky-500/15 border-sky-500/40 text-sky-400 font-semibold'
                         : 'bg-white/[0.02] border-white/[0.08] text-slate-300'
@@ -576,7 +575,7 @@ export const ProgressView: React.FC<Props> = ({
                   >
                     <span>{skill.name}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${
-                      isCompleted ? 'bg-[#00f2a9]/20 text-[#00f2a9]' : isInProgress ? 'bg-sky-500/20 text-sky-300' : 'bg-white/[0.06] text-slate-400'
+                      isCompleted ? 'bg-emerald-500/20 text-emerald-300' : isInProgress ? 'bg-sky-500/20 text-sky-300' : 'bg-white/[0.06] text-slate-400'
                     }`}>
                       x{skill.count}
                     </span>
@@ -591,7 +590,7 @@ export const ProgressView: React.FC<Props> = ({
             {/* Header with Search and Tab filters */}
             <div className="p-5 bg-white/[0.02] border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center space-x-2">
-                <Terminal className="w-4 h-4 text-[#00f2a9]" />
+                <Terminal className="w-4 h-4 text-emerald-400" />
                 <h2 className="text-sm font-bold text-white">
                   Recent Submissions ({filteredSubmissions.length})
                 </h2>
@@ -606,7 +605,7 @@ export const ProgressView: React.FC<Props> = ({
                     value={searchHistory}
                     onChange={e => setSearchHistory(e.target.value)}
                     placeholder="Search challenges..."
-                    className="w-48 pl-8 pr-3 py-1.5 bg-[#080c14] border border-white/[0.1] rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#00f2a9]/50"
+                    className="w-48 pl-8 pr-3 py-1.5 bg-[#080c14] border border-white/[0.1] rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500/50"
                   />
                 </div>
 
@@ -616,9 +615,9 @@ export const ProgressView: React.FC<Props> = ({
                     <button
                       key={tab}
                       onClick={() => setSelectedSubmissionsTab(tab)}
-                      className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                      className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-150 active:scale-95 ${
                         selectedSubmissionsTab === tab
-                          ? 'bg-white/[0.12] text-white font-bold'
+                          ? 'bg-white/[0.12] text-white font-bold shadow-sm'
                           : 'text-slate-400 hover:text-white'
                       }`}
                     >
@@ -655,7 +654,7 @@ export const ProgressView: React.FC<Props> = ({
                           onClick={() => onSelectChallenge(c)}
                         >
                           <td className="py-4 px-5">
-                            <div className="font-bold text-white text-sm hover:text-[#00f2a9] transition-colors">
+                            <div className="font-bold text-white text-sm hover:text-emerald-400 transition-colors">
                               {c.title}
                             </div>
                             <div className="text-xs text-slate-400 font-mono mt-0.5">
@@ -696,7 +695,7 @@ export const ProgressView: React.FC<Props> = ({
                                 e.stopPropagation();
                                 onSelectChallenge(c);
                               }}
-                              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.06] hover:bg-[#00f2a9] text-white hover:text-black border border-white/[0.1] transition-all"
+                              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.06] hover:bg-emerald-500 text-white hover:text-black border border-white/[0.1] transition-all duration-150 active:scale-95"
                             >
                               <span>{isSolved ? 'Review' : 'Solve'}</span>
                               <ArrowRight className="w-3.5 h-3.5" />
@@ -731,7 +730,7 @@ export const ProgressView: React.FC<Props> = ({
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
               <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#00f2a9]/10 border border-[#00f2a9]/20 flex items-center justify-center text-[#00f2a9]">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                   <Edit3 className="w-4 h-4" />
                 </div>
                 <div>
@@ -763,7 +762,7 @@ export const ProgressView: React.FC<Props> = ({
                   value={editForm.displayName}
                   onChange={(e) => setEditForm(prev => ({ ...prev, displayName: e.target.value }))}
                   placeholder="e.g. Alex Rivera"
-                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs sm:text-sm"
+                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs sm:text-sm"
                 />
               </div>
 
@@ -778,7 +777,7 @@ export const ProgressView: React.FC<Props> = ({
                   value={editForm.title}
                   onChange={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="e.g. Senior Backend Engineer / Distributed Systems"
-                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs sm:text-sm"
+                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs sm:text-sm"
                 />
               </div>
 
@@ -786,7 +785,7 @@ export const ProgressView: React.FC<Props> = ({
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-[#00f2a9]" />
+                    <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Bio / Summary</span>
                   </label>
                   <span className="text-[10px] text-zinc-500 font-mono">
@@ -800,7 +799,7 @@ export const ProgressView: React.FC<Props> = ({
                   value={editForm.bio}
                   onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
                   placeholder="Tell the community about your backend engineering stack, distributed systems experience, or what challenges you are mastering..."
-                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs sm:text-sm resize-none leading-relaxed"
+                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs sm:text-sm resize-none leading-relaxed"
                 />
               </div>
 
@@ -816,7 +815,7 @@ export const ProgressView: React.FC<Props> = ({
                     value={editForm.location}
                     onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
                     placeholder="e.g. San Francisco, CA"
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs"
                   />
                 </div>
 
@@ -831,7 +830,7 @@ export const ProgressView: React.FC<Props> = ({
                     value={editForm.github}
                     onChange={(e) => setEditForm(prev => ({ ...prev, github: e.target.value }))}
                     placeholder="e.g. alexrivera"
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#00f2a9] focus:ring-1 focus:ring-[#00f2a9] transition-all text-xs"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs"
                   />
                 </div>
               </div>
@@ -850,7 +849,7 @@ export const ProgressView: React.FC<Props> = ({
                 <button
                   type="submit"
                   disabled={isSavingProfile}
-                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-[#00f2a9] hover:bg-[#00d696] text-black font-bold text-xs font-display shadow-[0_4px_20px_rgba(0,242,169,0.25)] transition-all active:scale-[0.98] disabled:opacity-50"
+                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs font-display shadow-[0_4px_20px_rgba(16,185,129,0.25)] transition-all active:scale-[0.98] disabled:opacity-50"
                 >
                   {isSavingProfile ? (
                     <>
