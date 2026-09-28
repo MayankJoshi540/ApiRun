@@ -4,7 +4,8 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, CheckCircle2, Lock, Mail, AlertCircle, ArrowRight, Check, Loader2 } from '@/components/ui/GoogleIcon';
+import { ArrowLeft, Lock, Mail, AlertCircle, ArrowRight, Loader2 } from '@/components/ui/GoogleIcon';
+import { AppBackground } from '@/components/ui/AppBackground';
 
 function SignUpContent() {
   const router = useRouter();
@@ -85,6 +86,9 @@ function SignUpContent() {
 
   return (
     <div className="relative min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased overflow-hidden selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+      {/* Home Page Background Artwork */}
+      <AppBackground />
+
       {/* Fine Technical Grid Texture Overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.035] z-0"
@@ -126,57 +130,22 @@ function SignUpContent() {
       </header>
 
       {/* 3. Main Two-Column Auth Container */}
-      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center my-auto">
+      <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center my-auto">
         
-        {/* Left Column: Home-styled Hero Copy & Live Feature Card */}
-        <div className="lg:col-span-6 space-y-6 sm:space-y-8">
-          {/* Eyebrow Pill */}
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>BACKEND PRACTICE PLATFORM</span>
-          </div>
-
-          {/* Main Headline */}
-          <div className="space-y-1 sm:space-y-2 font-display font-black tracking-tight leading-[1.05]">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl text-white">
+        {/* Left Column: Prominent Vertically Stacked Headline */}
+        <div className="lg:col-span-6 space-y-5 sm:space-y-6 text-left">
+          <div className="flex flex-col space-y-2 sm:space-y-3 font-display font-black tracking-tight leading-[1.05]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl text-white font-extrabold tracking-tight">
               Defend Edge Cases.
             </h1>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl text-emerald-400">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl text-emerald-400 font-extrabold tracking-tight">
               Master Production Systems.
             </h1>
           </div>
 
           <p className="text-sm sm:text-base text-[#94a3b8] leading-relaxed max-w-lg font-normal">
-            Create an account to start solving backend engineering challenges with real-time test execution and personal progress tracking.
+            Create an account to start solving real-world backend challenges with automated testing and progress tracking.
           </p>
-
-          {/* Live Platform Security Card (Matching Home Page Floating Cards) */}
-          <div className="rounded-2xl bg-[#090d14]/90 border border-white/[0.1] backdrop-blur-xl p-5 shadow-2xl space-y-3 font-sans text-xs max-w-lg">
-            <div className="flex items-center justify-between border-b border-white/[0.06] pb-2.5">
-              <div className="flex items-center space-x-2">
-                <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 font-bold font-mono text-[11px] border border-sky-500/20">
-                  GET
-                </span>
-                <span className="font-mono text-zinc-300">/api/v1/resource</span>
-              </div>
-              <span className="text-[11px] text-amber-400 font-mono font-semibold">429 TOO MANY REQUESTS</span>
-            </div>
-
-            <div className="space-y-1.5 pt-1">
-              <div className="flex items-center space-x-2 text-zinc-300 text-[11px]">
-                <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
-                <span>Sliding-window Redis token bucket enforcement</span>
-              </div>
-              <div className="flex items-center space-x-2 text-zinc-300 text-[11px]">
-                <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
-                <span>Retry-After and X-RateLimit response headers compliant</span>
-              </div>
-              <div className="flex items-center space-x-2 text-zinc-300 text-[11px]">
-                <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
-                <span>Zero thread locks under 100 concurrent burst requests</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Right Column: Sign Up Card */}
