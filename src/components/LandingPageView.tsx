@@ -78,45 +78,45 @@ export const LandingPageView: React.FC<Props> = ({
   const previewChallenges = challenges.slice(0, 4);
 
   const conceptTags = [
-    'HTTP/REST RFC-9110', 'REDIS DISTRIBUTED LOCKS', 'SLIDING WINDOW RATE LIMITER', 
-    'IDEMPOTENCY KEYS', 'JWT REFRESH ROTATION', 'ASYNCHRONOUS JOB WORKERS', 'STRIPE WEBHOOK HMAC'
+    'API DESIGN', 'DISTRIBUTED LOCKS', 'RATE LIMITING', 
+    'IDEMPOTENCY', 'JWT AUTH', 'BACKGROUND JOBS', 'WEBHOOK SECURITY'
   ];
 
   const comparisonRows = [
     {
       feature: 'Core Challenge Type',
-      traditional: 'Inverting binary trees, synthetic array index manipulation, and abstract dynamic programming.',
-      apirun: 'Implementing production REST endpoints, JSON payload schemas, route mutations, and auth headers.',
+      traditional: 'Inverting binary trees, synthetic array tricks, and abstract recursion problems.',
+      apirun: 'Building real API endpoints, input validation, database updates, and authentication.',
       highlight: true
     },
     {
       feature: 'Edge Case Verification',
-      traditional: 'Null array bounds, artificial timeout limits (TLE), and integer overflow limits.',
-      apirun: '50-thread concurrent race conditions, Redis rate limiter bursts, and idempotency key replays.',
+      traditional: 'Array boundary index checks and artificial CPU time limits.',
+      apirun: 'High-concurrency traffic, race condition prevention, and duplicate request handling.',
       highlight: true
     },
     {
-      feature: 'Protocol Semantics',
-      traditional: 'Single stdout string print match (e.g. System.out.println("true")).',
-      apirun: 'Strict RFC-9110 HTTP status codes (200, 201, 400, 404, 409, 422, 429) & Content-Type validation.',
+      feature: 'API Standards',
+      traditional: 'Single text print output (e.g. System.out.println("true")).',
+      apirun: 'Real HTTP status codes (200, 201, 400, 404, 409, 429) and structured JSON responses.',
       highlight: false
     },
     {
-      feature: 'State & Infrastructure',
-      traditional: 'None. In-memory ephemeral scratchpad that resets on every execution.',
-      apirun: 'Real Redis keyspaces, distributed mutex locks, ACID database transactions, and rollback isolation.',
+      feature: 'State & Databases',
+      traditional: 'None. Ephemeral memory resets on every run.',
+      apirun: 'Real Redis keys, distributed locks, database transactions, and automatic rollbacks.',
       highlight: true
     },
     {
       feature: 'Developer Workflow',
-      traditional: 'Constrained browser text box with mock driver code and hidden artificial test harnesses.',
-      apirun: 'In-browser Monaco Editor or your actual local IDE via native CLI (npx apirun test).',
+      traditional: 'Locked inside a basic browser text box with hidden mock drivers.',
+      apirun: 'Code in the browser editor or test your actual local backend server using our CLI.',
       highlight: false
     },
     {
-      feature: 'Industry & Job Relevance',
-      traditional: 'Rarely encountered in real-world backend microservices or distributed systems.',
-      apirun: 'Directly mirrors Senior & Staff backend engineering responsibilities and system design live coding.',
+      feature: 'Real-World Relevance',
+      traditional: 'Rarely encountered in day-to-day backend development or production systems.',
+      apirun: 'Directly mirrors real production backend engineering and system design interviews.',
       highlight: true
     }
   ];
@@ -124,45 +124,45 @@ export const LandingPageView: React.FC<Props> = ({
   const engineeringTracks = [
     {
       number: '01',
-      title: 'Concurrency & Distributed Mutexes',
+      title: 'Concurrency & Distributed Locks',
       badge: 'High Concurrency',
-      description: 'Defend against race conditions, phantom reads, and double spend errors using distributed locks, Redis Redlock, and optimistic locking strategies.',
-      skills: ['Mutex Locks', 'Redis Redlock', 'Optimistic Locking', 'Deadlock Detection']
+      description: 'Defend against race conditions and double-spending bugs under heavy traffic using distributed locks and atomic transactions.',
+      skills: ['Race Conditions', 'Distributed Locks', 'Transactions', 'Deadlock Prevention']
     },
     {
       number: '02',
-      title: 'Traffic Shaping & Rate Limiting',
-      badge: 'Traffic Architecture',
-      description: 'Implement atomic sliding-window counters, token buckets, and leaky bucket algorithms tested under 1,000 req/sec burst attacks.',
-      skills: ['Sliding Window', 'Redis Lua Scripts', 'HTTP 429 Retry-After', 'Token Bucket']
+      title: 'Traffic & Rate Limiting',
+      badge: 'Traffic Management',
+      description: 'Implement sliding-window counters and token bucket rate limiters to protect your APIs from traffic spikes and abuse.',
+      skills: ['Rate Limiting', 'Redis Counters', '429 Handling', 'Token Bucket']
     },
     {
       number: '03',
-      title: 'Financial Idempotency & Webhooks',
-      badge: 'Payment Reliability',
-      description: 'Handle Stripe and payment webhook replays safely with HMAC-SHA256 signature verification and atomic database deduplication keys.',
-      skills: ['HMAC-SHA256', 'Idempotency-Key Header', 'Atomic Deduplication', 'At-Least-Once Delivery']
+      title: 'Payment Safety & Webhooks',
+      badge: 'Reliability',
+      description: 'Safely handle payment webhooks with cryptographic signature checks and duplicate request prevention.',
+      skills: ['Signature Checks', 'Idempotency Keys', 'Duplicate Prevention', 'Webhook Security']
     },
     {
       number: '04',
-      title: 'RFC HTTP & Schema Contract Design',
-      badge: 'API Architecture',
-      description: 'Master strict RFC-9110 HTTP semantics, status code precision (201 Created vs 200, 422 Unprocessable vs 400), and payload contracts.',
-      skills: ['RFC-9110 Semantics', 'JSON Schema Validation', 'Header Negotiation', 'RFC-5322 Boundaries']
+      title: 'API Design & Status Codes',
+      badge: 'API Standards',
+      description: 'Design clean REST endpoints with proper HTTP status codes, structured error handling, and request validation.',
+      skills: ['REST Endpoints', 'Input Validation', 'Status Codes', 'Error Handling']
     },
     {
       number: '05',
-      title: 'Asynchronous Job Queues & Workers',
-      badge: 'Distributed Systems',
-      description: 'Build reliable background job workers with delayed retry queues, dead-letter exchanges (DLX), and worker heartbeat coordination.',
-      skills: ['Dead Letter Queues', 'Exponential Backoff', 'Worker Ack/Nack', 'Job Deduplication']
+      title: 'Background Queues & Workers',
+      badge: 'Async Processing',
+      description: 'Build reliable background job workers with automatic retries, failed job queues, and task scheduling.',
+      skills: ['Task Queues', 'Retry Logic', 'Failed Job Queues', 'Task Scheduling']
     },
     {
       number: '06',
-      title: 'Auth, JWT & Session Security',
+      title: 'Auth, Tokens & Session Security',
       badge: 'Authentication',
-      description: 'Implement dual-token rotating authentication, asymmetric RS256 signing, refresh token rotation, and distributed revocation blacklists.',
-      skills: ['RS256 JWT Signing', 'Refresh Token Rotation', 'Token Blacklisting', 'Role-Based Access (RBAC)']
+      description: 'Implement secure token authentication, refresh token rotation, password hashing, and user role permissions.',
+      skills: ['JWT Tokens', 'Token Refresh', 'Session Security', 'Role-Based Access']
     }
   ];
 
@@ -390,13 +390,13 @@ export const LandingPageView: React.FC<Props> = ({
           <ScrollReveal variant="fade-up" duration={600}>
             <div className="text-center space-y-3">
               <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
-                VERIFICATION ENGINE
+                TESTING PIPELINE
               </div>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-                Production evaluation, zero mock fluff
+                Automated testing, real-world verification
               </h2>
               <p className="text-sm sm:text-base text-[#94a3b8] max-w-2xl mx-auto font-normal leading-relaxed">
-                Every submission runs in an isolated ephemeral execution sandbox tested by our automated adversarial harness.
+                Every submission runs in a secure sandbox tested against real traffic spikes, edge cases, and API error states.
               </p>
             </div>
           </ScrollReveal>
@@ -407,42 +407,42 @@ export const LandingPageView: React.FC<Props> = ({
               <div className="font-mono text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-md w-fit">
                 01 &bull; Sandbox Isolation
               </div>
-              <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Ephemeral Container</h3>
+              <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Fast Environment</h3>
               <p className="text-xs text-[#94a3b8] leading-relaxed">
-                Spins an isolated in-memory container running your Node.js, Go, or Python service in under 50ms.
+                Spins up an isolated sandbox running your Node.js, Go, or Python service in under 50ms.
               </p>
             </div>
 
             {/* Step 2 */}
             <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-sky-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
               <div className="font-mono text-[11px] font-bold text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 rounded-md w-fit">
-                02 &bull; Contract Checks
+                02 &bull; API Contracts
               </div>
-              <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors">RFC Specification</h3>
+              <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors">Response Validation</h3>
               <p className="text-xs text-[#94a3b8] leading-relaxed">
-                Validates exact HTTP status semantics (201 Created, 400, 404, 409, 422, 429) and content-type headers.
+                Validates proper HTTP status codes (200, 201, 400, 404, 409, 429) and structured JSON responses.
               </p>
             </div>
 
             {/* Step 3 */}
             <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-purple-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
               <div className="font-mono text-[11px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2.5 py-0.5 rounded-md w-fit">
-                03 &bull; Parallel Fuzzing
+                03 &bull; Traffic &amp; Concurrency
               </div>
-              <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors">Concurrency Mutex</h3>
+              <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors">Race Condition Checks</h3>
               <p className="text-xs text-[#94a3b8] leading-relaxed">
-                Injects parallel concurrent requests to uncover race conditions, double charges, and deadlock bugs.
+                Sends parallel requests to verify thread safety, prevent double charges, and test locks.
               </p>
             </div>
 
             {/* Step 4 */}
             <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-amber-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
               <div className="font-mono text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-md w-fit">
-                04 &bull; Scorecard
+                04 &bull; Detailed Scorecard
               </div>
-              <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">Latency &amp; Traces</h3>
+              <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">Speed &amp; Diagnostics</h3>
               <p className="text-xs text-[#94a3b8] leading-relaxed">
-                Generates a detailed execution scorecard with latency p99 distributions and assertion diffs.
+                Instant breakdown of passed test assertions, execution latency, and error traces.
               </p>
             </div>
           </StaggerContainer>
@@ -453,14 +453,27 @@ export const LandingPageView: React.FC<Props> = ({
         {/* ========================================================= */}
         <section className="px-4 sm:px-6 max-w-4xl mx-auto pb-20 font-sans">
           <ScrollReveal variant="fade-up" duration={600}>
-            <div className="p-5 sm:p-8 rounded-3xl bg-[#080d16] border border-white/[0.12] space-y-5 shadow-2xl">
+            <div className="relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-[#080d16] border border-white/[0.12] space-y-6 shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
+              {/* Top ambient glow */}
+              <div 
+                className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-40 pointer-events-none opacity-40"
+                style={{
+                  background: 'radial-gradient(ellipse at center, rgba(16, 185, 129, 0.25), transparent 70%)',
+                  filter: 'blur(40px)',
+                }}
+              />
+
               {/* Header: Title + Language Switcher */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center space-x-2 text-xs text-white font-bold">
-                  <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
+              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center space-x-2.5 text-xs text-white font-bold">
+                  <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 shadow-sm">
                     <TerminalSquare className="w-4 h-4" />
                   </div>
-                  <span className="tracking-wide">LOCAL RUNNER &amp; CLI COMPATIBLE</span>
+                  <span className="tracking-wide">LOCAL RUNNER &amp; CLI</span>
+                  <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono font-bold uppercase tracking-wider">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>IN ACTIVE BUILD</span>
+                  </div>
                 </div>
 
                 {/* Language Switcher Tabs */}
@@ -471,8 +484,8 @@ export const LandingPageView: React.FC<Props> = ({
                       onClick={() => setSelectedCliLang(lang)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                         selectedCliLang === lang 
-                          ? 'bg-white/[0.1] text-emerald-300 shadow-sm' 
-                          : 'text-slate-400 hover:text-white'
+                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm' 
+                          : 'text-slate-400 hover:text-white border border-transparent'
                       }`}
                     >
                       {lang === 'nodejs' ? 'TypeScript / Node' : lang === 'go' ? 'Go' : 'Python'}
@@ -481,19 +494,25 @@ export const LandingPageView: React.FC<Props> = ({
                 </div>
               </div>
 
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
-                Prefer your local IDE? Test your live Express, FastAPI, or Gin server against our automated contract and concurrency suites using your local endpoint:
-              </p>
+              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal max-w-xl">
+                  Prefer your local IDE? Test your live Express, FastAPI, or Go server directly against our automated test suites:
+                </p>
+                <div className="text-[11px] font-mono text-zinc-400 flex items-center space-x-1.5 shrink-0">
+                  <span className="text-emerald-400">⚡</span>
+                  <span>Release: <strong className="text-white">v0.2.0 Early Access</strong></span>
+                </div>
+              </div>
 
               {/* Terminal Frame */}
-              <div className="rounded-2xl bg-[#04060a] border border-white/[0.1] overflow-hidden shadow-inner">
+              <div className="relative z-10 rounded-2xl bg-[#04060a] border border-white/[0.1] overflow-hidden shadow-2xl">
                 {/* Window Header */}
                 <div className="flex items-center justify-between px-4 py-2.5 bg-white/[0.03] border-b border-white/[0.06]">
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
-                    <span className="text-[11px] text-slate-500 pl-2 font-medium hidden xs:inline">bash &bull; apirun-runner</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+                    <span className="text-[11px] font-mono text-zinc-400 pl-2">apirun-cli &bull; port 8000 &bull; local test suite</span>
                   </div>
 
                   <button
@@ -516,9 +535,9 @@ export const LandingPageView: React.FC<Props> = ({
                 </div>
 
                 {/* Command & Output Content */}
-                <div className="p-4 space-y-2 overflow-x-auto text-xs sm:text-sm">
+                <div className="p-4 sm:p-5 space-y-3 overflow-x-auto text-xs sm:text-sm font-mono leading-relaxed">
                   <div className="flex items-start space-x-2 text-emerald-400 font-bold select-all">
-                    <span className="text-slate-500 shrink-0">$</span>
+                    <span className="text-zinc-500 shrink-0 select-none">$</span>
                     <span className="break-all sm:break-normal">
                       {selectedCliLang === 'go' 
                         ? 'go run apirun.dev/cli@latest test --target http://localhost:8080 --challenge create-user-api'
@@ -528,15 +547,47 @@ export const LandingPageView: React.FC<Props> = ({
                     </span>
                   </div>
 
-                  <div className="text-[11px] text-slate-400 pt-1 space-y-0.5 border-t border-white/[0.04]">
-                    <div className="text-emerald-400 font-semibold flex items-center space-x-1.5">
-                      <span>✔</span>
-                      <span>12/12 RFC-9110 assertions &amp; concurrency tests passed (0.04s)</span>
+                  <div className="space-y-1 text-zinc-400 text-xs pt-1 border-t border-white/[0.05]">
+                    <div className="text-zinc-300 flex items-center space-x-2">
+                      <span className="text-sky-400">[1/3]</span>
+                      <span>Connected to local server on http://localhost:{selectedCliLang === 'go' ? '8080' : '8000'}</span>
                     </div>
-                    <div className="text-slate-400 text-[10px]">
-                      &rarr; 50 concurrent requests handled &bull; 0 race conditions &bull; 0 deadlocks
+                    <div className="text-zinc-300 flex items-center space-x-2">
+                      <span className="text-sky-400">[2/3]</span>
+                      <span>Verified HTTP status codes and response formats</span>
+                    </div>
+                    <div className="text-zinc-300 flex items-center space-x-2">
+                      <span className="text-sky-400">[3/3]</span>
+                      <span>Tested concurrency and race condition edge cases</span>
                     </div>
                   </div>
+
+                  <div className="pt-2 flex items-center justify-between border-t border-white/[0.05] text-[11px]">
+                    <div className="text-emerald-400 font-bold flex items-center space-x-1.5">
+                      <span>✔</span>
+                      <span>12/12 test assertions passed (0.038s) &bull; All edge cases covered</span>
+                    </div>
+                    <span className="text-zinc-500 hidden sm:inline font-mono">exit code 0</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Pipeline Status Strip */}
+              <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-[11px] font-mono">
+                <div className="px-3 py-2 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center space-x-2 text-zinc-300">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="text-zinc-400">Sandboxes:</span>
+                  <span className="text-white font-semibold">Fast &amp; Isolated</span>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center space-x-2 text-zinc-300">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="text-zinc-400">API Tests:</span>
+                  <span className="text-white font-semibold">Edge Cases Covered</span>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center space-x-2 text-zinc-300">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  <span className="text-zinc-400">CLI Tool:</span>
+                  <span className="text-amber-300 font-semibold">Building v0.2.0</span>
                 </div>
               </div>
             </div>
