@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
 export interface FeedbackComment {
   id: string;
@@ -68,9 +69,8 @@ function writeFallbackFeedbacks(list: FeedbackItem[]) {
   try {
     fs.writeFileSync(FALLBACK_TMP_PATH, JSON.stringify(list, null, 2), 'utf-8');
   } catch (err) {
-    console.warn('Local feedbacks.json read notice:', err);
+    console.warn('Fallback file write failed:', err);
   }
-  return [];
 }
 
 // GET: Retrieve all feedback items (from Firestore / DB)
@@ -95,10 +95,10 @@ export async function GET(req: NextRequest) {
             description: data.description || data.message || '',
             type: data.type || (data.category === 'Bug Report' ? 'bug' : 'suggestion'),
             status: data.status || 'open',
-            isAnonymous: true, // Everyone is anonymous
+            isAnonymous: true,
             userId: data.userId || data.user_id,
             userName: 'Anonymous Developer',
-            userEmail: undefined, // Concealed for privacy
+            userEmail: undefined,
             upvotesCount: typeof data.upvotesCount === 'number' ? data.upvotesCount : (data.upvotes_count || 1),
             upvotedBy: Array.isArray(data.upvotedBy) ? data.upvotedBy : (data.upvoted_by || []),
             commentsCount: typeof data.commentsCount === 'number' ? data.commentsCount : (data.comments?.length || 0),
@@ -201,9 +201,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const generatedId = `fb_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
     // Everyone is stored as anonymous by default
     const newFeedback: FeedbackItem = {
-      id: `fb_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      id: generatedId,
       title: finalTitle,
       description: finalDescription,
       type: type === 'bug' ? 'bug' : 'suggestion',
@@ -221,7 +223,7 @@ export async function POST(req: NextRequest) {
       category: category || (type === 'bug' ? 'Bug Report' : 'Feature Request'),
     };
 
-    let firestoreId = generatedId;
+    let savedStorage = 'Firestore Database';
 
     if (db) {
       try {
@@ -240,11 +242,6 @@ export async function POST(req: NextRequest) {
       writeFallbackFeedbacks(list);
       savedStorage = 'Local Fallback Storage';
     }
-
-    // Also persist into root feedbacks.json
-    const existingList = readLocalFeedbacks();
-    existingList.unshift(newFeedback);
-    writeLocalFeedbacks(existingList);
 
     return NextResponse.json(
       {
@@ -323,7 +320,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: true, feedback: updatedItem });
     }
 
-    // ACTION 2: Post Comment / Reply (Anonymous by default, Moderator badge if admin)
+    // ACTION 2: Post Comment / Reply
     if (action === 'comment') {
       if (!content || !content.trim()) {
         return NextResponse.json({ error: 'Comment content cannot be empty' }, { status: 400 });
@@ -488,18 +485,6 @@ export async function DELETE(req: NextRequest) {
         console.warn('Firestore deleteDoc error:', err);
       }
     }
-
-    // 2. Merge local records from feedbacks.json
-    const localList = readLocalFeedbacks();
-    for (const item of localList) {
-      if (!feedbacksMap.has(item.id)) {
-        feedbacksMap.set(item.id, item);
-      }
-    }
-
-    const feedbacks = Array.from(feedbacksMap.values()).sort(
-      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    );
 
     return NextResponse.json({
       success: true,
