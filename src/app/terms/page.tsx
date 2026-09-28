@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Scale, Code2, Shield, Lock } from '@/components/ui/GoogleIcon';
 import { BackendRankNavbar } from '@/components/BackendRankNavbar';
 import { Footer } from '@/components/Footer';
+import { AppBackground } from '@/components/ui/AppBackground';
 
 export default function TermsPage() {
   const router = useRouter();
@@ -17,7 +18,9 @@ export default function TermsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between overflow-hidden">
+      {/* Home Page Background Artwork */}
+      <AppBackground />
       
       {/* Floating Top Navbar */}
       <BackendRankNavbar
@@ -75,10 +78,10 @@ export default function TermsPage() {
           <div className="p-4 rounded-xl bg-[#0a0f16] border border-white/[0.08] space-y-1.5">
             <div className="flex items-center space-x-2 text-amber-400 font-bold">
               <Lock className="w-4 h-4 text-amber-400" />
-              <span>Adversarial Bounds</span>
+              <span>Safe Testing Bounds</span>
             </div>
             <p className="text-zinc-400 leading-relaxed">
-              Automated tests adhere strictly to RFC-9110 HTTP specifications without OS-level exploits.
+              Automated tests focus strictly on API logic, error codes, and concurrency safely.
             </p>
           </div>
         </div>
@@ -92,22 +95,22 @@ export default function TermsPage() {
               <span>Acceptance of Terms</span>
             </h2>
             <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
-              By accessing or using APIRun, creating a developer account, or triggering automated test executions against local or remote endpoints, you agree to comply with and be bound by these Terms of Service.
+              By accessing or using APIRun, creating a developer account, or running automated challenge tests, you agree to comply with and be bound by these Terms of Service.
             </p>
           </section>
 
           <section className="space-y-2.5">
             <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center space-x-2">
               <span className="text-emerald-400 font-mono">02.</span>
-              <span>Acceptable Sandbox &amp; Execution Use</span>
+              <span>Acceptable Sandbox &amp; Testing Use</span>
             </h2>
             <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
-              APIRun provides ephemeral in-memory sandboxes and automated attack harnesses for educational and engineering evaluation purposes. You agree NOT to:
+              APIRun provides secure, isolated testing environments for developer learning and API verification. You agree NOT to:
             </p>
             <ul className="list-disc list-inside space-y-1.5 text-zinc-400 text-xs sm:text-sm pl-2">
-              <li>Use the testing engine to initiate denial-of-service (DDoS) attacks against third-party endpoints.</li>
-              <li>Inject malware, cryptominers, or unauthorized egress probes into execution sandboxes.</li>
-              <li>Attempt to circumvent memory quotas or exploit host operating systems.</li>
+              <li>Use the testing engine to send traffic or attacks against unauthorized third-party websites.</li>
+              <li>Inject malware, mining scripts, or unauthorized network scanners into testing environments.</li>
+              <li>Attempt to bypass memory limits or compromise host systems.</li>
             </ul>
           </section>
 
