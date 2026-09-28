@@ -140,13 +140,19 @@ export const Footer: React.FC<FooterProps> = ({
               Developer CLI
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Test your local API server directly from terminal:
+              Test local API servers straight from your command line:
             </p>
-            <div className="px-3 py-2 rounded-lg bg-[#0c1017] border border-white/[0.08] font-sans font-semibold text-xs text-zinc-200 select-all">
-              npx apirun test
+            <div className="group relative px-3 py-2.5 rounded-xl bg-[#090d14] border border-white/[0.08] hover:border-emerald-500/30 font-mono text-xs text-zinc-300 transition-all flex items-center justify-between shadow-inner">
+              <div className="flex items-center space-x-2 truncate">
+                <span className="text-emerald-400 font-bold select-none">&gt;</span>
+                <span className="text-zinc-200">npx apirun@next</span>
+              </div>
+              <span className="text-[10px] font-mono text-emerald-400/80 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 shrink-0 ml-2">
+                pre-release
+              </span>
             </div>
-            <p className="text-[11px] text-slate-500">
-              Compatible with Node.js, Go, and Python.
+            <p className="text-[11px] text-slate-500 flex items-center space-x-1">
+              <span>⚡ Native harnesses for Node, Go &amp; Python</span>
             </p>
           </div>
         </div>
