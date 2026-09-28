@@ -14,7 +14,6 @@ import {
 } from 'firebase/firestore';
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
 
 export interface FeedbackComment {
   id: string;
@@ -69,8 +68,9 @@ function writeFallbackFeedbacks(list: FeedbackItem[]) {
   try {
     fs.writeFileSync(FALLBACK_TMP_PATH, JSON.stringify(list, null, 2), 'utf-8');
   } catch (err) {
-    console.warn('Fallback file write failed:', err);
+    console.warn('Local feedbacks.json read notice:', err);
   }
+  return [];
 }
 
 // GET: Retrieve all feedback items (from Firestore / DB)
@@ -221,7 +221,7 @@ export async function POST(req: NextRequest) {
       category: category || (type === 'bug' ? 'Bug Report' : 'Feature Request'),
     };
 
-    let savedStorage = 'Firestore Database';
+    let firestoreId = generatedId;
 
     if (db) {
       try {
@@ -240,6 +240,11 @@ export async function POST(req: NextRequest) {
       writeFallbackFeedbacks(list);
       savedStorage = 'Local Fallback Storage';
     }
+
+    // Also persist into root feedbacks.json
+    const existingList = readLocalFeedbacks();
+    existingList.unshift(newFeedback);
+    writeLocalFeedbacks(existingList);
 
     return NextResponse.json(
       {
@@ -483,6 +488,18 @@ export async function DELETE(req: NextRequest) {
         console.warn('Firestore deleteDoc error:', err);
       }
     }
+
+    // 2. Merge local records from feedbacks.json
+    const localList = readLocalFeedbacks();
+    for (const item of localList) {
+      if (!feedbacksMap.has(item.id)) {
+        feedbacksMap.set(item.id, item);
+      }
+    }
+
+    const feedbacks = Array.from(feedbacksMap.values()).sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
 
     return NextResponse.json({
       success: true,

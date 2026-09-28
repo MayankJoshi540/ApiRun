@@ -68,12 +68,18 @@ export const AuthControls: React.FC<AuthControlsProps> = ({ variant = 'navbar' }
           <ChevronDown className="w-3.5 h-3.5 text-zinc-400 group-hover:text-white transition-transform duration-200" />
         </button>
 
-        {/* User Dropdown Menu */}
+        {/* User Dropdown Menu - Glassmorphic */}
         {dropdownOpen && (
-          <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-[#0b0e14] border border-white/[0.1] shadow-2xl p-2 z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150">
+          <div 
+            style={{
+              backdropFilter: 'blur(24px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            }}
+            className="absolute right-0 mt-2 w-56 rounded-2xl bg-[#0b0e14]/85 border border-white/[0.12] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_18px_45px_rgba(0,0,0,0.7)] p-2 z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150"
+          >
             {/* Header info */}
             <div className="px-3 py-2 border-b border-white/[0.06] mb-1">
-              <div className="font-bold text-white font-display truncate">{displayName}</div>
+              <div className="font-bold text-white truncate">{displayName}</div>
               <div className="text-[11px] text-zinc-400 truncate mt-0.5">{user.email}</div>
             </div>
 
@@ -81,7 +87,7 @@ export const AuthControls: React.FC<AuthControlsProps> = ({ variant = 'navbar' }
             <Link
               href="/progress"
               onClick={() => setDropdownOpen(false)}
-              className="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-white/[0.05] text-zinc-300 hover:text-white transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-white/[0.06] text-zinc-300 hover:text-white transition-colors"
             >
               <User className="w-3.5 h-3.5 text-emerald-400" />
               <span>My Progress &amp; Solves</span>
@@ -106,7 +112,7 @@ export const AuthControls: React.FC<AuthControlsProps> = ({ variant = 'navbar' }
     <div className="flex items-center space-x-2">
       <Link
         href="/sign-in"
-        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-zinc-200 hover:text-white border border-white/[0.08] transition-all"
+        className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/[0.06] hover:bg-white/[0.1] text-zinc-200 hover:text-white border border-white/[0.12] backdrop-blur-md transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] active:scale-95"
       >
         <LogIn className="w-3.5 h-3.5 text-emerald-400" />
         <span>Sign In</span>
@@ -114,7 +120,7 @@ export const AuthControls: React.FC<AuthControlsProps> = ({ variant = 'navbar' }
 
       <Link
         href="/sign-up"
-        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-sm shadow-emerald-950/40"
+        className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all border border-emerald-500/40 active:scale-95 shadow-sm"
       >
         <UserPlus className="w-3.5 h-3.5" />
         <span>Sign Up</span>

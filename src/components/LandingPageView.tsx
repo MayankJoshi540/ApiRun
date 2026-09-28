@@ -623,10 +623,10 @@ export const LandingPageView: React.FC<Props> = ({
               <GsapMagnetic strength={0.3}>
                 <Link
                   href="/feedback"
-                  className="shrink-0 w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-all shadow-md active:scale-95"
+                  className="group shrink-0 w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition-all duration-200 border border-emerald-400/30 hover:border-emerald-300/60 shadow-[0_4px_16px_rgba(16,185,129,0.25)] hover:shadow-[0_4px_22px_rgba(16,185,129,0.4)] active:scale-[0.98]"
                 >
                   <span>Share Feedback</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
                 </Link>
               </GsapMagnetic>
             </div>
