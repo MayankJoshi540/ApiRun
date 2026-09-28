@@ -84,11 +84,11 @@ export const ChallengeShowcaseScroll: React.FC<Props> = () => {
       ref={containerRef}
       className="mt-6 sm:mt-12 pt-6 sm:pt-10 pb-20 px-4 sm:px-6 max-w-6xl mx-auto relative z-10 font-sans"
     >
-      {/* Ambient background effect behind the image */}
+      {/* Ambient luminous bloom behind the dashboard showcase */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10">
         <div 
           ref={glowRef}
-          className="w-[85%] max-w-3xl h-[340px] rounded-full bg-emerald-500/[0.08] blur-[100px] transition-all duration-300"
+          className="w-[90%] max-w-4xl h-[360px] rounded-full bg-emerald-500/[0.12] blur-[100px] transition-all duration-300"
         />
       </div>
 
@@ -96,7 +96,7 @@ export const ChallengeShowcaseScroll: React.FC<Props> = () => {
       <div 
         ref={imageWrapperRef}
         style={{ willChange: 'transform, opacity' }}
-        className="relative rounded-2xl sm:rounded-3xl border border-white/[0.12] bg-[#070a10] shadow-[0_30px_90px_rgba(0,0,0,0.9),0_0_40px_rgba(16,185,129,0.08)] overflow-hidden transition-all duration-500 hover:border-white/[0.2]"
+        className="relative rounded-2xl sm:rounded-3xl border border-white/[0.14] bg-[#070a10] shadow-[0_30px_90px_rgba(0,0,0,0.95),0_0_50px_rgba(16,185,129,0.1)] overflow-hidden transition-all duration-500 hover:border-emerald-500/30"
       >
         <Image
           src="/image.png"

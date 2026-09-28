@@ -168,13 +168,13 @@ export const LandingPageView: React.FC<Props> = ({
 
   return (
     <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans selection:bg-emerald-500/30 selection:text-white relative overflow-x-hidden">
-      {/* 1. Global Page Technical Background Atmosphere (Extends down the entire page) */}
+      {/* 1. Global Page Technical Background Atmosphere (Luminous technical grid) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Continuous Technical Dot Matrix */}
+        {/* Continuous Technical Dot Matrix with micro-luminescence */}
         <div 
-          className="absolute inset-0 opacity-[0.08]"
+          className="absolute inset-0 opacity-[0.07]"
           style={{
-            backgroundImage: 'radial-gradient(rgba(16, 185, 129, 0.3) 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(rgba(52, 211, 153, 0.4) 1px, transparent 1px)',
             backgroundSize: '32px 32px'
           }}
         />
@@ -184,8 +184,8 @@ export const LandingPageView: React.FC<Props> = ({
           className="absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage: `
-              linear-gradient(to right, rgba(16, 185, 129, 0.35) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(16, 185, 129, 0.35) 1px, transparent 1px)
+              linear-gradient(to right, rgba(52, 211, 153, 0.3) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(52, 211, 153, 0.3) 1px, transparent 1px)
             `,
             backgroundSize: '64px 64px'
           }}

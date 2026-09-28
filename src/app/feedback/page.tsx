@@ -1,435 +1,591 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { BackendRankNavbar } from '@/components/BackendRankNavbar';
 import { Footer } from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { 
-  MessageSquarePlus, 
+  MessageSquare, 
+  MessageCircle,
   Star, 
   Send, 
   CheckCircle2, 
-  Layers, 
   Bug, 
   Zap, 
-  MessageCircle, 
-  ArrowRight, 
   Loader2, 
-  Check, 
-  Code2, 
-  ThumbsUp,
-  Eye,
+  Flame,
+  Clock,
+  User as UserIcon,
+  ChevronUp,
+  X,
   RefreshCw,
   Search,
-  Mail,
-  User,
   ShieldCheck,
-  Clock,
-  ArrowLeft,
-  Activity,
-  Trash2,
-  AlertTriangle
-} from '@/components/ui/GoogleIcon';
+  Lock,
+  Trash2
+} from '@/components/ui/Icons';
 
-interface FeedbackItem {
+export interface FeedbackComment {
   id: string;
-  timestamp: string;
-  name: string;
-  email: string;
-  rating: number;
-  category: string;
-  subject: string;
-  message: string;
   userId?: string;
-  userAgent?: string;
+  userName: string;
+  userRole?: 'admin' | 'user';
+  content: string;
+  isAnonymous?: boolean;
+  createdAt: string;
 }
 
-const ADMIN_EMAIL = 'joshimayank646@gmail.com';
+export interface FeedbackItem {
+  id: string;
+  title: string;
+  description: string;
+  type: 'suggestion' | 'bug';
+  status: 'open' | 'closed';
+  isAnonymous: boolean;
+  userId?: string;
+  userName: string;
+  userEmail?: string;
+  upvotesCount: number;
+  upvotedBy: string[];
+  commentsCount: number;
+  comments: FeedbackComment[];
+  createdAt: string;
+  closedAt?: string;
+  closedBy?: string;
+  category?: string;
+}
 
-const CATEGORIES = [
-  { id: 'Challenge Suggestion', label: 'New Challenge Idea', icon: Layers, desc: 'Suggest a real-world backend scenario, idempotency edge case, or system contract' },
-  { id: 'Feature Request', label: 'Feature Request', icon: Code2, desc: 'Propose new features for the test harness, CLI runner, or Monaco editor' },
-  { id: 'Bug Report', label: 'Bug Report', icon: Bug, desc: 'Report an issue with challenge assertions, runner execution, or UI' },
-  { id: 'Performance', label: 'Harness & Performance', icon: Zap, desc: 'Suggest optimizations for runner latency, sandbox overhead, or streaming logs' },
-  { id: 'General Feedback', label: 'General Experience', icon: MessageCircle, desc: 'Share your thoughts, praise, or ideas for improving the platform' },
-];
+const ADMIN_EMAILS = ['joshimayank646@gmail.com'];
 
 export default function FeedbackPage() {
   const router = useRouter();
   const { user } = useAuth();
 
-  // Admin access strictly restricted to joshimayank646@gmail.com
-  const isAdmin = Boolean(user?.email && user.email.toLowerCase().trim() === ADMIN_EMAIL);
-  const [activeTab, setActiveTab] = useState<'submit' | 'inbox'>('submit');
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
+  const isAdmin = Boolean(user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase().trim()));
+
+  // Feed State
+  const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTypeTab, setActiveTypeTab] = useState<'all' | 'suggestions' | 'bugs'>('all');
+  const [activeSort, setActiveSort] = useState<'hot' | 'top' | 'new'>('hot');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'closed'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [counts, setCounts] = useState({ all: 0, suggestions: 0, bugs: 0, open: 0, closed: 0 });
 
   // Form State
-  const [category, setCategory] = useState('Challenge Suggestion');
-  const [rating, setRating] = useState(5);
-  const [hoveredRating, setHoveredRating] = useState(0);
-  const [message, setMessage] = useState('');
-  const [name, setName] = useState(user?.displayName || '');
-  const [email, setEmail] = useState(user?.email || '');
-  
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [formType, setFormType] = useState<'suggestion' | 'bug'>('suggestion');
+  const [formTitle, setFormTitle] = useState('');
+  const [formDescription, setFormDescription] = useState('');
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const [formSuccessMessage, setFormSuccessMessage] = useState<string | null>(null);
+  const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null);
 
-  // Admin Inbox & Table State
-  const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
-  const [isLoadingFeedbacks, setIsLoadingFeedbacks] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState<string>('ALL');
-  const [filterRating, setFilterRating] = useState<number | 'ALL'>('ALL');
+  // Discussion Modal State
+  const [selectedFeedback, setSelectedFeedback] = useState<FeedbackItem | null>(null);
+  const [commentText, setCommentText] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [isClosingTicket, setIsClosingTicket] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [actionNotice, setActionNotice] = useState<string | null>(null);
 
-  const fetchFeedbacks = async () => {
-    if (!isAdmin || !user?.email) return;
-
-    try {
-      setIsLoadingFeedbacks(true);
-      const res = await fetch(`/api/feedback?adminEmail=${encodeURIComponent(user.email)}`, {
-        headers: {
-          'x-admin-email': user.email,
-        }
-      });
-      
-      if (!res.ok) {
-        throw new Error('Failed to load database feedback records.');
+  // Client identifier for voting
+  const currentUserId = useMemo(() => {
+    if (user?.uid) return user.uid;
+    if (typeof window !== 'undefined') {
+      let storedId = localStorage.getItem('apirun_client_id');
+      if (!storedId) {
+        storedId = `client_${Math.random().toString(36).substring(2, 10)}`;
+        localStorage.setItem('apirun_client_id', storedId);
       }
-      
+      return storedId;
+    }
+    return 'client_temp';
+  }, [user]);
+
+  // Fetch Feedbacks from Server/DB
+  const fetchFeedbacks = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch(`/api/feedback?type=${activeTypeTab}&sort=${activeSort}&status=${statusFilter}`);
+      if (!res.ok) throw new Error('Failed to fetch feedbacks.');
       const data = await res.json();
       setFeedbacks(data.feedbacks || []);
-    } catch (err: any) {
-      console.error('Error fetching feedbacks:', err);
-      setActionNotice(err.message || 'Error loading records.');
+      if (data.counts) {
+        setCounts(data.counts);
+      }
+    } catch (err) {
+      console.error('Error loading feedbacks:', err);
     } finally {
-      setIsLoadingFeedbacks(false);
+      setIsLoading(false);
     }
-  };
+  }, [activeTypeTab, activeSort, statusFilter]);
 
   useEffect(() => {
-    if (isAdmin && activeTab === 'inbox') {
-      fetchFeedbacks();
-    }
-  }, [isAdmin, activeTab, user?.email]);
+    fetchFeedbacks();
+  }, [fetchFeedbacks]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim()) {
-      setErrorMessage('Please enter your feedback message.');
-      return;
+  // Handle Upvoting
+  const handleVote = async (feedbackId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+
+    // Optimistic UI update
+    setFeedbacks((prev) =>
+      prev.map((fb) => {
+        if (fb.id !== feedbackId) return fb;
+        const hasVoted = fb.upvotedBy.includes(currentUserId);
+        return {
+          ...fb,
+          upvotesCount: hasVoted ? Math.max(0, fb.upvotesCount - 1) : fb.upvotesCount + 1,
+          upvotedBy: hasVoted
+            ? fb.upvotedBy.filter((id) => id !== currentUserId)
+            : [...fb.upvotedBy, currentUserId],
+        };
+      })
+    );
+
+    if (selectedFeedback && selectedFeedback.id === feedbackId) {
+      const hasVoted = selectedFeedback.upvotedBy.includes(currentUserId);
+      setSelectedFeedback({
+        ...selectedFeedback,
+        upvotesCount: hasVoted ? Math.max(0, selectedFeedback.upvotesCount - 1) : selectedFeedback.upvotesCount + 1,
+        upvotedBy: hasVoted
+          ? selectedFeedback.upvotedBy.filter((id) => id !== currentUserId)
+          : [...selectedFeedback.upvotedBy, currentUserId],
+      });
     }
 
     try {
-      setIsSubmitting(true);
-      setErrorMessage(null);
-
-      const res = await fetch('/api/feedback', {
-        method: 'POST',
+      await fetch('/api/feedback', {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          category,
-          rating,
-          subject: category, // Category stored directly as summary/subject
-          message: message.trim(),
-          name: name.trim() || user?.displayName || 'Anonymous Developer',
-          email: email.trim() || user?.email || 'developer@apirun.dev',
-          userId: user?.uid || undefined,
+          action: 'vote',
+          feedbackId,
+          userId: currentUserId,
         }),
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit feedback.');
-      }
-
-      setIsSuccess(true);
-    } catch (err: any) {
-      console.error('Feedback submit error:', err);
-      setErrorMessage(err.message || 'Could not save feedback. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+    } catch (err) {
+      console.error('Error submitting vote:', err);
+      fetchFeedbacks();
     }
   };
 
-  // Delete Feedback Entry (Admin Only)
-  const handleDeleteFeedback = async (id: string) => {
-    if (!user?.email || !isAdmin) return;
-    
-    if (!window.confirm('Are you sure you want to permanently delete this feedback entry from the database?')) {
-      return;
-    }
+  // Handle Moderator Delete
+  const handleDeleteFeedback = async (feedbackId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+
+    const confirmed = window.confirm('Are you sure you want to permanently delete this feedback?');
+    if (!confirmed) return;
 
     try {
-      setDeletingId(id);
-      const res = await fetch('/api/feedback', {
+      setDeletingId(feedbackId);
+
+      const res = await fetch(`/api/feedback?id=${encodeURIComponent(feedbackId)}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-email': user.email,
-        },
-        body: JSON.stringify({
-          id,
-          adminEmail: user.email,
-        }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to delete record.');
+      if (!res.ok) throw new Error('Failed to delete feedback');
+
+      setFeedbacks((prev) => prev.filter((fb) => fb.id !== feedbackId));
+
+      if (selectedFeedback && selectedFeedback.id === feedbackId) {
+        setSelectedFeedback(null);
       }
 
-      // Optimistic removal from state
-      setFeedbacks(prev => prev.filter(item => item.id !== id));
-      setActionNotice('Feedback entry successfully deleted from database.');
-      setTimeout(() => setActionNotice(null), 3000);
-    } catch (err: any) {
-      console.error('Delete feedback error:', err);
-      alert(err.message || 'Failed to delete feedback entry.');
+      fetchFeedbacks();
+    } catch (err) {
+      console.error('Error deleting feedback:', err);
+      alert('Failed to delete feedback. Please try again.');
     } finally {
       setDeletingId(null);
     }
   };
 
-  const handleResetForm = () => {
-    setIsSuccess(false);
-    setMessage('');
-    setRating(5);
-    setCategory('Challenge Suggestion');
-    setErrorMessage(null);
+  // Handle New Feedback Form Submission (Stored anonymously)
+  const handleSubmitFeedback = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formTitle.trim() || !formDescription.trim()) {
+      setFormErrorMessage('Please fill in both the title and description.');
+      return;
+    }
+
+    try {
+      setIsSubmittingForm(true);
+      setFormErrorMessage(null);
+      setFormSuccessMessage(null);
+
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: formTitle.trim(),
+          description: formDescription.trim(),
+          type: formType,
+          userId: currentUserId,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to submit feedback.');
+
+      setFormSuccessMessage('Feedback submitted anonymously and saved to database!');
+      setFormTitle('');
+      setFormDescription('');
+
+      fetchFeedbacks();
+
+      setTimeout(() => setFormSuccessMessage(null), 5000);
+    } catch (err: any) {
+      console.error('Error submitting feedback:', err);
+      setFormErrorMessage(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsSubmittingForm(false);
+    }
   };
 
-  // Filtered & Searched Feedbacks
-  const filteredFeedbacks = useMemo(() => {
-    return feedbacks.filter(item => {
-      const matchesSearch = 
-        !searchQuery ||
-        item.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.message?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category?.toLowerCase().includes(searchQuery.toLowerCase());
+  // Handle Submitting Comment / Reply (Anonymous or Moderator)
+  const handleAddComment = async () => {
+    if (!selectedFeedback || !commentText.trim()) return;
 
-      const matchesCategory = filterCategory === 'ALL' || item.category === filterCategory;
-      const matchesRating = filterRating === 'ALL' || item.rating === filterRating;
+    try {
+      setIsSubmittingComment(true);
 
-      return matchesSearch && matchesCategory && matchesRating;
-    });
-  }, [feedbacks, searchQuery, filterCategory, filterRating]);
+      const res = await fetch('/api/feedback', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'comment',
+          feedbackId: selectedFeedback.id,
+          userId: currentUserId,
+          userName: isAdmin ? 'Moderator' : 'Anonymous',
+          userRole: isAdmin ? 'admin' : 'user',
+          content: commentText.trim(),
+        }),
+      });
 
-  const averageRating = useMemo(() => {
-    if (feedbacks.length === 0) return 5.0;
-    const sum = feedbacks.reduce((acc, curr) => acc + (curr.rating || 5), 0);
-    return (sum / feedbacks.length).toFixed(1);
-  }, [feedbacks]);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to post reply.');
+
+      const newComment: FeedbackComment = data.comment || {
+        id: `c_${Date.now()}`,
+        userName: isAdmin ? 'Moderator' : 'Anonymous',
+        userRole: isAdmin ? 'admin' : 'user',
+        content: commentText.trim(),
+        isAnonymous: !isAdmin,
+        createdAt: new Date().toISOString(),
+      };
+
+      setSelectedFeedback((prev) => {
+        if (!prev) return null;
+        const nextComments = [...prev.comments, newComment];
+        return {
+          ...prev,
+          comments: nextComments,
+          commentsCount: nextComments.length,
+        };
+      });
+
+      setFeedbacks((prev) =>
+        prev.map((fb) =>
+          fb.id === selectedFeedback.id
+            ? {
+                ...fb,
+                comments: [...fb.comments, newComment],
+                commentsCount: fb.commentsCount + 1,
+              }
+            : fb
+        )
+      );
+
+      setCommentText('');
+    } catch (err) {
+      console.error('Failed to add comment:', err);
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  // Handle Closing or Reopening Ticket
+  const handleToggleTicketStatus = async (targetStatus: 'closed' | 'open') => {
+    if (!selectedFeedback) return;
+
+    try {
+      setIsClosingTicket(true);
+
+      const res = await fetch('/api/feedback', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'status',
+          status: targetStatus,
+          feedbackId: selectedFeedback.id,
+          userId: currentUserId,
+          userName: isAdmin ? 'Moderator' : 'Anonymous',
+          userRole: isAdmin ? 'admin' : 'user',
+          closingNote: commentText.trim() ? commentText.trim() : undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update ticket status.');
+
+      const updated = data.feedback || {
+        ...selectedFeedback,
+        status: targetStatus,
+        closedAt: targetStatus === 'closed' ? new Date().toISOString() : undefined,
+        closedBy: targetStatus === 'closed' ? (isAdmin ? 'Moderator' : 'Anonymous') : undefined,
+      };
+
+      setSelectedFeedback(updated);
+      setFeedbacks((prev) =>
+        prev.map((fb) => (fb.id === selectedFeedback.id ? { ...fb, ...updated } : fb))
+      );
+
+      if (commentText.trim()) {
+        setCommentText('');
+      }
+
+      fetchFeedbacks();
+    } catch (err) {
+      console.error('Error toggling ticket status:', err);
+    } finally {
+      setIsClosingTicket(false);
+    }
+  };
+
+  // Filtered feedbacks by search
+  const displayedFeedbacks = useMemo(() => {
+    if (!searchQuery.trim()) return feedbacks;
+    const q = searchQuery.toLowerCase();
+    return feedbacks.filter(
+      (fb) =>
+        fb.title.toLowerCase().includes(q) ||
+        fb.description.toLowerCase().includes(q)
+    );
+  }, [feedbacks, searchQuery]);
+
+  const formatDate = (isoStr: string) => {
+    try {
+      const d = new Date(isoStr);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch {
+      return 'Recently';
+    }
+  };
+
+  const handleNavigate = (tab: 'landing' | 'challenges' | 'progress' | 'feedback' | 'dashboard') => {
+    if (tab === 'landing') router.push('/');
+    else if (tab === 'progress') router.push('/progress');
+    else if (tab === 'challenges' || tab === 'dashboard') router.push('/challenges');
+    else router.push('/feedback');
+  };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative flex flex-col justify-between">
       
-      <BackendRankNavbar activeTab="feedback" />
+      {/* Top Navigation */}
+      <BackendRankNavbar
+        activeTab="feedback"
+        onSelectTab={handleNavigate}
+        solvedCount={0}
+        totalCount={12}
+      />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-20 relative z-10 flex-grow w-full space-y-8 font-sans">
+      {/* Main Feedback Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-20 flex-grow w-full">
         
-        {/* Admin Access Notification Banner (Visible exclusively to joshimayank646@gmail.com) */}
+        {/* Moderator Info Banner (Visible for Admin) */}
         {isAdmin && (
-          <div className="rounded-2xl bg-[#080d16] border border-emerald-500/30 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
-            <div className="flex items-center space-x-3.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner">
+          <div className="mb-8 p-4 rounded-2xl bg-[#0a0f16] border border-white/[0.1] flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-zinc-300">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
                 <div className="text-xs font-bold text-white flex items-center space-x-2">
-                  <span>Database Administrator Mode</span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
-                    {ADMIN_EMAIL}
+                  <span>Moderator Controls Active</span>
+                  <span className="px-2 py-0.5 rounded bg-white/[0.08] text-zinc-300 text-[10px] font-mono border border-white/[0.1]">
+                    {user?.email}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  You have authorized administrator privileges to view, search, and delete database feedback entries.
+                <p className="text-[11px] text-zinc-400">
+                  You can permanently delete feedback items, resolve tickets, and reply as Moderator.
                 </p>
               </div>
             </div>
-
-            <div className="flex items-center space-x-2 w-full sm:w-auto shrink-0">
-              <button
-                type="button"
-                onClick={() => setActiveTab('submit')}
-                className={`flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
-                  activeTab === 'submit'
-                    ? 'bg-emerald-600 text-white border border-emerald-500'
-                    : 'bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border border-white/[0.08]'
-                }`}
-              >
-                Submit Form
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('inbox');
-                  fetchFeedbacks();
-                }}
-                className={`flex-1 sm:flex-initial flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
-                  activeTab === 'inbox'
-                    ? 'bg-emerald-600 text-white border border-emerald-500'
-                    : 'bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1]'
-                }`}
-              >
-                <Eye className="w-4 h-4 text-emerald-400" />
-                <span>Admin DB Table ({feedbacks.length})</span>
-              </button>
-            </div>
+            <button
+              onClick={fetchFeedbacks}
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-white/[0.08] text-xs font-semibold text-white transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Refresh</span>
+            </button>
           </div>
         )}
 
-        {/* Global Action Toast */}
-        {actionNotice && (
-          <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center space-x-2 animate-in fade-in duration-150">
-            <Check className="w-4 h-4 text-emerald-400" />
-            <span>{actionNotice}</span>
-          </div>
-        )}
+        {/* Hero Section */}
+        <div className="text-center mb-12 sm:mb-16 space-y-4">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+            Suggest a{' '}
+            <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-xl inline-block">
+              feature
+            </span>{' '}
+            or Report{' '}
+            <br className="hidden sm:inline" />
+            a{' '}
+            <span className="text-rose-400 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-xl inline-block">
+              bug
+            </span>
+          </h1>
+          <p className="text-sm sm:text-base text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+            Help us shape the future of APIRun. All suggestions and bug reports are stored securely in our database and posted anonymously.
+          </p>
+        </div>
 
-        {/* ----------------- ADMIN DATABASE TABLE & INBOX VIEW ----------------- */}
-        {isAdmin && activeTab === 'inbox' ? (
-          <div className="space-y-6">
-            {/* Admin Stats Metric Strip */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-              <div className="p-4 rounded-2xl bg-[#080d16] border border-white/[0.08] flex items-center justify-between">
-                <div>
-                  <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Stored Records</div>
-                  <div className="text-2xl font-black text-white mt-0.5">{feedbacks.length}</div>
-                </div>
-                <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-200">
-                  <MessageSquarePlus className="w-5 h-5 text-emerald-400" />
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-[#080d16] border border-white/[0.08] flex items-center justify-between">
-                <div>
-                  <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Average Score</div>
-                  <div className="text-2xl font-black text-amber-400 mt-0.5">{averageRating} / 5.0</div>
-                </div>
-                <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-amber-400">
-                  <Star className="w-5 h-5 fill-amber-400" />
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-[#080d16] border border-white/[0.08] flex items-center justify-between">
-                <div>
-                  <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Database Source</div>
-                  <div className="text-xs font-bold text-emerald-400 mt-1">Firestore &bull; feedbacks table</div>
-                </div>
-                <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-emerald-400">
-                  <Activity className="w-5 h-5" />
-                </div>
-              </div>
-            </div>
-
-            {/* Filter & View Mode Controls */}
-            <div className="rounded-2xl bg-[#080d16] border border-white/[0.08] p-5 sm:p-6 space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-bold text-white tracking-tight flex items-center space-x-2">
-                    <span>Database Feedback Submissions</span>
-                    <span className="text-xs font-normal px-2.5 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.1] text-slate-300">
-                      {filteredFeedbacks.length} Showing
-                    </span>
-                  </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Live feedback records stored in Firestore database and synced locally.
-                  </p>
-                </div>
-
-                <div className="flex items-center space-x-2 self-stretch sm:self-auto">
-                  {/* Table vs Card View Toggle */}
-                  <div className="flex items-center bg-black/40 p-0.5 rounded-xl border border-white/[0.08] text-xs">
-                    <button
-                      onClick={() => setViewMode('table')}
-                      className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                        viewMode === 'table' ? 'bg-white/[0.1] text-emerald-300' : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      Table View
-                    </button>
-                    <button
-                      onClick={() => setViewMode('cards')}
-                      className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                        viewMode === 'cards' ? 'bg-white/[0.1] text-emerald-300' : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      Card View
-                    </button>
-                  </div>
-
-                  {/* Refresh Button */}
+        {/* 2-Column Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
+          
+          {/* ================= LEFT COLUMN: FEEDBACK LIST & FILTERS (2 COLS) ================= */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Filter Bar & Controls */}
+            <div className="p-3 sm:p-4 rounded-2xl bg-[#0a0f16] border border-white/[0.08] space-y-3.5">
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                
+                {/* Type Tabs (All / Suggestions / Bugs) */}
+                <div className="flex items-center p-1 bg-[#05070a] rounded-xl border border-white/[0.06] w-full sm:w-auto">
                   <button
-                    onClick={fetchFeedbacks}
-                    disabled={isLoadingFeedbacks}
-                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.1] text-xs font-semibold text-white transition-colors disabled:opacity-50"
+                    onClick={() => setActiveTypeTab('all')}
+                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
+                      activeTypeTab === 'all'
+                        ? 'bg-emerald-600 text-white'
+                        : 'text-zinc-400 hover:text-white'
+                    }`}
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingFeedbacks ? 'animate-spin text-emerald-400' : ''}`} />
-                    <span className="hidden sm:inline">Refresh</span>
+                    <span>All</span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.15] font-mono">
+                      {counts.all}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTypeTab('suggestions')}
+                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
+                      activeTypeTab === 'suggestions'
+                        ? 'bg-emerald-600 text-white'
+                        : 'text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    <span>Suggestions</span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.15] font-mono">
+                      {counts.suggestions}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTypeTab('bugs')}
+                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
+                      activeTypeTab === 'bugs'
+                        ? 'bg-emerald-600 text-white'
+                        : 'text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    <span>Bugs</span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.15] font-mono">
+                      {counts.bugs}
+                    </span>
                   </button>
                 </div>
+
+                {/* Sort Tabs (Hot / Top / New) */}
+                <div className="flex items-center space-x-1.5 self-end sm:self-center">
+                  <button
+                    onClick={() => setActiveSort('hot')}
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border ${
+                      activeSort === 'hot'
+                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
+                    }`}
+                  >
+                    <Flame className="w-3.5 h-3.5" />
+                    <span>Hot</span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveSort('top')}
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border ${
+                      activeSort === 'top'
+                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
+                    }`}
+                  >
+                    <Star className="w-3.5 h-3.5" />
+                    <span>Top</span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveSort('new')}
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border ${
+                      activeSort === 'new'
+                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
+                    }`}
+                  >
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>New</span>
+                  </button>
+                </div>
+
               </div>
 
-              {/* Search & Filters Bar */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-white/[0.06]">
-                <div className="relative md:col-span-1">
-                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+              {/* Search Bar & Status Filter Row */}
+              <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-2 border-t border-white/[0.06]">
+                <div className="relative flex-1 w-full">
+                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by keyword, author, email..."
-                    className="w-full pl-10 pr-4 py-2.5 bg-[#04060a] border border-white/[0.08] rounded-xl text-white placeholder-slate-500 text-xs focus:outline-none focus:border-emerald-500"
+                    placeholder="Search feedback by keywords..."
+                    className="w-full pl-10 pr-4 py-2 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-white/30 transition-colors"
                   />
                 </div>
 
-                <select
-                  value={filterCategory}
-                  onChange={(e) => setFilterCategory(e.target.value)}
-                  className="px-3.5 py-2.5 bg-[#04060a] border border-white/[0.08] rounded-xl text-white text-xs focus:outline-none focus:border-emerald-500"
-                >
-                  <option value="ALL">All Categories</option>
-                  {CATEGORIES.map(c => (
-                    <option key={c.id} value={c.id}>{c.label}</option>
+                <div className="flex items-center space-x-1.5 w-full sm:w-auto">
+                  <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-mono pl-1">Status:</span>
+                  {(['all', 'open', 'closed'] as const).map((st) => (
+                    <button
+                      key={st}
+                      onClick={() => setStatusFilter(st)}
+                      className={`px-2.5 py-1 rounded-lg text-xs capitalize transition-colors border ${
+                        statusFilter === st
+                          ? 'bg-zinc-800 text-white border-white/20 font-semibold'
+                          : 'bg-[#05070a] text-zinc-400 border-white/[0.04] hover:text-zinc-200'
+                      }`}
+                    >
+                      {st}
+                    </button>
                   ))}
-                </select>
-
-                <select
-                  value={filterRating}
-                  onChange={(e) => setFilterRating(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
-                  className="px-3.5 py-2.5 bg-[#04060a] border border-white/[0.08] rounded-xl text-white text-xs focus:outline-none focus:border-emerald-500"
-                >
-                  <option value="ALL">All Ratings (1 - 5 Stars)</option>
-                  <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
-                  <option value="4">⭐⭐⭐⭐ 4 Stars</option>
-                  <option value="3">⭐⭐⭐ 3 Stars</option>
-                  <option value="2">⭐⭐ 2 Stars</option>
-                  <option value="1">⭐ 1 Star</option>
-                </select>
+                </div>
               </div>
+
             </div>
 
-            {/* List / Table Content */}
-            {isLoadingFeedbacks ? (
-              <div className="py-20 text-center space-y-3 rounded-2xl bg-[#080d16] border border-white/[0.08]">
-                <Loader2 className="w-7 h-7 animate-spin text-emerald-400 mx-auto" />
-                <p className="text-xs text-slate-400 font-medium">Fetching feedback database records...</p>
+            {/* List of Feedback Items */}
+            {isLoading ? (
+              <div className="py-20 text-center space-y-3 rounded-2xl bg-[#0a0f16] border border-white/[0.06]">
+                <Loader2 className="w-7 h-7 animate-spin text-zinc-400 mx-auto" />
+                <p className="text-xs text-zinc-400 font-mono">Loading feedback from database...</p>
               </div>
-            ) : filteredFeedbacks.length === 0 ? (
-              <div className="py-16 text-center space-y-3 rounded-2xl bg-[#080d16] border border-white/[0.06] p-8">
-                <MessageCircle className="w-8 h-8 text-slate-600 mx-auto" />
-                <h3 className="text-sm font-bold text-white">No feedback records found</h3>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  {searchQuery || filterCategory !== 'ALL' || filterRating !== 'ALL'
-                    ? 'No submissions matched your current search filters.'
-                    : 'No feedback submissions have been stored in the database yet.'}
+            ) : displayedFeedbacks.length === 0 ? (
+              <div className="py-16 text-center space-y-3 rounded-2xl bg-[#0a0f16] border border-white/[0.06] p-8">
+                <MessageCircle className="w-10 h-10 text-zinc-600 mx-auto" />
+                <h3 className="text-base font-bold text-white">No feedback submissions yet</h3>
+                <p className="text-xs text-zinc-400 max-w-sm mx-auto">
+                  {searchQuery
+                    ? 'No submissions matched your search query.'
+                    : 'Be the first to suggest a challenge idea or report an issue using the form!'}
                 </p>
               </div>
             ) : viewMode === 'table' ? (
@@ -541,346 +697,510 @@ export default function FeedbackPage() {
                 </div>
               </div>
             ) : (
-              /* ----------------- CARD VIEW ----------------- */
-              <div className="space-y-3.5">
-                {filteredFeedbacks.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-5 sm:p-6 rounded-2xl bg-[#080d16] border border-white/[0.08] space-y-3.5 shadow-lg"
-                  >
-                    {/* Top Row: Rating, Category, Date, Delete */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
-                      <div className="flex items-center space-x-2.5">
-                        <div className="flex items-center text-amber-400">
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
-                              key={s}
-                              className={`w-3.5 h-3.5 ${s <= item.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-700'}`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-xs font-bold text-amber-400">
-                          {item.rating}/5
-                        </span>
-                        <span className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] text-slate-300 text-[11px] font-semibold">
-                          {item.category}
-                        </span>
-                      </div>
+              <div className="space-y-4">
+                {displayedFeedbacks.map((item) => {
+                  const hasVoted = item.upvotedBy.includes(currentUserId);
 
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-1.5 text-slate-500 text-[11px]">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>
-                            {item.timestamp ? new Date(item.timestamp).toLocaleString() : 'Recent'}
-                          </span>
-                        </div>
-
-                        <button
-                          onClick={() => handleDeleteFeedback(item.id)}
-                          disabled={deletingId === item.id}
-                          className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/25 transition-all active:scale-95 disabled:opacity-50"
-                          title="Delete record"
-                        >
-                          {deletingId === item.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Submitter Details */}
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
-                      <div className="flex items-center space-x-1.5 text-white font-medium">
-                        <User className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{item.name || 'Anonymous'}</span>
-                      </div>
-
-                      <div className="flex items-center space-x-1.5">
-                        <Mail className="w-3.5 h-3.5 text-slate-500" />
-                        <a
-                          href={`mailto:${item.email}`}
-                          className="hover:text-white transition-colors"
-                        >
-                          {item.email || 'No email provided'}
-                        </a>
-                      </div>
-
-                      {item.userId && (
-                        <span className="text-[10px] text-slate-600">
-                          UID: {item.userId.substring(0, 10)}...
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Subject & Message Content */}
-                    <div className="space-y-1.5">
-                      {item.subject && (
-                        <h4 className="text-sm font-bold text-white">
-                          {item.subject}
-                        </h4>
-                      )}
-                      <div className="p-3.5 rounded-xl bg-[#04060a] border border-white/[0.04] text-slate-300 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans">
-                        {item.message}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          /* ----------------- SUBMIT FEEDBACK VIEW (FOR ALL USERS) ----------------- */
-          <>
-            {/* Page Header */}
-            <div className="text-center space-y-3 max-w-3xl mx-auto relative select-none">
-              <div className="space-y-1.5">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-[1.08]">
-                  Developer Feedback &amp; <span className="text-emerald-400">Requests</span>
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed font-normal">
-                  Submit real-world backend challenge ideas, report test harness issues, or request new runtime frameworks.
-                </p>
-              </div>
-
-              {/* Technical Quick Tags */}
-              <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px]">
-                <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-400 font-semibold">
-                  # Concurrency Bugs
-                </span>
-                <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-400 font-semibold">
-                  # Rate Limiters
-                </span>
-                <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-400 font-semibold">
-                  # Idempotency Replays
-                </span>
-                <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-400 font-semibold">
-                  # Harness Features
-                </span>
-              </div>
-            </div>
-
-            {/* Feedback Card Form / Success View */}
-            <div className="rounded-3xl bg-[#080d16] border border-white/[0.1] p-6 sm:p-9 shadow-2xl">
-              
-              {isSuccess ? (
-                /* Success Screen */
-                <div className="py-8 text-center space-y-5">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/35 flex items-center justify-center mx-auto text-emerald-400 shadow-inner">
-                    <Check className="w-7 h-7 stroke-[3]" />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <h2 className="text-xl sm:text-2xl font-bold text-white">
-                      Feedback Received!
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
-                      Thank you for contributing! Your feedback is securely stored in our database to help us improve APIRun.
-                    </p>
-                  </div>
-
-                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button
-                      onClick={handleResetForm}
-                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] text-white text-xs font-semibold border border-white/[0.08] transition-colors"
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => setSelectedFeedback(item)}
+                      className="p-5 sm:p-6 rounded-2xl bg-[#0a0f16] border border-white/[0.08] hover:border-white/20 hover:bg-[#0d131d] transition-colors cursor-pointer group flex items-start gap-4 sm:gap-6 relative"
                     >
-                      Submit Another Feedback
-                    </button>
+                      {/* Left / Center Body */}
+                      <div className="flex-1 min-w-0 space-y-2.5">
+                        
+                        {/* Title */}
+                        <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug">
+                          {item.title}
+                        </h3>
 
-                    <button
-                      onClick={() => router.push('/challenges')}
-                      className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all border border-emerald-500"
-                    >
-                      <span>Back to Challenges</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                /* Feedback Form */
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  
-                  {errorMessage && (
-                    <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center space-x-2">
-                      <AlertTriangle className="w-4 h-4 shrink-0" />
-                      <span>{errorMessage}</span>
-                    </div>
-                  )}
+                        {/* Description (Truncated) */}
+                        <p className="text-xs sm:text-sm text-zinc-400 line-clamp-2 leading-relaxed">
+                          {item.description}
+                        </p>
 
-                  {/* 1. Category Selection */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                      1. Feedback Category
-                    </label>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                      {CATEGORIES.map(cat => {
-                        const Icon = cat.icon;
-                        const isSelected = category === cat.id;
-
-                        return (
-                          <div
-                            key={cat.id}
-                            onClick={() => setCategory(cat.id)}
-                            className={`p-3.5 rounded-2xl border transition-all duration-150 cursor-pointer flex flex-col space-y-1 text-left group active:scale-[0.98] ${
-                              isSelected
-                                ? 'bg-emerald-500/10 border-emerald-500 text-white'
-                                : 'bg-[#04060a] border-white/[0.08] hover:border-white/[0.22] hover:bg-white/[0.03] text-slate-400 hover:text-slate-200'
+                        {/* Meta Tags Row */}
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-zinc-400 pt-1">
+                          
+                          {/* Type Pill */}
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border flex items-center space-x-1 ${
+                              item.type === 'bug'
+                                ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                             }`}
                           >
-                            <div className="flex items-center space-x-2">
-                              <Icon className={`w-4 h-4 transition-colors duration-150 ${isSelected ? 'text-emerald-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
-                              <span className="text-xs font-bold text-white tracking-tight">{cat.label}</span>
-                            </div>
-                            <p className="text-[11px] text-slate-500 group-hover:text-slate-400 leading-tight transition-colors">
-                              {cat.desc}
-                            </p>
+                            {item.type === 'bug' ? (
+                              <Bug className="w-3 h-3" />
+                            ) : (
+                              <Zap className="w-3 h-3" />
+                            )}
+                            <span className="capitalize">{item.type === 'bug' ? 'Bug' : 'Feature'}</span>
+                          </span>
+
+                          {/* Comments Counter */}
+                          <div className="flex items-center space-x-1 text-zinc-400 font-medium">
+                            <MessageSquare className="w-3.5 h-3.5" />
+                            <span>{item.commentsCount || item.comments?.length || 0}</span>
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
 
-                  {/* 2. Rating */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                      2. Overall Rating
-                    </label>
-                    
-                    <div className="flex items-center space-x-3 p-3 rounded-2xl bg-[#04060a] border border-white/[0.08] hover:border-white/[0.16] transition-colors duration-200 w-fit">
-                      <div className="flex items-center space-x-1">
-                        {[1, 2, 3, 4, 5].map((star) => {
-                          const isLit = (hoveredRating || rating) >= star;
-                          return (
-                            <button
-                              key={star}
-                              type="button"
-                              onMouseEnter={() => setHoveredRating(star)}
-                              onMouseLeave={() => setHoveredRating(0)}
-                              onClick={() => setRating(star)}
-                              className="p-1 hover:scale-110 active:scale-95 transition-transform text-amber-400 cursor-pointer"
-                              aria-label={`Rate ${star} star`}
-                            >
-                              <Star className={`w-4 h-4 transition-colors ${isLit ? 'fill-amber-400 text-amber-400' : 'text-slate-700 hover:text-slate-500'}`} />
-                            </button>
-                          );
-                        })}
+                          <span className="text-zinc-600 hidden sm:inline">•</span>
+
+                          {/* Author (Always Anonymous) */}
+                          <div className="flex items-center space-x-1.5">
+                            <div className="w-4 h-4 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
+                              <UserIcon className="w-2.5 h-2.5" />
+                            </div>
+                            <span className="text-zinc-300">
+                              Anonymous Developer
+                            </span>
+                          </div>
+
+                          <span className="text-zinc-600 hidden sm:inline">•</span>
+
+                          {/* Date */}
+                          <span className="text-zinc-500 font-mono text-[11px]">
+                            {formatDate(item.createdAt)}
+                          </span>
+
+                          {/* Status Badge */}
+                          <span
+                            className={`px-2 py-0.5 rounded-md text-[10px] uppercase font-mono tracking-wider ${
+                              item.status === 'open'
+                                ? 'bg-zinc-800 text-emerald-400 border border-emerald-500/20'
+                                : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+
+                        </div>
+
                       </div>
-                      
-                      <span className="text-xs text-slate-400 pl-2.5 border-l border-white/[0.08] font-semibold">
-                        {rating === 5 ? '5/5 Excellent' : rating === 4 ? '4/5 Great' : rating === 3 ? '3/5 Good' : rating === 2 ? '2/5 Needs Work' : '1/5 Poor'}
-                      </span>
+
+                      {/* Right Action Controls: Moderator Delete & Upvote */}
+                      <div className="shrink-0 flex items-center space-x-2 pt-0.5">
+                        
+                        {/* Moderator Delete Button */}
+                        {isAdmin && (
+                          <button
+                            type="button"
+                            title="Delete this feedback permanently (Moderator)"
+                            disabled={deletingId === item.id}
+                            onClick={(e) => handleDeleteFeedback(item.id, e)}
+                            className="p-2.5 rounded-xl bg-zinc-800 hover:bg-rose-950/40 text-zinc-400 hover:text-rose-400 border border-white/[0.08] hover:border-rose-500/30 transition-colors"
+                          >
+                            {deletingId === item.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </button>
+                        )}
+
+                        {/* Upvote Button */}
+                        <button
+                          type="button"
+                          onClick={(e) => handleVote(item.id, e)}
+                          className={`flex flex-col items-center justify-center min-w-[50px] sm:min-w-[54px] py-2 px-2.5 rounded-xl border transition-colors ${
+                            hasVoted
+                              ? 'bg-emerald-600 border-emerald-500 text-white'
+                              : 'bg-[#05070a] border-white/[0.08] hover:bg-zinc-900 hover:border-white/20 text-zinc-400 hover:text-white'
+                          }`}
+                        >
+                          <ChevronUp className="w-5 h-5" />
+                          <span className="text-xs font-bold font-mono mt-0.5">
+                            {item.upvotesCount}
+                          </span>
+                        </button>
+
+                      </div>
+
                     </div>
-                  </div>
+                  );
+                })}
+              </div>
+            )}
 
-                  {/* 3. Detailed Message */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                        3. Detailed Message
-                      </label>
-                      <span className="text-[10px] text-slate-500 font-semibold">
-                        {message.length} characters
-                      </span>
-                    </div>
-                    <textarea
-                      rows={4}
-                      required
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Describe your suggestion, edge case, or feedback in detail..."
-                      className="w-full px-4 py-3 bg-[#04060a] border border-white/[0.08] hover:border-white/[0.18] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40 text-xs sm:text-sm resize-y leading-relaxed transition-all duration-200"
-                    />
-                  </div>
+          </div>
 
-                  {/* 4. Contact Details (Optional) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-white/[0.06]">
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-300">Name (Optional)</label>
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g. Mayank Joshi"
-                        className="w-full px-3.5 py-2.5 bg-[#04060a] border border-white/[0.08] hover:border-white/[0.18] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs transition-all duration-200"
-                      />
-                    </div>
+          {/* ================= RIGHT COLUMN: STICKY SUBMISSION FORM (1 COL) ================= */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 rounded-2xl bg-[#0a0f16] border border-white/[0.08] p-6 sm:p-7 space-y-5">
+              
+              <div>
+                <h2 className="text-lg font-bold text-white font-display">
+                  Suggest a feature or Report a bug
+                </h2>
+                <p className="text-xs text-zinc-400 mt-1">
+                  Submissions are posted anonymously to protect developer privacy.
+                </p>
+              </div>
 
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-300">Email (Optional)</label>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="e.g. developer@apirun.dev"
-                        className="w-full px-3.5 py-2.5 bg-[#04060a] border border-white/[0.08] hover:border-white/[0.18] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs transition-all duration-200"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="group relative w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm tracking-tight transition-all duration-150 border border-emerald-500/40 hover:border-emerald-400 flex items-center justify-center space-x-2.5 disabled:opacity-50 active:scale-[0.99] cursor-pointer shadow-sm"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin text-white" />
-                          <span>Submitting Feedback to Database...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Submit Developer Feedback</span>
-                          <Send className="w-4 h-4 transition-transform duration-150 group-hover:translate-x-0.5" />
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                </form>
+              {formSuccessMessage && (
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>{formSuccessMessage}</span>
+                </div>
               )}
 
+              {formErrorMessage && (
+                <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs flex items-center space-x-2">
+                  <X className="w-4 h-4 shrink-0" />
+                  <span>{formErrorMessage}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmitFeedback} className="space-y-4">
+                
+                {/* Type Switcher */}
+                <div className="grid grid-cols-2 gap-2 p-1 bg-[#05070a] rounded-xl border border-white/[0.06]">
+                  <button
+                    type="button"
+                    onClick={() => setFormType('suggestion')}
+                    className={`flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-bold transition-colors ${
+                      formType === 'suggestion'
+                        ? 'bg-emerald-600 text-white'
+                        : 'text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                    <span>Feature</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFormType('bug')}
+                    className={`flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-bold transition-colors ${
+                      formType === 'bug'
+                        ? 'bg-rose-600 text-white'
+                        : 'text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    <Bug className="w-3.5 h-3.5" />
+                    <span>Bug</span>
+                  </button>
+                </div>
+
+                {/* Title Input */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-zinc-300">
+                    Short, descriptive title
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formTitle}
+                    onChange={(e) => setFormTitle(e.target.value)}
+                    placeholder={
+                      formType === 'suggestion'
+                        ? 'e.g. Add Redis Distributed Lock challenge'
+                        : 'e.g. Content-Type parser error on multipart'
+                    }
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 text-xs transition-colors"
+                  />
+                </div>
+
+                {/* Description Textarea */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-zinc-300">
+                    Description
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    value={formDescription}
+                    onChange={(e) => setFormDescription(e.target.value)}
+                    placeholder={
+                      formType === 'suggestion'
+                        ? 'I want to see real-world scenarios covering...'
+                        : 'Steps to reproduce the issue or expected behaviour...'
+                    }
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 text-xs resize-y transition-colors"
+                  />
+                </div>
+
+                {/* Anonymous Privacy Badge */}
+                <div className="p-2.5 rounded-xl bg-[#05070a] border border-white/[0.06] flex items-center space-x-2 text-[11px] text-zinc-400">
+                  <UserIcon className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Your feedback will be posted anonymously.</span>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={isSubmittingForm}
+                  className={`w-full py-3 px-4 rounded-xl text-white font-bold text-xs sm:text-sm transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 ${
+                    formType === 'bug'
+                      ? 'bg-rose-600 hover:bg-rose-700'
+                      : 'bg-emerald-600 hover:bg-emerald-700'
+                  }`}
+                >
+                  {isSubmittingForm ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>
+                        Suggest {formType === 'bug' ? 'Bug Report' : 'Feature'}
+                      </span>
+                    </>
+                  )}
+                </button>
+
+              </form>
+
+              {/* Bottom Support Link */}
+              <div className="pt-2 border-t border-white/[0.06] text-center">
+                <p className="text-[11px] text-zinc-500">
+                  Direct question or urgent issue? Contact maintainers at{' '}
+                  <a
+                    href="mailto:joshimayank646@gmail.com"
+                    className="text-emerald-400 hover:underline"
+                  >
+                    joshimayank646@gmail.com
+                  </a>
+                </p>
+              </div>
+
             </div>
+          </div>
 
-            {/* Feature Suggestion Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs text-slate-400">
-              <div className="p-4 rounded-2xl bg-[#080d16] border border-white/[0.06] space-y-1.5">
-                <div className="font-bold text-white flex items-center space-x-2">
-                  <Code2 className="w-4 h-4 text-emerald-400" />
-                  <span>Challenge Ideas</span>
-                </div>
-                <p className="leading-relaxed text-slate-400">
-                  Suggest distributed locks, rate limiters, or queue batching challenge contracts.
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-[#080d16] border border-white/[0.06] space-y-1.5">
-                <div className="font-bold text-white flex items-center space-x-2">
-                  <Zap className="w-4 h-4 text-amber-400" />
-                  <span>Harness &amp; CLI</span>
-                </div>
-                <p className="leading-relaxed text-slate-400">
-                  Help us refine assertion speed, terminal log output, and RFC test accuracy.
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-[#080d16] border border-white/[0.06] space-y-1.5">
-                <div className="font-bold text-white flex items-center space-x-2">
-                  <ThumbsUp className="w-4 h-4 text-sky-400" />
-                  <span>Platform Quality</span>
-                </div>
-                <p className="leading-relaxed text-slate-400">
-                  Every submission is reviewed to improve challenge depth and interview tracks.
-                </p>
-              </div>
-            </div>
-          </>
-        )}
+        </div>
 
       </main>
+
+      {/* ================= DISCUSSION & REPLY MODAL (DIALOG) ================= */}
+      {selectedFeedback && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in-0">
+          
+          <div 
+            className="relative w-full max-w-2xl max-h-[90vh] bg-[#0a0f16] border border-white/[0.12] rounded-2xl overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 border-b border-white/[0.08] flex items-start justify-between gap-4 bg-[#070b10]">
+              
+              <div className="flex items-start space-x-4 flex-1 min-w-0">
+                
+                {/* Header Vote Counter */}
+                <button
+                  onClick={() => handleVote(selectedFeedback.id)}
+                  className={`flex flex-col items-center justify-center min-w-[48px] py-2 px-2 rounded-xl border transition-colors shrink-0 ${
+                    selectedFeedback.upvotedBy.includes(currentUserId)
+                      ? 'bg-emerald-600 border-emerald-500 text-white'
+                      : 'bg-[#05070a] border-white/[0.08] hover:bg-zinc-900 text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  <ChevronUp className="w-4 h-4" />
+                  <span className="text-xs font-mono font-bold mt-0.5">
+                    {selectedFeedback.upvotesCount}
+                  </span>
+                </button>
+
+                <div className="space-y-1 flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    
+                    {/* Status Badge */}
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider ${
+                        selectedFeedback.status === 'open'
+                          ? 'bg-zinc-800 text-emerald-400 border border-emerald-500/20'
+                          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                      }`}
+                    >
+                      {selectedFeedback.status}
+                    </span>
+
+                    {/* Type Badge */}
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-mono capitalize ${
+                        selectedFeedback.type === 'bug'
+                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                          : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                      }`}
+                    >
+                      {selectedFeedback.type}
+                    </span>
+
+                    <span className="text-zinc-500">•</span>
+                    <span className="text-zinc-400">{formatDate(selectedFeedback.createdAt)}</span>
+                    <span className="text-zinc-500">•</span>
+                    <span className="text-zinc-300 font-medium">
+                      Anonymous Developer
+                    </span>
+                  </div>
+
+                  <h2 className="text-lg sm:text-xl font-bold text-white leading-snug">
+                    {selectedFeedback.title}
+                  </h2>
+                </div>
+
+              </div>
+
+              {/* Close Button & Moderator Delete */}
+              <div className="flex items-center space-x-1.5">
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDeleteFeedback(selectedFeedback.id)}
+                    title="Delete permanently"
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  onClick={() => setSelectedFeedback(null)}
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6">
+              
+              {/* Full Description */}
+              <div className="p-4 rounded-xl bg-[#05070a] border border-white/[0.06] text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                {selectedFeedback.description}
+              </div>
+
+              {/* Status Notice if Closed */}
+              {selectedFeedback.status === 'closed' && (
+                <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-white/[0.1] text-xs text-zinc-400 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Lock className="w-4 h-4 text-zinc-400 shrink-0" />
+                    <span>
+                      Ticket marked as closed {selectedFeedback.closedBy ? `by ${selectedFeedback.closedBy}` : ''}.
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleToggleTicketStatus('open')}
+                    disabled={isClosingTicket}
+                    className="text-emerald-400 hover:underline font-semibold"
+                  >
+                    Reopen Ticket
+                  </button>
+                </div>
+              )}
+
+              {/* Discussion Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-bold text-white flex items-center space-x-2">
+                    <MessageSquare className="w-4 h-4 text-emerald-400" />
+                    <span>Discussion ({selectedFeedback.comments?.length || 0})</span>
+                  </h4>
+                </div>
+
+                {/* Reply / Comment Input Box */}
+                <div className="p-4 rounded-xl bg-[#070b10] border border-white/[0.08] space-y-3">
+                  <textarea
+                    rows={3}
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Write an anonymous reply or resolution note..."
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-emerald-500 transition-colors resize-y"
+                  />
+
+                  <div className="flex flex-wrap items-center justify-between gap-2.5">
+                    
+                    <span className="text-xs text-zinc-500">
+                      {isAdmin ? 'Posting as Moderator' : 'Posting anonymously'}
+                    </span>
+
+                    <div className="flex items-center space-x-2">
+                      
+                      {/* Close Ticket Button */}
+                      {selectedFeedback.status === 'open' && (
+                        <button
+                          type="button"
+                          onClick={() => handleToggleTicketStatus('closed')}
+                          disabled={isClosingTicket}
+                          className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-white/10 text-xs font-semibold transition-colors disabled:opacity-50 flex items-center space-x-1.5"
+                        >
+                          {isClosingTicket ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Lock className="w-3.5 h-3.5" />
+                          )}
+                          <span>Close Ticket</span>
+                        </button>
+                      )}
+
+                      {/* Post Comment Button */}
+                      <button
+                        type="button"
+                        onClick={handleAddComment}
+                        disabled={isSubmittingComment || !commentText.trim()}
+                        className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors disabled:opacity-50 flex items-center space-x-1.5"
+                      >
+                        {isSubmittingComment ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Send className="w-3.5 h-3.5" />
+                        )}
+                        <span>Post Comment</span>
+                      </button>
+
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* Comment List */}
+                {selectedFeedback.comments && selectedFeedback.comments.length > 0 ? (
+                  <div className="space-y-3 pt-2">
+                    {selectedFeedback.comments.map((c) => (
+                      <div
+                        key={c.id}
+                        className="p-3.5 sm:p-4 rounded-xl bg-[#05070a] border border-white/[0.06] space-y-2"
+                      >
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">
+                              {c.userRole === 'admin' ? 'M' : 'A'}
+                            </div>
+                            <span className="font-semibold text-white">
+                              {c.userRole === 'admin' ? 'Moderator' : 'Anonymous'}
+                            </span>
+                            {c.userRole === 'admin' && (
+                              <span className="px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 text-[9px] font-mono border border-emerald-500/20">
+                                Maintainer
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] font-mono text-zinc-500">
+                            {formatDate(c.createdAt)}
+                          </span>
+                        </div>
+                        <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap pl-7">
+                          {c.content}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-zinc-500 italic py-2 text-center">
+                    No comments yet. Start the discussion!
+                  </p>
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
 
       {/* Global Footer */}
       <Footer />
