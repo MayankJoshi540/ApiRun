@@ -186,7 +186,6 @@ export default function FeedbackPage() {
 
       if (!res.ok) throw new Error('Failed to delete feedback');
 
-      // Remove from list
       setFeedbacks((prev) => prev.filter((fb) => fb.id !== feedbackId));
 
       if (selectedFeedback && selectedFeedback.id === feedbackId) {
@@ -233,7 +232,6 @@ export default function FeedbackPage() {
       setFormTitle('');
       setFormDescription('');
 
-      // Refresh list
       fetchFeedbacks();
 
       setTimeout(() => setFormSuccessMessage(null), 5000);
@@ -383,7 +381,7 @@ export default function FeedbackPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative flex flex-col justify-between">
       
       {/* Top Navigation */}
       <BackendRankNavbar
@@ -398,15 +396,15 @@ export default function FeedbackPage() {
         
         {/* Moderator Info Banner (Visible for Admin) */}
         {isAdmin && (
-          <div className="mb-8 p-4 rounded-2xl bg-[#0a0f16] border border-emerald-500/30 flex items-center justify-between">
+          <div className="mb-8 p-4 rounded-2xl bg-[#0a0f16] border border-white/[0.1] flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-zinc-300">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
                 <div className="text-xs font-bold text-white flex items-center space-x-2">
                   <span>Moderator Controls Active</span>
-                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono border border-emerald-500/20">
+                  <span className="px-2 py-0.5 rounded bg-white/[0.08] text-zinc-300 text-[10px] font-mono border border-white/[0.1]">
                     {user?.email}
                   </span>
                 </div>
@@ -417,7 +415,7 @@ export default function FeedbackPage() {
             </div>
             <button
               onClick={fetchFeedbacks}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-semibold text-white transition-colors"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-white/[0.08] text-xs font-semibold text-white transition-colors"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Refresh</span>
@@ -429,13 +427,13 @@ export default function FeedbackPage() {
         <div className="text-center mb-12 sm:mb-16 space-y-4">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
             Suggest a{' '}
-            <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-xl inline-block shadow-sm">
+            <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-xl inline-block">
               feature
             </span>{' '}
             or Report{' '}
             <br className="hidden sm:inline" />
             a{' '}
-            <span className="text-rose-400 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-xl inline-block shadow-sm">
+            <span className="text-rose-400 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-xl inline-block">
               bug
             </span>
           </h1>
@@ -451,7 +449,7 @@ export default function FeedbackPage() {
           <div className="lg:col-span-2 space-y-6">
             
             {/* Filter Bar & Controls */}
-            <div className="p-3 sm:p-4 rounded-2xl bg-[#0a0f16] border border-white/[0.08] space-y-3.5 shadow-sm">
+            <div className="p-3 sm:p-4 rounded-2xl bg-[#0a0f16] border border-white/[0.08] space-y-3.5">
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 
@@ -459,42 +457,42 @@ export default function FeedbackPage() {
                 <div className="flex items-center p-1 bg-[#05070a] rounded-xl border border-white/[0.06] w-full sm:w-auto">
                   <button
                     onClick={() => setActiveTypeTab('all')}
-                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1.5 ${
+                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
                       activeTypeTab === 'all'
-                        ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-950/40'
+                        ? 'bg-emerald-600 text-white'
                         : 'text-zinc-400 hover:text-white'
                     }`}
                   >
                     <span>All</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.1] font-mono">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.15] font-mono">
                       {counts.all}
                     </span>
                   </button>
 
                   <button
                     onClick={() => setActiveTypeTab('suggestions')}
-                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1.5 ${
+                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
                       activeTypeTab === 'suggestions'
-                        ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-950/40'
+                        ? 'bg-emerald-600 text-white'
                         : 'text-zinc-400 hover:text-white'
                     }`}
                   >
                     <span>Suggestions</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.1] font-mono">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.15] font-mono">
                       {counts.suggestions}
                     </span>
                   </button>
 
                   <button
                     onClick={() => setActiveTypeTab('bugs')}
-                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1.5 ${
+                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
                       activeTypeTab === 'bugs'
-                        ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-950/40'
+                        ? 'bg-emerald-600 text-white'
                         : 'text-zinc-400 hover:text-white'
                     }`}
                   >
                     <span>Bugs</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.1] font-mono">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.15] font-mono">
                       {counts.bugs}
                     </span>
                   </button>
@@ -504,10 +502,10 @@ export default function FeedbackPage() {
                 <div className="flex items-center space-x-1.5 self-end sm:self-center">
                   <button
                     onClick={() => setActiveSort('hot')}
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border ${
                       activeSort === 'hot'
-                        ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm'
-                        : 'bg-[#05070a] hover:bg-white/[0.05] text-zinc-400 border-white/[0.06]'
+                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
                     }`}
                   >
                     <Flame className="w-3.5 h-3.5" />
@@ -516,10 +514,10 @@ export default function FeedbackPage() {
 
                   <button
                     onClick={() => setActiveSort('top')}
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border ${
                       activeSort === 'top'
-                        ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm'
-                        : 'bg-[#05070a] hover:bg-white/[0.05] text-zinc-400 border-white/[0.06]'
+                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
                     }`}
                   >
                     <Star className="w-3.5 h-3.5" />
@@ -528,10 +526,10 @@ export default function FeedbackPage() {
 
                   <button
                     onClick={() => setActiveSort('new')}
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border ${
                       activeSort === 'new'
-                        ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm'
-                        : 'bg-[#05070a] hover:bg-white/[0.05] text-zinc-400 border-white/[0.06]'
+                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
                     }`}
                   >
                     <Clock className="w-3.5 h-3.5" />
@@ -550,7 +548,7 @@ export default function FeedbackPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search feedback by keywords..."
-                    className="w-full pl-10 pr-4 py-2 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-emerald-500 transition-all"
+                    className="w-full pl-10 pr-4 py-2 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-white/30 transition-colors"
                   />
                 </div>
 
@@ -560,10 +558,10 @@ export default function FeedbackPage() {
                     <button
                       key={st}
                       onClick={() => setStatusFilter(st)}
-                      className={`px-2.5 py-1 rounded-lg text-xs capitalize transition-all border ${
+                      className={`px-2.5 py-1 rounded-lg text-xs capitalize transition-colors border ${
                         statusFilter === st
-                          ? 'bg-white/[0.1] text-white border-white/[0.2] font-semibold'
-                          : 'bg-[#05070a] text-zinc-400 border-white/[0.04] hover:text-white'
+                          ? 'bg-zinc-800 text-white border-white/20 font-semibold'
+                          : 'bg-[#05070a] text-zinc-400 border-white/[0.04] hover:text-zinc-200'
                       }`}
                     >
                       {st}
@@ -577,7 +575,7 @@ export default function FeedbackPage() {
             {/* List of Feedback Items */}
             {isLoading ? (
               <div className="py-20 text-center space-y-3 rounded-2xl bg-[#0a0f16] border border-white/[0.06]">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-400 mx-auto" />
+                <Loader2 className="w-7 h-7 animate-spin text-zinc-400 mx-auto" />
                 <p className="text-xs text-zinc-400 font-mono">Loading feedback from database...</p>
               </div>
             ) : displayedFeedbacks.length === 0 ? (
@@ -599,13 +597,13 @@ export default function FeedbackPage() {
                     <div
                       key={item.id}
                       onClick={() => setSelectedFeedback(item)}
-                      className="p-5 sm:p-6 rounded-2xl bg-[#0a0f16] border border-white/[0.08] hover:border-emerald-500/40 hover:bg-[#0e141f] transition-all cursor-pointer group flex items-start gap-4 sm:gap-6 shadow-sm relative"
+                      className="p-5 sm:p-6 rounded-2xl bg-[#0a0f16] border border-white/[0.08] hover:border-white/20 hover:bg-[#0d131d] transition-colors cursor-pointer group flex items-start gap-4 sm:gap-6 relative"
                     >
                       {/* Left / Center Body */}
                       <div className="flex-1 min-w-0 space-y-2.5">
                         
                         {/* Title */}
-                        <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-emerald-300 transition-colors leading-snug">
+                        <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug">
                           {item.title}
                         </h3>
 
@@ -621,8 +619,8 @@ export default function FeedbackPage() {
                           <span
                             className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border flex items-center space-x-1 ${
                               item.type === 'bug'
-                                ? 'bg-rose-500/10 text-rose-400 border-rose-500/25'
-                                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'
+                                ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                             }`}
                           >
                             {item.type === 'bug' ? (
@@ -662,7 +660,7 @@ export default function FeedbackPage() {
                           <span
                             className={`px-2 py-0.5 rounded-md text-[10px] uppercase font-mono tracking-wider ${
                               item.status === 'open'
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/25'
+                                ? 'bg-zinc-800 text-emerald-400 border border-emerald-500/20'
                                 : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
                             }`}
                           >
@@ -683,7 +681,7 @@ export default function FeedbackPage() {
                             title="Delete this feedback permanently (Moderator)"
                             disabled={deletingId === item.id}
                             onClick={(e) => handleDeleteFeedback(item.id, e)}
-                            className="p-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/25 transition-all"
+                            className="p-2.5 rounded-xl bg-zinc-800 hover:bg-rose-950/40 text-zinc-400 hover:text-rose-400 border border-white/[0.08] hover:border-rose-500/30 transition-colors"
                           >
                             {deletingId === item.id ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
@@ -697,13 +695,13 @@ export default function FeedbackPage() {
                         <button
                           type="button"
                           onClick={(e) => handleVote(item.id, e)}
-                          className={`flex flex-col items-center justify-center min-w-[50px] sm:min-w-[54px] py-2 px-2.5 rounded-xl border transition-all ${
+                          className={`flex flex-col items-center justify-center min-w-[50px] sm:min-w-[54px] py-2 px-2.5 rounded-xl border transition-colors ${
                             hasVoted
-                              ? 'bg-emerald-600 border-emerald-500 text-white shadow-sm shadow-emerald-950/40'
-                              : 'bg-[#05070a] border-white/[0.08] hover:border-emerald-500/40 hover:text-emerald-400 text-zinc-400'
+                              ? 'bg-emerald-600 border-emerald-500 text-white'
+                              : 'bg-[#05070a] border-white/[0.08] hover:bg-zinc-900 hover:border-white/20 text-zinc-400 hover:text-white'
                           }`}
                         >
-                          <ChevronUp className="w-5 h-5 transition-transform group-hover:-translate-y-0.5" />
+                          <ChevronUp className="w-5 h-5" />
                           <span className="text-xs font-bold font-mono mt-0.5">
                             {item.upvotesCount}
                           </span>
@@ -721,7 +719,7 @@ export default function FeedbackPage() {
 
           {/* ================= RIGHT COLUMN: STICKY SUBMISSION FORM (1 COL) ================= */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-2xl bg-[#0a0f16] border border-white/[0.08] p-6 sm:p-7 space-y-5 shadow-lg">
+            <div className="sticky top-24 rounded-2xl bg-[#0a0f16] border border-white/[0.08] p-6 sm:p-7 space-y-5">
               
               <div>
                 <h2 className="text-lg font-bold text-white font-display">
@@ -753,9 +751,9 @@ export default function FeedbackPage() {
                   <button
                     type="button"
                     onClick={() => setFormType('suggestion')}
-                    className={`flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                    className={`flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-bold transition-colors ${
                       formType === 'suggestion'
-                        ? 'bg-emerald-600 text-white shadow-sm'
+                        ? 'bg-emerald-600 text-white'
                         : 'text-zinc-400 hover:text-white'
                     }`}
                   >
@@ -766,9 +764,9 @@ export default function FeedbackPage() {
                   <button
                     type="button"
                     onClick={() => setFormType('bug')}
-                    className={`flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                    className={`flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-bold transition-colors ${
                       formType === 'bug'
-                        ? 'bg-rose-600 text-white shadow-sm'
+                        ? 'bg-rose-600 text-white'
                         : 'text-zinc-400 hover:text-white'
                     }`}
                   >
@@ -792,7 +790,7 @@ export default function FeedbackPage() {
                         ? 'e.g. Add Redis Distributed Lock challenge'
                         : 'e.g. Content-Type parser error on multipart'
                     }
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs transition-all"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 text-xs transition-colors"
                   />
                 </div>
 
@@ -811,24 +809,24 @@ export default function FeedbackPage() {
                         ? 'I want to see real-world scenarios covering...'
                         : 'Steps to reproduce the issue or expected behaviour...'
                     }
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs resize-y transition-all"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 text-xs resize-y transition-colors"
                   />
                 </div>
 
                 {/* Anonymous Privacy Badge */}
                 <div className="p-2.5 rounded-xl bg-[#05070a] border border-white/[0.06] flex items-center space-x-2 text-[11px] text-zinc-400">
                   <UserIcon className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>Your feedback will be posted 100% anonymously.</span>
+                  <span>Your feedback will be posted anonymously.</span>
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={isSubmittingForm}
-                  className={`w-full py-3 px-4 rounded-xl text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 shadow-md disabled:opacity-50 ${
+                  className={`w-full py-3 px-4 rounded-xl text-white font-bold text-xs sm:text-sm transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 ${
                     formType === 'bug'
-                      ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-950/40'
-                      : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-950/40'
+                      ? 'bg-rose-600 hover:bg-rose-700'
+                      : 'bg-emerald-600 hover:bg-emerald-700'
                   }`}
                 >
                   {isSubmittingForm ? (
@@ -873,7 +871,7 @@ export default function FeedbackPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in-0">
           
           <div 
-            className="relative w-full max-w-2xl max-h-[90vh] bg-[#0a0f16] border border-white/[0.12] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            className="relative w-full max-w-2xl max-h-[90vh] bg-[#0a0f16] border border-white/[0.12] rounded-2xl overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             
@@ -885,10 +883,10 @@ export default function FeedbackPage() {
                 {/* Header Vote Counter */}
                 <button
                   onClick={() => handleVote(selectedFeedback.id)}
-                  className={`flex flex-col items-center justify-center min-w-[48px] py-2 px-2 rounded-xl border transition-all shrink-0 ${
+                  className={`flex flex-col items-center justify-center min-w-[48px] py-2 px-2 rounded-xl border transition-colors shrink-0 ${
                     selectedFeedback.upvotedBy.includes(currentUserId)
-                      ? 'bg-emerald-600 border-emerald-500 text-white shadow-sm'
-                      : 'bg-[#05070a] border-white/[0.08] hover:border-emerald-500/40 text-zinc-400'
+                      ? 'bg-emerald-600 border-emerald-500 text-white'
+                      : 'bg-[#05070a] border-white/[0.08] hover:bg-zinc-900 text-zinc-400 hover:text-white'
                   }`}
                 >
                   <ChevronUp className="w-4 h-4" />
@@ -904,7 +902,7 @@ export default function FeedbackPage() {
                     <span
                       className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider ${
                         selectedFeedback.status === 'open'
-                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                          ? 'bg-zinc-800 text-emerald-400 border border-emerald-500/20'
                           : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
                       }`}
                     >
@@ -915,8 +913,8 @@ export default function FeedbackPage() {
                     <span
                       className={`px-2 py-0.5 rounded text-[10px] font-mono capitalize ${
                         selectedFeedback.type === 'bug'
-                          ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
-                          : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                          : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                       }`}
                     >
                       {selectedFeedback.type}
@@ -943,7 +941,7 @@ export default function FeedbackPage() {
                   <button
                     onClick={() => handleDeleteFeedback(selectedFeedback.id)}
                     title="Delete permanently"
-                    className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-colors"
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -1001,7 +999,7 @@ export default function FeedbackPage() {
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Write an anonymous reply or resolution note..."
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-emerald-500 transition-all resize-y"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-emerald-500 transition-colors resize-y"
                   />
 
                   <div className="flex flex-wrap items-center justify-between gap-2.5">
@@ -1018,7 +1016,7 @@ export default function FeedbackPage() {
                           type="button"
                           onClick={() => handleToggleTicketStatus('closed')}
                           disabled={isClosingTicket}
-                          className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/25 text-xs font-semibold transition-all disabled:opacity-50 flex items-center space-x-1.5"
+                          className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-white/10 text-xs font-semibold transition-colors disabled:opacity-50 flex items-center space-x-1.5"
                         >
                           {isClosingTicket ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1034,7 +1032,7 @@ export default function FeedbackPage() {
                         type="button"
                         onClick={handleAddComment}
                         disabled={isSubmittingComment || !commentText.trim()}
-                        className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-950/40 disabled:opacity-50 flex items-center space-x-1.5"
+                        className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors disabled:opacity-50 flex items-center space-x-1.5"
                       >
                         {isSubmittingComment ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
