@@ -66,15 +66,6 @@ export const LandingPageView: React.FC<Props> = ({
   onExploreChallenges,
   onNavigateProgress
 }) => {
-  const [copiedCli, setCopiedCli] = useState(false);
-  const [selectedCliLang, setSelectedCliLang] = useState<'nodejs' | 'go' | 'python'>('nodejs');
-
-  const handleCopyCli = () => {
-    navigator.clipboard.writeText('npx apirun test --target http://localhost:8000 --challenge create-user-api');
-    setCopiedCli(true);
-    setTimeout(() => setCopiedCli(false), 2000);
-  };
-
   const previewChallenges = challenges.slice(0, 4);
 
   const conceptTags = [
@@ -168,11 +159,11 @@ export const LandingPageView: React.FC<Props> = ({
 
   return (
     <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans selection:bg-emerald-500/30 selection:text-white relative overflow-x-hidden">
-      {/* 1. Global Page Technical Background Atmosphere (Luminous technical grid) */}
+      {/* 1. Global Page Technical Background Atmosphere (Clean, Minimal Dark with Subtle Bottom Emerald Glow) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {/* Continuous Technical Dot Matrix with micro-luminescence */}
         <div 
-          className="absolute inset-0 opacity-[0.07]"
+          className="absolute inset-0 opacity-[0.06]"
           style={{
             backgroundImage: 'radial-gradient(rgba(52, 211, 153, 0.4) 1px, transparent 1px)',
             backgroundSize: '32px 32px'
@@ -181,13 +172,21 @@ export const LandingPageView: React.FC<Props> = ({
 
         {/* Faint Coordinate Grid */}
         <div 
-          className="absolute inset-0 opacity-[0.025]"
+          className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `
               linear-gradient(to right, rgba(52, 211, 153, 0.3) 1px, transparent 1px),
               linear-gradient(to bottom, rgba(52, 211, 153, 0.3) 1px, transparent 1px)
             `,
             backgroundSize: '64px 64px'
+          }}
+        />
+
+        {/* Subtle, Soft Emerald Ambient Glow at Bottom Horizon */}
+        <div 
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] max-w-full h-[450px] pointer-events-none opacity-25 blur-[120px]"
+          style={{
+            background: 'radial-gradient(ellipse 60% 50% at 50% 100%, rgba(16, 185, 129, 0.25) 0%, transparent 75%)',
           }}
         />
       </div>
@@ -273,7 +272,7 @@ export const LandingPageView: React.FC<Props> = ({
             <div className="sm:hidden text-right text-[11px] text-slate-400 pb-2 px-1">
               &larr; Swipe table to compare &rarr;
             </div>
-            <div className="overflow-hidden rounded-2xl border border-white/[0.12] bg-[#090d15] shadow-2xl">
+            <div className="overflow-hidden rounded-2xl border border-white/[0.12] hover:border-emerald-500/30 bg-[#090d15] shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_40px_rgba(16,185,129,0.08)] transition-all duration-300">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px] text-left text-sm sm:text-base border-collapse">
                   <thead>
@@ -401,197 +400,59 @@ export const LandingPageView: React.FC<Props> = ({
             </div>
           </ScrollReveal>
 
-          <StaggerContainer className="grid grid-cols-1 md:grid-cols-4 gap-4" staggerDelay={90}>
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch" staggerDelay={90}>
             {/* Step 1 */}
-            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-emerald-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
+            <div className="h-full flex flex-col justify-start p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-emerald-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
               <div className="font-mono text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-md w-fit">
                 01 &bull; Sandbox Isolation
               </div>
-              <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Fast Environment</h3>
-              <p className="text-xs text-[#94a3b8] leading-relaxed">
-                Spins up an isolated sandbox running your Node.js, Go, or Python service in under 50ms.
-              </p>
+              <div className="space-y-1.5 flex-1">
+                <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Fast Environment</h3>
+                <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  Spins up an isolated sandbox running your Node, Go, or Python service in under 50ms.
+                </p>
+              </div>
             </div>
 
             {/* Step 2 */}
-            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-sky-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
+            <div className="h-full flex flex-col justify-start p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-sky-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
               <div className="font-mono text-[11px] font-bold text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 rounded-md w-fit">
                 02 &bull; API Contracts
               </div>
-              <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors">Response Validation</h3>
-              <p className="text-xs text-[#94a3b8] leading-relaxed">
-                Validates proper HTTP status codes (200, 201, 400, 404, 409, 429) and structured JSON responses.
-              </p>
+              <div className="space-y-1.5 flex-1">
+                <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors">Response Validation</h3>
+                <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  Asserts strict HTTP status codes, headers, and structured JSON response schemas.
+                </p>
+              </div>
             </div>
 
             {/* Step 3 */}
-            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-purple-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
+            <div className="h-full flex flex-col justify-start p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-purple-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
               <div className="font-mono text-[11px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2.5 py-0.5 rounded-md w-fit">
                 03 &bull; Traffic &amp; Concurrency
               </div>
-              <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors">Race Condition Checks</h3>
-              <p className="text-xs text-[#94a3b8] leading-relaxed">
-                Sends parallel requests to verify thread safety, prevent double charges, and test locks.
-              </p>
+              <div className="space-y-1.5 flex-1">
+                <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors">Race Condition Checks</h3>
+                <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  Sends concurrent burst traffic to verify thread safety and prevent double writes.
+                </p>
+              </div>
             </div>
 
             {/* Step 4 */}
-            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-amber-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
+            <div className="h-full flex flex-col justify-start p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-amber-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
               <div className="font-mono text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-md w-fit">
                 04 &bull; Detailed Scorecard
               </div>
-              <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">Speed &amp; Diagnostics</h3>
-              <p className="text-xs text-[#94a3b8] leading-relaxed">
-                Instant breakdown of passed test assertions, execution latency, and error traces.
-              </p>
+              <div className="space-y-1.5 flex-1">
+                <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">Speed &amp; Diagnostics</h3>
+                <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  Instant breakdown of passed test assertions, latency benchmarks, and traces.
+                </p>
+              </div>
             </div>
           </StaggerContainer>
-        </section>
-
-        {/* ========================================================= */}
-        {/* CLI QUICK-START TERMINAL WIDGET */}
-        {/* ========================================================= */}
-        <section className="px-4 sm:px-6 max-w-4xl mx-auto pb-20 font-sans">
-          <ScrollReveal variant="fade-up" duration={600}>
-            <div className="relative overflow-hidden p-5 sm:p-8 rounded-3xl bg-[#080d16] border border-white/[0.12] space-y-6 shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
-              {/* Top ambient glow */}
-              <div 
-                className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-40 pointer-events-none opacity-40"
-                style={{
-                  background: 'radial-gradient(ellipse at center, rgba(16, 185, 129, 0.25), transparent 70%)',
-                  filter: 'blur(40px)',
-                }}
-              />
-
-              {/* Header: Title + Language Switcher */}
-              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center space-x-2.5 text-xs text-white font-bold">
-                  <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 shadow-sm">
-                    <TerminalSquare className="w-4 h-4" />
-                  </div>
-                  <span className="tracking-wide">LOCAL RUNNER &amp; CLI</span>
-                  <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono font-bold uppercase tracking-wider">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>IN ACTIVE BUILD</span>
-                  </div>
-                </div>
-
-                {/* Language Switcher Tabs */}
-                <div className="flex items-center space-x-1 bg-black/40 p-1 rounded-xl border border-white/[0.08] text-xs self-start sm:self-auto">
-                  {(['nodejs', 'go', 'python'] as const).map(lang => (
-                    <button
-                      key={lang}
-                      onClick={() => setSelectedCliLang(lang)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                        selectedCliLang === lang 
-                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm' 
-                          : 'text-slate-400 hover:text-white border border-transparent'
-                      }`}
-                    >
-                      {lang === 'nodejs' ? 'TypeScript / Node' : lang === 'go' ? 'Go' : 'Python'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal max-w-xl">
-                  Prefer your local IDE? Test your live Express, FastAPI, or Go server directly against our automated test suites:
-                </p>
-                <div className="text-[11px] font-mono text-zinc-400 flex items-center space-x-1.5 shrink-0">
-                  <span className="text-emerald-400">⚡</span>
-                  <span>Release: <strong className="text-white">v0.2.0 Early Access</strong></span>
-                </div>
-              </div>
-
-              {/* Terminal Frame */}
-              <div className="relative z-10 rounded-2xl bg-[#04060a] border border-white/[0.1] overflow-hidden shadow-2xl">
-                {/* Window Header */}
-                <div className="flex items-center justify-between px-4 py-2.5 bg-white/[0.03] border-b border-white/[0.06]">
-                  <div className="flex items-center space-x-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
-                    <span className="text-[11px] font-mono text-zinc-400 pl-2">apirun-cli &bull; port 8000 &bull; local test suite</span>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      const cmd = selectedCliLang === 'go'
-                        ? 'go run apirun.dev/cli@latest test --target http://localhost:8080 --challenge create-user-api'
-                        : selectedCliLang === 'python'
-                        ? 'python -m apirun test --target http://localhost:8000 --challenge create-user-api'
-                        : 'npx apirun test --target http://localhost:8000 --challenge create-user-api';
-                      navigator.clipboard.writeText(cmd);
-                      setCopiedCli(true);
-                      setTimeout(() => setCopiedCli(false), 2000);
-                    }}
-                    className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-white text-[11px] font-bold transition-all active:scale-95"
-                    aria-label="Copy CLI command"
-                  >
-                    {copiedCli ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-300" />}
-                    <span>{copiedCli ? 'Copied' : 'Copy'}</span>
-                  </button>
-                </div>
-
-                {/* Command & Output Content */}
-                <div className="p-4 sm:p-5 space-y-3 overflow-x-auto text-xs sm:text-sm font-mono leading-relaxed">
-                  <div className="flex items-start space-x-2 text-emerald-400 font-bold select-all">
-                    <span className="text-zinc-500 shrink-0 select-none">$</span>
-                    <span className="break-all sm:break-normal">
-                      {selectedCliLang === 'go' 
-                        ? 'go run apirun.dev/cli@latest test --target http://localhost:8080 --challenge create-user-api'
-                        : selectedCliLang === 'python'
-                        ? 'python -m apirun test --target http://localhost:8000 --challenge create-user-api'
-                        : 'npx apirun test --target http://localhost:8000 --challenge create-user-api'}
-                    </span>
-                  </div>
-
-                  <div className="space-y-1 text-zinc-400 text-xs pt-1 border-t border-white/[0.05]">
-                    <div className="text-zinc-300 flex items-center space-x-2">
-                      <span className="text-sky-400">[1/3]</span>
-                      <span>Connected to local server on http://localhost:{selectedCliLang === 'go' ? '8080' : '8000'}</span>
-                    </div>
-                    <div className="text-zinc-300 flex items-center space-x-2">
-                      <span className="text-sky-400">[2/3]</span>
-                      <span>Verified HTTP status codes and response formats</span>
-                    </div>
-                    <div className="text-zinc-300 flex items-center space-x-2">
-                      <span className="text-sky-400">[3/3]</span>
-                      <span>Tested concurrency and race condition edge cases</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 flex items-center justify-between border-t border-white/[0.05] text-[11px]">
-                    <div className="text-emerald-400 font-bold flex items-center space-x-1.5">
-                      <span>✔</span>
-                      <span>12/12 test assertions passed (0.038s) &bull; All edge cases covered</span>
-                    </div>
-                    <span className="text-zinc-500 hidden sm:inline font-mono">exit code 0</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Pipeline Status Strip */}
-              <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-[11px] font-mono">
-                <div className="px-3 py-2 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center space-x-2 text-zinc-300">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                  <span className="text-zinc-400">Sandboxes:</span>
-                  <span className="text-white font-semibold">Fast &amp; Isolated</span>
-                </div>
-                <div className="px-3 py-2 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center space-x-2 text-zinc-300">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                  <span className="text-zinc-400">API Tests:</span>
-                  <span className="text-white font-semibold">Edge Cases Covered</span>
-                </div>
-                <div className="px-3 py-2 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center space-x-2 text-zinc-300">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-zinc-400">CLI Tool:</span>
-                  <span className="text-amber-300 font-semibold">Building v0.2.0</span>
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
         </section>
 
         {/* ========================================================= */}
@@ -646,40 +507,60 @@ export const LandingPageView: React.FC<Props> = ({
         </section>
 
         {/* ========================================================= */}
-        {/* ACTIVE DEVELOPMENT & COMMUNITY FEEDBACK BANNER */}
+        {/* COMMUNITY FEEDBACK & CHALLENGE SUGGESTIONS */}
         {/* ========================================================= */}
-        <section className="py-8 px-4 sm:px-6 max-w-5xl mx-auto font-sans">
-          <ScrollReveal variant="scale" duration={650}>
-            <div className="relative overflow-hidden rounded-3xl bg-[#090d15] border border-emerald-500/30 p-6 sm:p-8 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_15px_40px_rgba(0,0,0,0.6)]">
-              <div className="flex items-start sm:items-center space-x-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner">
-                  <MessageSquarePlus className="w-6 h-6" />
+        <section className="py-12 px-4 sm:px-6 max-w-5xl mx-auto font-sans">
+          <ScrollReveal variant="fade-up" duration={500}>
+            <div className="rounded-2xl bg-[#080c14] border border-white/[0.08] hover:border-white/[0.14] transition-colors p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-3 max-w-xl">
+                <div className="flex items-center space-x-2 text-xs font-mono text-slate-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                  <span className="font-semibold text-slate-300">OPEN FEEDBACK</span>
+                  <span className="text-slate-600">/</span>
+                  <span className="text-slate-400">EARLY PREVIEW</span>
                 </div>
-                <div className="space-y-1 text-left">
-                  <div className="flex items-center space-x-2">
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider border border-emerald-500/30 font-sans">
-                      Live Early Preview
-                    </span>
-                    <span className="text-xs text-slate-400 hidden sm:inline">Actively expanding challenge library</span>
-                  </div>
-                  <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                    We&apos;re in active development &mdash; accepting developer feedback!
+
+                <div className="space-y-1.5">
+                  <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+                    Help us expand the challenge catalog
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-400 max-w-xl leading-relaxed">
-                    Have a real-world API scenario, edge-case challenge idea, or runner suggestion? Help shape APIRun for backend engineers worldwide.
+                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                    Encountered tricky race conditions, idempotency bugs, or token bucket edge cases in production? Share your ideas and help shape upcoming backend challenges.
                   </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2 pt-1 text-[11px] font-mono text-slate-400">
+                  <span className="px-2.5 py-1 rounded-md bg-white/[0.03] border border-white/[0.06]">
+                    + New Challenge Specs
+                  </span>
+                  <span className="px-2.5 py-1 rounded-md bg-white/[0.03] border border-white/[0.06]">
+                    + Framework Requests
+                  </span>
+                  <span className="px-2.5 py-1 rounded-md bg-white/[0.03] border border-white/[0.06]">
+                    + Harness Edge Cases
+                  </span>
                 </div>
               </div>
 
-              <GsapMagnetic strength={0.3}>
+              <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-stretch sm:items-center gap-3 shrink-0">
                 <Link
                   href="/feedback"
-                  className="group shrink-0 w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition-all duration-200 border border-emerald-400/30 hover:border-emerald-300/60 shadow-[0_4px_16px_rgba(16,185,129,0.25)] hover:shadow-[0_4px_22px_rgba(16,185,129,0.4)] active:scale-[0.98]"
+                  className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs transition-colors active:scale-[0.98]"
                 >
                   <span>Share Feedback</span>
-                  <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
-              </GsapMagnetic>
+
+                <a
+                  href="https://github.com/MayankJoshi540/ApiRun/issues"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.08] font-medium text-xs transition-colors"
+                >
+                  <span>GitHub Issues</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
+                </a>
+              </div>
             </div>
           </ScrollReveal>
         </section>

@@ -34,7 +34,8 @@ export const GsapTilt: React.FC<GsapTiltProps> = ({
 
     const rotXTo = gsap.quickTo(el, 'rotationX', { duration: 0.5, ease: 'power2.out' });
     const rotYTo = gsap.quickTo(el, 'rotationY', { duration: 0.5, ease: 'power2.out' });
-    const scaleTo = gsap.quickTo(el, 'scale', { duration: 0.5, ease: 'power2.out' });
+    const scaleXTo = gsap.quickTo(el, 'scaleX', { duration: 0.5, ease: 'power2.out' });
+    const scaleYTo = gsap.quickTo(el, 'scaleY', { duration: 0.5, ease: 'power2.out' });
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = el.getBoundingClientRect();
@@ -49,13 +50,15 @@ export const GsapTilt: React.FC<GsapTiltProps> = ({
 
       rotXTo(rotX);
       rotYTo(rotY);
-      scaleTo(scale);
+      scaleXTo(scale);
+      scaleYTo(scale);
     };
 
     const handleMouseLeave = () => {
       rotXTo(0);
       rotYTo(0);
-      scaleTo(1);
+      scaleXTo(1);
+      scaleYTo(1);
     };
 
     el.addEventListener('mousemove', handleMouseMove);

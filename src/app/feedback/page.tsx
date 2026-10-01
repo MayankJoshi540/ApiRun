@@ -652,13 +652,16 @@ export default function FeedbackPage() {
                     <button
                       key={st}
                       onClick={() => setStatusFilter(st)}
-                      className={`px-2.5 py-1 rounded-md text-xs capitalize transition-colors border font-mono ${
+                      className={`px-2.5 py-1 rounded-md text-xs capitalize transition-colors border font-mono flex items-center space-x-1 ${
                         statusFilter === st
-                          ? 'bg-zinc-800 text-white border-white/20 font-semibold'
+                          ? st === 'closed'
+                            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-semibold'
+                            : 'bg-zinc-800 text-white border-white/20 font-semibold'
                           : 'bg-[#05070a] text-zinc-400 border-white/[0.04] hover:text-zinc-200'
                       }`}
                     >
-                      {st === 'closed' ? 'resolved' : st}
+                      {st === 'closed' && <CheckCircle2 className="w-3 h-3 text-emerald-400" />}
+                      <span>{st === 'closed' ? 'resolved' : st}</span>
                     </button>
                   ))}
                 </div>
@@ -691,7 +694,11 @@ export default function FeedbackPage() {
                     <div
                       key={item.id}
                       onClick={() => setSelectedFeedback(item)}
-                      className="p-5 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08] hover:border-white/20 hover:bg-[#0d131f]/90 transition-all cursor-pointer group flex items-start gap-4 sm:gap-5 relative active:scale-[0.99]"
+                      className={`p-5 rounded-xl bg-[#090d14]/85 backdrop-blur-md border transition-all cursor-pointer group flex items-start gap-4 sm:gap-5 relative active:scale-[0.99] ${
+                        item.status === 'closed'
+                          ? 'border-emerald-500/30 hover:border-emerald-500/60 bg-[#07130e]/40 hover:bg-[#07130e]/60 shadow-[0_0_20px_rgba(16,185,129,0.06)]'
+                          : 'border-white/[0.08] hover:border-white/20 hover:bg-[#0d131f]/90'
+                      }`}
                     >
                       {/* Left: Tactile Vertical Upvote Button */}
                       <div className="shrink-0 pt-0.5">
@@ -738,16 +745,17 @@ export default function FeedbackPage() {
                           </span>
 
                           {/* Status Pill */}
-                          <span
-                            className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono tracking-wider flex items-center space-x-1 ${
-                              item.status === 'open'
-                                ? 'bg-zinc-900 text-emerald-400 border border-emerald-500/20'
-                                : 'bg-zinc-900 text-zinc-400 border border-zinc-700'
-                            }`}
-                          >
-                            <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'open' ? 'bg-emerald-400' : 'bg-zinc-500'}`} />
-                            <span>{item.status === 'closed' ? 'Resolved' : 'Open'}</span>
-                          </span>
+                          {item.status === 'closed' ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-mono font-bold tracking-wider flex items-center space-x-1.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/35 shadow-[0_0_12px_rgba(16,185,129,0.18)]">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                              <span>RESOLVED</span>
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] uppercase font-mono tracking-wider flex items-center space-x-1 bg-zinc-900 text-zinc-300 border border-white/[0.08]">
+                              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0 animate-pulse" />
+                              <span>Open</span>
+                            </span>
+                          )}
 
                           <span className="text-zinc-600 hidden sm:inline">•</span>
 
@@ -1010,16 +1018,17 @@ export default function FeedbackPage() {
                   <div className="flex flex-wrap items-center gap-2 text-xs">
                     
                     {/* Status Badge */}
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 ${
-                        selectedFeedback.status === 'open'
-                          ? 'bg-zinc-900 text-emerald-400 border border-emerald-500/20'
-                          : 'bg-zinc-900 text-zinc-400 border border-zinc-700'
-                      }`}
-                    >
-                      <span className={`w-1.5 h-1.5 rounded-full ${selectedFeedback.status === 'open' ? 'bg-emerald-400' : 'bg-zinc-500'}`} />
-                      <span>{selectedFeedback.status === 'closed' ? 'Resolved' : 'Open'}</span>
-                    </span>
+                    {selectedFeedback.status === 'closed' ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider flex items-center space-x-1.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/35 shadow-[0_0_12px_rgba(16,185,129,0.18)]">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>RESOLVED</span>
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 bg-zinc-900 text-zinc-300 border border-white/[0.08]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0 animate-pulse" />
+                        <span>Open</span>
+                      </span>
+                    )}
 
                     {/* Type Badge */}
                     <span
@@ -1078,20 +1087,29 @@ export default function FeedbackPage() {
 
               {/* Status Notice if Closed */}
               {selectedFeedback.status === 'closed' && (
-                <div className="p-3.5 rounded-xl bg-[#05070a] border border-emerald-500/20 text-xs text-emerald-400 flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <CheckCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>
-                      Marked as resolved {selectedFeedback.closedBy ? `by ${selectedFeedback.closedBy}` : ''}.
-                    </span>
+                <div className="p-4 rounded-xl bg-emerald-950/25 border border-emerald-500/35 text-xs text-emerald-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner">
+                      <CheckCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-white flex items-center space-x-2">
+                        <span className="text-emerald-400 font-mono text-[11px] uppercase tracking-wider">RESOLVED & VERIFIED</span>
+                      </div>
+                      <p className="text-emerald-300/80 text-xs mt-0.5">
+                        This item was marked as resolved {selectedFeedback.closedBy ? `by ${selectedFeedback.closedBy}` : 'by maintainers'}.
+                      </p>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => handleToggleTicketStatus('open')}
-                    disabled={isClosingTicket}
-                    className="text-white hover:underline font-mono font-semibold"
-                  >
-                    Reopen
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleToggleTicketStatus('open')}
+                      disabled={isClosingTicket}
+                      className="px-3 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 hover:text-white border border-white/[0.1] text-xs font-mono font-semibold transition-colors shrink-0"
+                    >
+                      Reopen Issue
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -1122,20 +1140,20 @@ export default function FeedbackPage() {
 
                     <div className="flex items-center space-x-2">
                       
-                      {/* Close Ticket Button */}
+                      {/* Mark as Resolved Button (for admin / moderator) */}
                       {selectedFeedback.status === 'open' && (
                         <button
                           type="button"
                           onClick={() => handleToggleTicketStatus('closed')}
                           disabled={isClosingTicket}
-                          className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-white/10 text-xs font-semibold transition-colors disabled:opacity-50 flex items-center space-x-1.5"
+                          className="px-3.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 hover:text-emerald-300 border border-emerald-500/35 text-xs font-semibold transition-all disabled:opacity-50 flex items-center space-x-1.5 active:scale-95 shadow-[0_0_10px_rgba(16,185,129,0.12)]"
                         >
                           {isClosingTicket ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           ) : (
-                            <Lock className="w-3.5 h-3.5" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                           )}
-                          <span>Close as Resolved</span>
+                          <span>Mark as Resolved</span>
                         </button>
                       )}
 
