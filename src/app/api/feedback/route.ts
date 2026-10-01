@@ -16,6 +16,10 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 export interface FeedbackComment {
   id: string;
   userId?: string;
@@ -47,33 +51,75 @@ export interface FeedbackItem {
   category?: string;
 }
 
-// Fallback path in /tmp for environments where filesystem writes are needed
+const ADMIN_EMAILS = ['joshimayank646@gmail.com'];
+
+function isModerator(userEmail?: string, userRole?: string): boolean {
+  if (userRole === 'admin') return true;
+  if (userEmail && ADMIN_EMAILS.includes(userEmail.toLowerCase().trim())) return true;
+  return false;
+}
+
+// Local and tmp fallback storage paths
+const LOCAL_PATH = path.join(process.cwd(), 'feedbacks.json');
 const FALLBACK_TMP_PATH = path.join(os.tmpdir(), 'apirun_feedbacks_db.json');
 
 function readFallbackFeedbacks(): FeedbackItem[] {
+  const mergedMap = new Map<string, FeedbackItem>();
+
+  // 1. Read from local project feedbacks.json if exists
+  try {
+    if (fs.existsSync(LOCAL_PATH)) {
+      const raw = fs.readFileSync(LOCAL_PATH, 'utf-8');
+      const list = JSON.parse(raw);
+      if (Array.isArray(list)) {
+        list.forEach((item: FeedbackItem) => {
+          if (item?.id) mergedMap.set(item.id, item);
+        });
+      }
+    }
+  } catch (err) {
+    // Ignore read error
+  }
+
+  // 2. Read from tmp file if exists
   try {
     if (fs.existsSync(FALLBACK_TMP_PATH)) {
       const raw = fs.readFileSync(FALLBACK_TMP_PATH, 'utf-8');
       const list = JSON.parse(raw);
       if (Array.isArray(list)) {
-        return list;
+        list.forEach((item: FeedbackItem) => {
+          if (item?.id) mergedMap.set(item.id, item);
+        });
       }
     }
   } catch (err) {
-    console.warn('Fallback file read error:', err);
+    // Ignore read error
   }
-  return [];
+
+  return Array.from(mergedMap.values()).sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 }
 
 function writeFallbackFeedbacks(list: FeedbackItem[]) {
+  const jsonStr = JSON.stringify(list, null, 2);
+
+  // Try writing to local project file (for local dev persistence)
   try {
-    fs.writeFileSync(FALLBACK_TMP_PATH, JSON.stringify(list, null, 2), 'utf-8');
+    fs.writeFileSync(LOCAL_PATH, jsonStr, 'utf-8');
   } catch (err) {
-    console.warn('Fallback file write failed:', err);
+    // Expected to fail on read-only serverless filesystems (e.g., Vercel)
+  }
+
+  // Always write to os.tmpdir() (writable in serverless)
+  try {
+    fs.writeFileSync(FALLBACK_TMP_PATH, jsonStr, 'utf-8');
+  } catch (err) {
+    console.warn('Fallback tmp file write failed:', err);
   }
 }
 
-// GET: Retrieve all feedback items (from Firestore / DB)
+// GET: Retrieve all feedback items (from Firestore / DB & Fallback Store)
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -81,16 +127,24 @@ export async function GET(req: NextRequest) {
     const statusFilter = searchParams.get('status') || 'all'; // all, open, closed
     const sortBy = searchParams.get('sort') || 'hot'; // hot, top, new
 
-    let feedbacks: FeedbackItem[] = [];
+    const feedbackMap = new Map<string, FeedbackItem>();
 
+    // 1. Read local / tmp store first
+    const localFeedbacks = readFallbackFeedbacks();
+    localFeedbacks.forEach((fb) => {
+      if (fb?.id) feedbackMap.set(fb.id, fb);
+    });
+
+    // 2. Read from Firestore if configured
     if (db) {
       try {
         const q = query(collection(db, 'feedbacks'), orderBy('createdAt', 'desc'), limit(200));
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data() as any;
-          feedbacks.push({
-            id: docSnap.id,
+          const id = docSnap.id;
+          feedbackMap.set(id, {
+            id: id,
             title: data.title || data.subject || 'Untitled Feedback',
             description: data.description || data.message || '',
             type: data.type || (data.category === 'Bug Report' ? 'bug' : 'suggestion'),
@@ -116,11 +170,10 @@ export async function GET(req: NextRequest) {
         });
       } catch (err) {
         console.warn('Firestore getDocs fallback to local store:', err);
-        feedbacks = readFallbackFeedbacks();
       }
-    } else {
-      feedbacks = readFallbackFeedbacks();
     }
+
+    let feedbacks = Array.from(feedbackMap.values());
 
     // Calculate total and category counts across entire collection
     const counts = {
@@ -161,12 +214,19 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({
-      success: true,
-      total: feedbacks.length,
-      counts,
-      feedbacks: filtered,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        total: feedbacks.length,
+        counts,
+        feedbacks: filtered,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        },
+      }
+    );
   } catch (error: any) {
     console.error('Error in GET /api/feedback:', error);
     return NextResponse.json(
@@ -203,7 +263,7 @@ export async function POST(req: NextRequest) {
 
     const generatedId = `fb_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-    // Everyone is stored as anonymous by default
+    // Stored anonymously by default
     const newFeedback: FeedbackItem = {
       id: generatedId,
       title: finalTitle,
@@ -223,24 +283,24 @@ export async function POST(req: NextRequest) {
       category: category || (type === 'bug' ? 'Bug Report' : 'Feature Request'),
     };
 
-    let savedStorage = 'Firestore Database';
+    // 1. Persist to local fallback storage immediately
+    const list = readFallbackFeedbacks();
+    list.unshift(newFeedback);
+    writeFallbackFeedbacks(list);
 
+    // 2. Persist to Firestore if available
     if (db) {
       try {
         const docRef = await addDoc(collection(db, 'feedbacks'), newFeedback);
         newFeedback.id = docRef.id;
+        // Update local store with the Firestore doc ID if assigned
+        const updatedList = readFallbackFeedbacks().map((item) =>
+          item.id === generatedId ? { ...item, id: docRef.id } : item
+        );
+        writeFallbackFeedbacks(updatedList);
       } catch (err) {
-        console.warn('Firestore addDoc failed, writing to fallback store:', err);
-        const list = readFallbackFeedbacks();
-        list.unshift(newFeedback);
-        writeFallbackFeedbacks(list);
-        savedStorage = 'Local Fallback Storage';
+        console.warn('Firestore addDoc fallback used:', err);
       }
-    } else {
-      const list = readFallbackFeedbacks();
-      list.unshift(newFeedback);
-      writeFallbackFeedbacks(list);
-      savedStorage = 'Local Fallback Storage';
     }
 
     return NextResponse.json(
@@ -248,7 +308,6 @@ export async function POST(req: NextRequest) {
         success: true,
         message: 'Feedback submitted successfully!',
         feedback: newFeedback,
-        savedTo: savedStorage,
       },
       { status: 201 }
     );
@@ -265,7 +324,7 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { action, feedbackId, userId, userName, userRole, content, status, closingNote } = body;
+    const { action, feedbackId, userId, userName, userRole, userEmail, content, status, closingNote } = body;
 
     if (!feedbackId) {
       return NextResponse.json({ error: 'feedbackId is required' }, { status: 400 });
@@ -326,15 +385,15 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ error: 'Comment content cannot be empty' }, { status: 400 });
       }
 
-      const isModerator = userRole === 'admin' || userName?.toLowerCase().includes('moderator') || userName?.toLowerCase().includes('admin');
+      const isMod = isModerator(userEmail, userRole) || userName?.toLowerCase().includes('moderator');
 
       const newComment: FeedbackComment = {
         id: `c_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         userId: userId || undefined,
-        userName: isModerator ? 'Moderator' : 'Anonymous',
-        userRole: isModerator ? 'admin' : 'user',
+        userName: isMod ? 'Moderator' : 'Anonymous',
+        userRole: isMod ? 'admin' : 'user',
         content: content.trim(),
-        isAnonymous: !isModerator,
+        isAnonymous: !isMod,
         createdAt: new Date().toISOString(),
       };
 
@@ -371,10 +430,18 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: true, comment: newComment, feedback: updatedItem });
     }
 
-    // ACTION 3: Close or Reopen Feedback Ticket
+    // ACTION 3: Close or Reopen Feedback Ticket (STRICTLY MODERATOR ONLY)
     if (action === 'status' || action === 'close' || action === 'reopen') {
+      const isMod = isModerator(userEmail, userRole);
+      if (!isMod) {
+        return NextResponse.json(
+          { error: 'Unauthorized: Only the moderator (joshimayank646@gmail.com) can resolve or reopen feedback tickets.' },
+          { status: 403 }
+        );
+      }
+
       const nextStatus: 'open' | 'closed' = (action === 'reopen' || status === 'open') ? 'open' : 'closed';
-      const actorName = userRole === 'admin' ? 'Moderator' : 'Anonymous';
+      const actorName = 'Moderator';
 
       let updatedItem: FeedbackItem | null = null;
 
@@ -394,9 +461,9 @@ export async function PATCH(req: NextRequest) {
             id: `c_${Date.now()}_res`,
             userId: userId || undefined,
             userName: actorName,
-            userRole: userRole === 'admin' ? 'admin' : 'user',
+            userRole: 'admin',
             content: `[Resolution]: ${closingNote.trim()}`,
-            isAnonymous: userRole !== 'admin',
+            isAnonymous: false,
             createdAt: new Date().toISOString(),
           };
           item.comments = item.comments || [];
@@ -425,9 +492,9 @@ export async function PATCH(req: NextRequest) {
                 id: `c_${Date.now()}_res`,
                 userId: userId || undefined,
                 userName: actorName,
-                userRole: userRole === 'admin' ? 'admin' : 'user',
+                userRole: 'admin',
                 content: `[Resolution]: ${closingNote.trim()}`,
-                isAnonymous: userRole !== 'admin',
+                isAnonymous: false,
                 createdAt: new Date().toISOString(),
               };
               const currentComments = Array.isArray(snap.data()?.comments) ? snap.data().comments : [];
@@ -461,14 +528,19 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-// DELETE: Moderator Delete Feedback permanently
+// DELETE: Moderator Delete Feedback permanently (STRICTLY MODERATOR ONLY)
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const feedbackId = searchParams.get('id');
+    const userEmail = req.headers.get('x-user-email') || searchParams.get('email');
 
     if (!feedbackId) {
       return NextResponse.json({ error: 'Feedback id is required for deletion' }, { status: 400 });
+    }
+
+    if (userEmail && !ADMIN_EMAILS.includes(userEmail.toLowerCase().trim())) {
+      return NextResponse.json({ error: 'Unauthorized: Only moderator can delete feedback' }, { status: 403 });
     }
 
     // 1. Remove from local fallback file

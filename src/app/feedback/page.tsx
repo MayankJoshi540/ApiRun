@@ -109,7 +109,16 @@ export default function FeedbackPage() {
   const fetchFeedbacks = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/feedback?type=${activeTypeTab}&sort=${activeSort}&status=${statusFilter}`);
+      const res = await fetch(
+        `/api/feedback?type=${activeTypeTab}&sort=${activeSort}&status=${statusFilter}&_t=${Date.now()}`,
+        {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+            Pragma: 'no-cache',
+          },
+        }
+      );
       if (!res.ok) throw new Error('Failed to fetch feedbacks.');
       const data = await res.json();
       setFeedbacks(data.feedbacks || []);
@@ -182,14 +191,22 @@ export default function FeedbackPage() {
   const handleDeleteFeedback = async (feedbackId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
 
+    if (!isAdmin) {
+      alert('Only the moderator (joshimayank646@gmail.com) can delete feedback items.');
+      return;
+    }
+
     const confirmed = window.confirm('Are you sure you want to permanently delete this feedback?');
     if (!confirmed) return;
 
     try {
       setDeletingId(feedbackId);
 
-      const res = await fetch(`/api/feedback?id=${encodeURIComponent(feedbackId)}`, {
+      const res = await fetch(`/api/feedback?id=${encodeURIComponent(feedbackId)}&email=${encodeURIComponent(user?.email || '')}`, {
         method: 'DELETE',
+        headers: {
+          'x-user-email': user?.email || '',
+        },
       });
 
       if (!res.ok) throw new Error('Failed to delete feedback');
@@ -209,7 +226,7 @@ export default function FeedbackPage() {
     }
   };
 
-  // Handle New Feedback Form Submission (Stored anonymously)
+  // Handle New Feedback Form Submission (Stored anonymously, shows in main immediately)
   const handleSubmitFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formTitle.trim() || !formDescription.trim()) {
@@ -236,9 +253,27 @@ export default function FeedbackPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to submit feedback.');
 
-      setFormSuccessMessage('Feedback recorded and saved to live database!');
+      // Optimistically insert newly created feedback immediately at the top of feed
+      if (data.feedback) {
+        setFeedbacks((prev) => [data.feedback, ...prev.filter((fb) => fb.id !== data.feedback.id)]);
+        setCounts((prev) => ({
+          ...prev,
+          all: prev.all + 1,
+          open: prev.open + 1,
+          [data.feedback.type === 'bug' ? 'bugs' : 'suggestions']:
+            prev[data.feedback.type === 'bug' ? 'bugs' : 'suggestions'] + 1,
+        }));
+      }
+
+      setFormSuccessMessage('Feedback recorded and posted to the community feed!');
       setFormTitle('');
       setFormDescription('');
+
+      // If user had active filters hiding new open feedback, reset them so user sees it right away
+      if (statusFilter === 'closed') {
+        setStatusFilter('all');
+      }
+      setSearchQuery('');
 
       fetchFeedbacks();
 
@@ -267,6 +302,7 @@ export default function FeedbackPage() {
           userId: currentUserId,
           userName: isAdmin ? 'Moderator' : 'Anonymous',
           userRole: isAdmin ? 'admin' : 'user',
+          userEmail: user?.email || undefined,
           content: commentText.trim(),
         }),
       });
@@ -313,9 +349,14 @@ export default function FeedbackPage() {
     }
   };
 
-  // Handle Closing or Reopening Ticket
+  // Handle Closing or Reopening Ticket (STRICTLY MODERATOR ONLY)
   const handleToggleTicketStatus = async (targetStatus: 'closed' | 'open') => {
     if (!selectedFeedback) return;
+
+    if (!isAdmin) {
+      alert('Only the moderator (joshimayank646@gmail.com) is authorized to resolve or reopen feedback tickets.');
+      return;
+    }
 
     try {
       setIsClosingTicket(true);
@@ -328,8 +369,9 @@ export default function FeedbackPage() {
           status: targetStatus,
           feedbackId: selectedFeedback.id,
           userId: currentUserId,
-          userName: isAdmin ? 'Moderator' : 'Anonymous',
-          userRole: isAdmin ? 'admin' : 'user',
+          userName: 'Moderator',
+          userRole: 'admin',
+          userEmail: user?.email || undefined,
           closingNote: commentText.trim() ? commentText.trim() : undefined,
         }),
       });
@@ -341,7 +383,7 @@ export default function FeedbackPage() {
         ...selectedFeedback,
         status: targetStatus,
         closedAt: targetStatus === 'closed' ? new Date().toISOString() : undefined,
-        closedBy: targetStatus === 'closed' ? (isAdmin ? 'Moderator' : 'Anonymous') : undefined,
+        closedBy: targetStatus === 'closed' ? 'Moderator' : undefined,
       };
 
       setSelectedFeedback(updated);
@@ -354,8 +396,9 @@ export default function FeedbackPage() {
       }
 
       fetchFeedbacks();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error toggling ticket status:', err);
+      alert(err.message || 'Failed to update ticket status.');
     } finally {
       setIsClosingTicket(false);
     }
@@ -1140,8 +1183,8 @@ export default function FeedbackPage() {
 
                     <div className="flex items-center space-x-2">
                       
-                      {/* Mark as Resolved Button (for admin / moderator) */}
-                      {selectedFeedback.status === 'open' && (
+                      {/* Mark as Resolved Button (STRICTLY MODERATOR ONLY: joshimayank646@gmail.com) */}
+                      {isAdmin && selectedFeedback.status === 'open' && (
                         <button
                           type="button"
                           onClick={() => handleToggleTicketStatus('closed')}
