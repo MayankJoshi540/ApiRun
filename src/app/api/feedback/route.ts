@@ -16,6 +16,10 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 export interface FeedbackComment {
   id: string;
   userId?: string;
@@ -210,12 +214,19 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({
-      success: true,
-      total: feedbacks.length,
-      counts,
-      feedbacks: filtered,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        total: feedbacks.length,
+        counts,
+        feedbacks: filtered,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        },
+      }
+    );
   } catch (error: any) {
     console.error('Error in GET /api/feedback:', error);
     return NextResponse.json(

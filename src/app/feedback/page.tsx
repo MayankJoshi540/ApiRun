@@ -109,7 +109,16 @@ export default function FeedbackPage() {
   const fetchFeedbacks = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/feedback?type=${activeTypeTab}&sort=${activeSort}&status=${statusFilter}`);
+      const res = await fetch(
+        `/api/feedback?type=${activeTypeTab}&sort=${activeSort}&status=${statusFilter}&_t=${Date.now()}`,
+        {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+            Pragma: 'no-cache',
+          },
+        }
+      );
       if (!res.ok) throw new Error('Failed to fetch feedbacks.');
       const data = await res.json();
       setFeedbacks(data.feedbacks || []);
