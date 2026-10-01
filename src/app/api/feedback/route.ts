@@ -1,17 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { 
-  collection, 
-  addDoc, 
-  getDocs, 
-  query, 
-  orderBy, 
-  limit, 
-  doc, 
-  getDoc, 
-  updateDoc,
-  deleteDoc 
-} from 'firebase/firestore';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -52,6 +39,8 @@ export interface FeedbackItem {
 }
 
 const ADMIN_EMAILS = ['joshimayank646@gmail.com'];
+const PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'apirun-2c70e';
+const FIRESTORE_API_BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/feedbacks`;
 
 function isModerator(userEmail?: string, userRole?: string): boolean {
   if (userRole === 'admin') return true;
@@ -59,14 +48,114 @@ function isModerator(userEmail?: string, userRole?: string): boolean {
   return false;
 }
 
-// Local and tmp fallback storage paths
+// Convert FeedbackItem to Google Firestore REST JSON format
+function toFirestoreFields(item: FeedbackItem) {
+  return {
+    fields: {
+      id: { stringValue: item.id },
+      title: { stringValue: item.title },
+      description: { stringValue: item.description },
+      type: { stringValue: item.type },
+      status: { stringValue: item.status },
+      isAnonymous: { booleanValue: Boolean(item.isAnonymous) },
+      userId: item.userId ? { stringValue: item.userId } : { nullValue: null },
+      userName: { stringValue: item.userName || 'Anonymous Developer' },
+      upvotesCount: { integerValue: String(item.upvotesCount || 0) },
+      upvotedBy: {
+        arrayValue: {
+          values: (item.upvotedBy || []).map((id) => ({ stringValue: id })),
+        },
+      },
+      commentsCount: { integerValue: String(item.commentsCount || 0) },
+      comments: {
+        arrayValue: {
+          values: (item.comments || []).map((c) => ({
+            mapValue: {
+              fields: {
+                id: { stringValue: c.id },
+                userName: { stringValue: c.userName },
+                userRole: { stringValue: c.userRole || 'user' },
+                content: { stringValue: c.content },
+                isAnonymous: { booleanValue: Boolean(c.isAnonymous) },
+                createdAt: { stringValue: c.createdAt },
+              },
+            },
+          })),
+        },
+      },
+      createdAt: { stringValue: item.createdAt || new Date().toISOString() },
+      closedAt: item.closedAt ? { stringValue: item.closedAt } : { nullValue: null },
+      closedBy: item.closedBy ? { stringValue: item.closedBy } : { nullValue: null },
+      rating: { integerValue: String(item.rating || 5) },
+      category: { stringValue: item.category || (item.type === 'bug' ? 'Bug Report' : 'Feature Request') },
+    },
+  };
+}
+
+// Parse Google Firestore REST JSON document into FeedbackItem
+function fromFirestoreDoc(doc: any): FeedbackItem | null {
+  try {
+    if (!doc || !doc.fields) return null;
+    const f = doc.fields;
+    const pathParts = (doc.name || '').split('/');
+    const docId = f.id?.stringValue || pathParts[pathParts.length - 1];
+
+    const comments: FeedbackComment[] = [];
+    if (f.comments?.arrayValue?.values) {
+      f.comments.arrayValue.values.forEach((v: any) => {
+        const cf = v.mapValue?.fields;
+        if (cf) {
+          comments.push({
+            id: cf.id?.stringValue || `c_${Date.now()}`,
+            userName: cf.userName?.stringValue || 'Anonymous',
+            userRole: (cf.userRole?.stringValue as any) || 'user',
+            content: cf.content?.stringValue || '',
+            isAnonymous: Boolean(cf.isAnonymous?.booleanValue),
+            createdAt: cf.createdAt?.stringValue || new Date().toISOString(),
+          });
+        }
+      });
+    }
+
+    const upvotedBy: string[] = [];
+    if (f.upvotedBy?.arrayValue?.values) {
+      f.upvotedBy.arrayValue.values.forEach((v: any) => {
+        if (v.stringValue) upvotedBy.push(v.stringValue);
+      });
+    }
+
+    return {
+      id: docId,
+      title: f.title?.stringValue || 'Untitled',
+      description: f.description?.stringValue || '',
+      type: (f.type?.stringValue === 'bug' ? 'bug' : 'suggestion') as 'suggestion' | 'bug',
+      status: (f.status?.stringValue === 'closed' ? 'closed' : 'open') as 'open' | 'closed',
+      isAnonymous: true,
+      userId: f.userId?.stringValue || undefined,
+      userName: 'Anonymous Developer',
+      upvotesCount: parseInt(f.upvotesCount?.integerValue || '0', 10),
+      upvotedBy,
+      commentsCount: parseInt(f.commentsCount?.integerValue || String(comments.length), 10),
+      comments,
+      createdAt: f.createdAt?.stringValue || new Date().toISOString(),
+      closedAt: f.closedAt?.stringValue || undefined,
+      closedBy: f.closedBy?.stringValue || undefined,
+      rating: parseInt(f.rating?.integerValue || '5', 10),
+      category: f.category?.stringValue,
+    };
+  } catch (err) {
+    console.warn('Error parsing firestore doc:', err);
+    return null;
+  }
+}
+
+// Local fallback storage
 const LOCAL_PATH = path.join(process.cwd(), 'feedbacks.json');
 const FALLBACK_TMP_PATH = path.join(os.tmpdir(), 'apirun_feedbacks_db.json');
 
 function readFallbackFeedbacks(): FeedbackItem[] {
   const mergedMap = new Map<string, FeedbackItem>();
 
-  // 1. Read from local project feedbacks.json if exists
   try {
     if (fs.existsSync(LOCAL_PATH)) {
       const raw = fs.readFileSync(LOCAL_PATH, 'utf-8');
@@ -77,11 +166,8 @@ function readFallbackFeedbacks(): FeedbackItem[] {
         });
       }
     }
-  } catch (err) {
-    // Ignore read error
-  }
+  } catch {}
 
-  // 2. Read from tmp file if exists
   try {
     if (fs.existsSync(FALLBACK_TMP_PATH)) {
       const raw = fs.readFileSync(FALLBACK_TMP_PATH, 'utf-8');
@@ -92,90 +178,65 @@ function readFallbackFeedbacks(): FeedbackItem[] {
         });
       }
     }
-  } catch (err) {
-    // Ignore read error
-  }
+  } catch {}
 
-  return Array.from(mergedMap.values()).sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  return Array.from(mergedMap.values());
 }
 
 function writeFallbackFeedbacks(list: FeedbackItem[]) {
   const jsonStr = JSON.stringify(list, null, 2);
-
-  // Try writing to local project file (for local dev persistence)
   try {
     fs.writeFileSync(LOCAL_PATH, jsonStr, 'utf-8');
-  } catch (err) {
-    // Expected to fail on read-only serverless filesystems (e.g., Vercel)
-  }
-
-  // Always write to os.tmpdir() (writable in serverless)
+  } catch {}
   try {
     fs.writeFileSync(FALLBACK_TMP_PATH, jsonStr, 'utf-8');
-  } catch (err) {
-    console.warn('Fallback tmp file write failed:', err);
-  }
+  } catch {}
 }
 
-// GET: Retrieve all feedback items (from Firestore / DB & Fallback Store)
+// GET: Retrieve all feedback items (Cloud Firestore REST API + Local Fallback)
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const typeFilter = searchParams.get('type') || 'all'; // all, suggestions, bugs
-    const statusFilter = searchParams.get('status') || 'all'; // all, open, closed
-    const sortBy = searchParams.get('sort') || 'hot'; // hot, top, new
+    const typeFilter = searchParams.get('type') || 'all';
+    const statusFilter = searchParams.get('status') || 'all';
+    const sortBy = searchParams.get('sort') || 'hot';
 
     const feedbackMap = new Map<string, FeedbackItem>();
 
-    // 1. Read local / tmp store first
+    // 1. Fetch live from Firestore REST API (Works in 100% of environments including Vercel)
+    try {
+      const firestoreRes = await fetch(`${FIRESTORE_API_BASE}?pageSize=300`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' },
+      });
+
+      if (firestoreRes.ok) {
+        const data = await firestoreRes.json();
+        if (data.documents && Array.isArray(data.documents)) {
+          data.documents.forEach((d: any) => {
+            const item = fromFirestoreDoc(d);
+            if (item && item.id) {
+              feedbackMap.set(item.id, item);
+            }
+          });
+        }
+      } else {
+        console.warn('Firestore REST fetch status:', firestoreRes.status);
+      }
+    } catch (err) {
+      console.warn('Firestore REST fetch error:', err);
+    }
+
+    // 2. Merge local fallback items
     const localFeedbacks = readFallbackFeedbacks();
     localFeedbacks.forEach((fb) => {
-      if (fb?.id) feedbackMap.set(fb.id, fb);
-    });
-
-    // 2. Read from Firestore if configured
-    if (db) {
-      try {
-        const q = query(collection(db, 'feedbacks'), orderBy('createdAt', 'desc'), limit(200));
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data() as any;
-          const id = docSnap.id;
-          feedbackMap.set(id, {
-            id: id,
-            title: data.title || data.subject || 'Untitled Feedback',
-            description: data.description || data.message || '',
-            type: data.type || (data.category === 'Bug Report' ? 'bug' : 'suggestion'),
-            status: data.status || 'open',
-            isAnonymous: true,
-            userId: data.userId || data.user_id,
-            userName: 'Anonymous Developer',
-            userEmail: undefined,
-            upvotesCount: typeof data.upvotesCount === 'number' ? data.upvotesCount : (data.upvotes_count || 1),
-            upvotedBy: Array.isArray(data.upvotedBy) ? data.upvotedBy : (data.upvoted_by || []),
-            commentsCount: typeof data.commentsCount === 'number' ? data.commentsCount : (data.comments?.length || 0),
-            comments: Array.isArray(data.comments) ? data.comments.map((c: any) => ({
-              ...c,
-              userName: c.userRole === 'admin' && !c.isAnonymous ? (c.userName || 'Moderator') : 'Anonymous',
-              isAnonymous: c.userRole === 'admin' && !c.isAnonymous ? false : true,
-            })) : [],
-            createdAt: data.createdAt || data.timestamp || new Date().toISOString(),
-            closedAt: data.closedAt,
-            closedBy: data.closedBy,
-            category: data.category,
-            rating: data.rating,
-          });
-        });
-      } catch (err) {
-        console.warn('Firestore getDocs fallback to local store:', err);
+      if (fb?.id && !feedbackMap.has(fb.id)) {
+        feedbackMap.set(fb.id, fb);
       }
-    }
+    });
 
     let feedbacks = Array.from(feedbackMap.values());
 
-    // Calculate total and category counts across entire collection
     const counts = {
       all: feedbacks.length,
       suggestions: feedbacks.filter((f) => f.type === 'suggestion').length,
@@ -184,7 +245,6 @@ export async function GET(req: NextRequest) {
       closed: feedbacks.filter((f) => f.status === 'closed').length,
     };
 
-    // Apply filtering
     let filtered = [...feedbacks];
 
     if (typeFilter === 'suggestions' || typeFilter === 'suggestion') {
@@ -199,13 +259,11 @@ export async function GET(req: NextRequest) {
       filtered = filtered.filter((f) => f.status === 'closed');
     }
 
-    // Apply sorting
     if (sortBy === 'top') {
       filtered.sort((a, b) => b.upvotesCount - a.upvotesCount);
     } else if (sortBy === 'new') {
       filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } else {
-      // 'hot'
       filtered.sort((a, b) => {
         const scoreA = a.upvotesCount * 3 + (a.commentsCount || 0) * 2;
         const scoreB = b.upvotesCount * 3 + (b.commentsCount || 0) * 2;
@@ -263,7 +321,6 @@ export async function POST(req: NextRequest) {
 
     const generatedId = `fb_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-    // Stored anonymously by default
     const newFeedback: FeedbackItem = {
       id: generatedId,
       title: finalTitle,
@@ -283,25 +340,24 @@ export async function POST(req: NextRequest) {
       category: category || (type === 'bug' ? 'Bug Report' : 'Feature Request'),
     };
 
-    // 1. Persist to local fallback storage immediately
+    // 1. Save to Cloud Firestore REST API directly
+    try {
+      const fsRes = await fetch(`${FIRESTORE_API_BASE}/${generatedId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(toFirestoreFields(newFeedback)),
+      });
+      if (!fsRes.ok) {
+        console.warn('Firestore REST POST status:', fsRes.status);
+      }
+    } catch (err) {
+      console.warn('Firestore REST write error:', err);
+    }
+
+    // 2. Save to local fallback storage
     const list = readFallbackFeedbacks();
     list.unshift(newFeedback);
     writeFallbackFeedbacks(list);
-
-    // 2. Persist to Firestore if available
-    if (db) {
-      try {
-        const docRef = await addDoc(collection(db, 'feedbacks'), newFeedback);
-        newFeedback.id = docRef.id;
-        // Update local store with the Firestore doc ID if assigned
-        const updatedList = readFallbackFeedbacks().map((item) =>
-          item.id === generatedId ? { ...item, id: docRef.id } : item
-        );
-        writeFallbackFeedbacks(updatedList);
-      } catch (err) {
-        console.warn('Firestore addDoc fallback used:', err);
-      }
-    }
 
     return NextResponse.json(
       {
@@ -330,53 +386,52 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'feedbackId is required' }, { status: 400 });
     }
 
-    const fallbackList = readFallbackFeedbacks();
-    const fallbackItemIndex = fallbackList.findIndex((f) => f.id === feedbackId);
+    // Fetch existing document from Firestore REST
+    let currentItem: FeedbackItem | null = null;
+    try {
+      const getRes = await fetch(`${FIRESTORE_API_BASE}/${feedbackId}`, { cache: 'no-store' });
+      if (getRes.ok) {
+        const rawDoc = await getRes.json();
+        currentItem = fromFirestoreDoc(rawDoc);
+      }
+    } catch {}
+
+    if (!currentItem) {
+      const localList = readFallbackFeedbacks();
+      currentItem = localList.find((f) => f.id === feedbackId) || null;
+    }
+
+    if (!currentItem) {
+      return NextResponse.json({ error: 'Feedback item not found' }, { status: 404 });
+    }
 
     // ACTION 1: Upvote toggle
     if (action === 'vote') {
       const voterId = userId || 'anon_client';
-      let updatedItem: FeedbackItem | null = null;
-
-      if (fallbackItemIndex !== -1) {
-        const item = fallbackList[fallbackItemIndex];
-        const hasVoted = item.upvotedBy.includes(voterId);
-        if (hasVoted) {
-          item.upvotedBy = item.upvotedBy.filter((id) => id !== voterId);
-          item.upvotesCount = Math.max(0, item.upvotesCount - 1);
-        } else {
-          item.upvotedBy.push(voterId);
-          item.upvotesCount += 1;
-        }
-        fallbackList[fallbackItemIndex] = item;
-        writeFallbackFeedbacks(fallbackList);
-        updatedItem = item;
+      const hasVoted = currentItem.upvotedBy.includes(voterId);
+      
+      if (hasVoted) {
+        currentItem.upvotedBy = currentItem.upvotedBy.filter((id) => id !== voterId);
+        currentItem.upvotesCount = Math.max(0, currentItem.upvotesCount - 1);
+      } else {
+        currentItem.upvotedBy.push(voterId);
+        currentItem.upvotesCount += 1;
       }
 
-      if (db) {
-        try {
-          const docRef = doc(db, 'feedbacks', feedbackId);
-          const snap = await getDoc(docRef);
-          if (snap.exists()) {
-            const data = snap.data() as FeedbackItem;
-            const currentVotes = Array.isArray(data.upvotedBy) ? data.upvotedBy : [];
-            const hasVoted = currentVotes.includes(voterId);
-            const nextVotes = hasVoted 
-              ? currentVotes.filter((id) => id !== voterId) 
-              : [...currentVotes, voterId];
-            const nextCount = Math.max(0, (data.upvotesCount || 0) + (hasVoted ? -1 : 1));
+      // Save back to Firestore REST
+      try {
+        await fetch(`${FIRESTORE_API_BASE}/${feedbackId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(toFirestoreFields(currentItem)),
+        });
+      } catch {}
 
-            await updateDoc(docRef, {
-              upvotedBy: nextVotes,
-              upvotesCount: nextCount,
-            });
-          }
-        } catch (err) {
-          console.warn('Firestore vote update error:', err);
-        }
-      }
+      // Save to local fallback
+      const localList = readFallbackFeedbacks().map((f) => (f.id === feedbackId ? currentItem! : f));
+      writeFallbackFeedbacks(localList);
 
-      return NextResponse.json({ success: true, feedback: updatedItem });
+      return NextResponse.json({ success: true, feedback: currentItem });
     }
 
     // ACTION 2: Post Comment / Reply
@@ -397,37 +452,24 @@ export async function PATCH(req: NextRequest) {
         createdAt: new Date().toISOString(),
       };
 
-      let updatedItem: FeedbackItem | null = null;
+      currentItem.comments = currentItem.comments || [];
+      currentItem.comments.push(newComment);
+      currentItem.commentsCount = currentItem.comments.length;
 
-      if (fallbackItemIndex !== -1) {
-        const item = fallbackList[fallbackItemIndex];
-        item.comments = item.comments || [];
-        item.comments.push(newComment);
-        item.commentsCount = item.comments.length;
-        fallbackList[fallbackItemIndex] = item;
-        writeFallbackFeedbacks(fallbackList);
-        updatedItem = item;
-      }
+      // Save back to Firestore REST
+      try {
+        await fetch(`${FIRESTORE_API_BASE}/${feedbackId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(toFirestoreFields(currentItem)),
+        });
+      } catch {}
 
-      if (db) {
-        try {
-          const docRef = doc(db, 'feedbacks', feedbackId);
-          const snap = await getDoc(docRef);
-          if (snap.exists()) {
-            const data = snap.data() as FeedbackItem;
-            const currentComments = Array.isArray(data.comments) ? data.comments : [];
-            currentComments.push(newComment);
-            await updateDoc(docRef, {
-              comments: currentComments,
-              commentsCount: currentComments.length,
-            });
-          }
-        } catch (err) {
-          console.warn('Firestore comment update error:', err);
-        }
-      }
+      // Save to local fallback
+      const localList = readFallbackFeedbacks().map((f) => (f.id === feedbackId ? currentItem! : f));
+      writeFallbackFeedbacks(localList);
 
-      return NextResponse.json({ success: true, comment: newComment, feedback: updatedItem });
+      return NextResponse.json({ success: true, comment: newComment, feedback: currentItem });
     }
 
     // ACTION 3: Close or Reopen Feedback Ticket (STRICTLY MODERATOR ONLY)
@@ -443,78 +485,48 @@ export async function PATCH(req: NextRequest) {
       const nextStatus: 'open' | 'closed' = (action === 'reopen' || status === 'open') ? 'open' : 'closed';
       const actorName = 'Moderator';
 
-      let updatedItem: FeedbackItem | null = null;
-
-      if (fallbackItemIndex !== -1) {
-        const item = fallbackList[fallbackItemIndex];
-        item.status = nextStatus;
-        if (nextStatus === 'closed') {
-          item.closedAt = new Date().toISOString();
-          item.closedBy = actorName;
-        } else {
-          item.closedAt = undefined;
-          item.closedBy = undefined;
-        }
-
-        if (closingNote && closingNote.trim()) {
-          const noteComment: FeedbackComment = {
-            id: `c_${Date.now()}_res`,
-            userId: userId || undefined,
-            userName: actorName,
-            userRole: 'admin',
-            content: `[Resolution]: ${closingNote.trim()}`,
-            isAnonymous: false,
-            createdAt: new Date().toISOString(),
-          };
-          item.comments = item.comments || [];
-          item.comments.push(noteComment);
-          item.commentsCount = item.comments.length;
-        }
-
-        fallbackList[fallbackItemIndex] = item;
-        writeFallbackFeedbacks(fallbackList);
-        updatedItem = item;
+      currentItem.status = nextStatus;
+      if (nextStatus === 'closed') {
+        currentItem.closedAt = new Date().toISOString();
+        currentItem.closedBy = actorName;
+      } else {
+        currentItem.closedAt = undefined;
+        currentItem.closedBy = undefined;
       }
 
-      if (db) {
-        try {
-          const docRef = doc(db, 'feedbacks', feedbackId);
-          const snap = await getDoc(docRef);
-          if (snap.exists()) {
-            const updates: any = {
-              status: nextStatus,
-              closedAt: nextStatus === 'closed' ? new Date().toISOString() : null,
-              closedBy: nextStatus === 'closed' ? actorName : null,
-            };
-
-            if (closingNote && closingNote.trim()) {
-              const noteComment: FeedbackComment = {
-                id: `c_${Date.now()}_res`,
-                userId: userId || undefined,
-                userName: actorName,
-                userRole: 'admin',
-                content: `[Resolution]: ${closingNote.trim()}`,
-                isAnonymous: false,
-                createdAt: new Date().toISOString(),
-              };
-              const currentComments = Array.isArray(snap.data()?.comments) ? snap.data().comments : [];
-              currentComments.push(noteComment);
-              updates.comments = currentComments;
-              updates.commentsCount = currentComments.length;
-            }
-
-            await updateDoc(docRef, updates);
-          }
-        } catch (err) {
-          console.warn('Firestore status update error:', err);
-        }
+      if (closingNote && closingNote.trim()) {
+        const noteComment: FeedbackComment = {
+          id: `c_${Date.now()}_res`,
+          userId: userId || undefined,
+          userName: actorName,
+          userRole: 'admin',
+          content: `[Resolution]: ${closingNote.trim()}`,
+          isAnonymous: false,
+          createdAt: new Date().toISOString(),
+        };
+        currentItem.comments = currentItem.comments || [];
+        currentItem.comments.push(noteComment);
+        currentItem.commentsCount = currentItem.comments.length;
       }
+
+      // Save back to Firestore REST
+      try {
+        await fetch(`${FIRESTORE_API_BASE}/${feedbackId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(toFirestoreFields(currentItem)),
+        });
+      } catch {}
+
+      // Save to local fallback
+      const localList = readFallbackFeedbacks().map((f) => (f.id === feedbackId ? currentItem! : f));
+      writeFallbackFeedbacks(localList);
 
       return NextResponse.json({ 
         success: true, 
         message: `Feedback marked as ${nextStatus}`, 
         status: nextStatus,
-        feedback: updatedItem 
+        feedback: currentItem 
       });
     }
 
@@ -543,20 +555,19 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized: Only moderator can delete feedback' }, { status: 403 });
     }
 
-    // 1. Remove from local fallback file
+    // 1. Delete from Cloud Firestore REST API
+    try {
+      await fetch(`${FIRESTORE_API_BASE}/${feedbackId}`, {
+        method: 'DELETE',
+      });
+    } catch (err) {
+      console.warn('Firestore REST delete error:', err);
+    }
+
+    // 2. Remove from local fallback file
     const fallbackList = readFallbackFeedbacks();
     const updatedFallbackList = fallbackList.filter((f) => f.id !== feedbackId);
     writeFallbackFeedbacks(updatedFallbackList);
-
-    // 2. Remove from Firestore if configured
-    if (db) {
-      try {
-        const docRef = doc(db, 'feedbacks', feedbackId);
-        await deleteDoc(docRef);
-      } catch (err) {
-        console.warn('Firestore deleteDoc error:', err);
-      }
-    }
 
     return NextResponse.json({
       success: true,
