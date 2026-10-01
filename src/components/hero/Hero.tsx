@@ -182,20 +182,20 @@ export const Hero: React.FC<HeroProps> = ({ onLaunchArena, onBrowseTracks }) => 
         </Link>
 
         {/* 3-Line Headline with Balanced Width and Bold Typography */}
-        <div className="w-full max-w-md sm:max-w-lg lg:max-w-2xl xl:max-w-3xl mx-auto space-y-1 sm:space-y-1.5 font-sans font-black tracking-tight leading-[1.05] sm:leading-[0.95]">
-          <h1 ref={title1Ref} className="text-[29px] xs:text-[33px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-white font-black drop-shadow-sm">
+        <div className="w-full max-w-4xl mx-auto space-y-1.5 sm:space-y-2 font-sans font-black tracking-tight leading-[1.08]">
+          <h1 ref={title1Ref} className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[64px] xl:text-[70px] text-white font-black drop-shadow-sm">
             Practice Real Backends.
           </h1>
-          <h1 ref={title2Ref} className="text-[29px] xs:text-[33px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-[#f1f5f9] font-black drop-shadow-sm">
+          <h1 ref={title2Ref} className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[64px] xl:text-[70px] text-[#f1f5f9] font-black drop-shadow-sm">
             Defend Edge Cases.
           </h1>
-          <h1 ref={title3Ref} className="text-[29px] xs:text-[33px] sm:text-5xl md:text-[54px] lg:text-[56px] xl:text-[62px] 2xl:text-[68px] text-emerald-400 font-black drop-shadow-[0_0_18px_rgba(52,211,153,0.35)]">
+          <h1 ref={title3Ref} className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[64px] xl:text-[70px] text-emerald-400 font-black drop-shadow-[0_0_20px_rgba(52,211,153,0.35)]">
             Master Production Systems.
           </h1>
         </div>
 
         {/* Subtitle */}
-        <p ref={subRef} className="max-w-md sm:max-w-lg lg:max-w-xl mx-auto text-sm sm:text-base md:text-[17px] text-[#94a3b8] font-normal leading-relaxed pt-0.5 px-2">
+        <p ref={subRef} className="max-w-lg sm:max-w-xl lg:max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-[#94a3b8] font-normal leading-relaxed pt-1 px-2">
           Hands-on backend challenges, real-world scenarios, automated verification, and a path to production-ready skills.
         </p>
 

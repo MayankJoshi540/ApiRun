@@ -42,10 +42,10 @@ out/
 .eslintcache
 .vite
 .cache
-.next/
-out/
-feedbacks.json
+*.tsbuildinfo
+tsconfig.tsbuildinfo
 feedbacks.json
 .agents/skills/emilkowalski-interaction/SKILL.md
 
 .vercel
+

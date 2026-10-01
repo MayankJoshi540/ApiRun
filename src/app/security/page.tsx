@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ShieldCheck, Lock, Server, Cpu } from '@/components/ui/GoogleIcon';
 import { BackendRankNavbar } from '@/components/BackendRankNavbar';
 import { Footer } from '@/components/Footer';
+import { AppBackground } from '@/components/ui/AppBackground';
 
 export default function SecurityPage() {
   const router = useRouter();
@@ -17,7 +18,9 @@ export default function SecurityPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between overflow-hidden">
+      {/* Home Page Background Artwork */}
+      <AppBackground />
       
       {/* Floating Top Navbar */}
       <BackendRankNavbar

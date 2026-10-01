@@ -11,6 +11,7 @@ import {
   Star, 
   Send, 
   CheckCircle2, 
+  CheckCheck,
   Bug, 
   Zap, 
   Loader2, 
@@ -18,12 +19,14 @@ import {
   Clock,
   User as UserIcon,
   ChevronUp,
+  ChevronRight,
   X,
   RefreshCw,
   Search,
   ShieldCheck,
   Lock,
-  Trash2
+  Trash2,
+  Layers
 } from '@/components/ui/Icons';
 
 export interface FeedbackComment {
@@ -123,6 +126,11 @@ export default function FeedbackPage() {
   useEffect(() => {
     fetchFeedbacks();
   }, [fetchFeedbacks]);
+
+  // Aggregate stats
+  const totalUpvotes = useMemo(() => {
+    return feedbacks.reduce((acc, curr) => acc + (curr.upvotesCount || 0), 0);
+  }, [feedbacks]);
 
   // Handle Upvoting
   const handleVote = async (feedbackId: string, e?: React.MouseEvent) => {
@@ -228,7 +236,7 @@ export default function FeedbackPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to submit feedback.');
 
-      setFormSuccessMessage('Feedback submitted anonymously and saved to database!');
+      setFormSuccessMessage('Feedback recorded and saved to live database!');
       setFormTitle('');
       setFormDescription('');
 
@@ -373,6 +381,12 @@ export default function FeedbackPage() {
     }
   };
 
+  const formatTicketNumber = (id: string, index: number) => {
+    if (id.startsWith('fb_sample_')) return `#RFC-00${id.replace('fb_sample_', '')}`;
+    const cleanNum = String(index + 1).padStart(3, '0');
+    return `#RFC-${cleanNum}`;
+  };
+
   const handleNavigate = (tab: 'landing' | 'challenges' | 'progress' | 'feedback' | 'dashboard') => {
     if (tab === 'landing') router.push('/');
     else if (tab === 'progress') router.push('/progress');
@@ -381,8 +395,50 @@ export default function FeedbackPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative flex flex-col justify-between selection:bg-emerald-500/20 selection:text-white">
       
+      {/* 1. Visible Home Page Background Artwork */}
+      <div className="absolute top-0 left-0 right-0 h-[950px] overflow-hidden pointer-events-none z-0">
+        
+        {/* Top Ambient Studio Glow */}
+        <div 
+          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(16, 185, 129, 0.16), rgba(5, 150, 105, 0.04) 50%, transparent 80%)',
+            filter: 'blur(40px)',
+          }}
+        />
+
+        {/* High-Resolution Globe / Grid Artwork (Visible & Crisp) */}
+        <img
+          src="/background.png"
+          alt="APIRun Background"
+          className="absolute inset-0 w-full h-full object-cover object-bottom select-none opacity-75 brightness-105 saturate-[1.05]"
+          style={{ 
+            objectPosition: 'center bottom',
+            minHeight: '100%',
+            minWidth: '100%'
+          }}
+        />
+
+        {/* Radiant Horizon Light Arc */}
+        <div 
+          className="absolute bottom-20 left-1/2 -translate-x-1/2 w-[85%] max-w-4xl h-[160px] pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(52, 211, 153, 0.12) 0%, rgba(16, 185, 129, 0.04) 40%, transparent 75%)',
+            filter: 'blur(50px)',
+          }}
+        />
+
+        {/* Natural Smooth Bottom Fade into Content */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-44 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to bottom, transparent 0%, rgba(5, 7, 8, 0.6) 50%, #050708 100%)'
+          }}
+        />
+      </div>
+
       {/* Top Navigation */}
       <BackendRankNavbar
         activeTab="feedback"
@@ -392,30 +448,30 @@ export default function FeedbackPage() {
       />
 
       {/* Main Feedback Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-20 flex-grow w-full">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-20 flex-grow w-full relative z-10">
         
         {/* Moderator Info Banner (Visible for Admin) */}
         {isAdmin && (
-          <div className="mb-8 p-4 rounded-2xl bg-[#0a0f16] border border-white/[0.1] flex items-center justify-between">
+          <div className="mb-8 p-4 rounded-xl bg-[#090e17]/90 backdrop-blur-md border border-white/[0.12] flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-zinc-300">
-                <ShieldCheck className="w-5 h-5" />
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <ShieldCheck className="w-4 h-4" />
               </div>
               <div>
                 <div className="text-xs font-bold text-white flex items-center space-x-2">
-                  <span>Moderator Controls Active</span>
-                  <span className="px-2 py-0.5 rounded bg-white/[0.08] text-zinc-300 text-[10px] font-mono border border-white/[0.1]">
+                  <span>Moderator Access Active</span>
+                  <span className="px-2 py-0.5 rounded bg-white/[0.06] text-zinc-300 text-[10px] font-mono border border-white/[0.1]">
                     {user?.email}
                   </span>
                 </div>
                 <p className="text-[11px] text-zinc-400">
-                  You can permanently delete feedback items, resolve tickets, and reply as Moderator.
+                  You can permanently delete feedback items, resolve tickets, and post as Moderator.
                 </p>
               </div>
             </div>
             <button
               onClick={fetchFeedbacks}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-white/[0.08] text-xs font-semibold text-white transition-colors"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-white/[0.08] text-xs font-semibold text-white transition-colors"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Refresh</span>
@@ -424,40 +480,78 @@ export default function FeedbackPage() {
         )}
 
         {/* Hero Section */}
-        <div className="text-center mb-12 sm:mb-16 space-y-4">
+        <div className="text-center mb-10 sm:mb-12 space-y-4">
+          
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
             Suggest a{' '}
-            <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-xl inline-block">
+            <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-0.5 rounded-xl inline-block font-mono text-2xl sm:text-4xl lg:text-5xl align-middle">
               feature
             </span>{' '}
             or Report{' '}
             <br className="hidden sm:inline" />
             a{' '}
-            <span className="text-rose-400 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-xl inline-block">
+            <span className="text-rose-400 bg-rose-500/10 border border-rose-500/20 px-3 py-0.5 rounded-xl inline-block font-mono text-2xl sm:text-4xl lg:text-5xl align-middle">
               bug
             </span>
           </h1>
-          <p className="text-sm sm:text-base text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-            Help us shape the future of APIRun. All suggestions and bug reports are stored securely in our database and posted anonymously.
+
+          <p className="text-xs sm:text-sm text-zinc-300 max-w-2xl mx-auto leading-relaxed font-sans">
+            Help shape the future of APIRun. Propose backend challenges, request execution harness features, or report edge cases. All submissions are stored in the database and posted anonymously.
           </p>
+
+          {/* Quick Metrics Bar (Clean, Structured, LinkedIn-Ready) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-3xl mx-auto pt-4 text-left">
+            <div className="p-3.5 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08]">
+              <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                <span>Submissions</span>
+                <Layers className="w-3.5 h-3.5 text-zinc-500" />
+              </div>
+              <div className="text-xl font-bold text-white font-mono mt-1">{counts.all}</div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08]">
+              <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                <span>Feature RFCs</span>
+                <Zap className="w-3.5 h-3.5 text-emerald-400" />
+              </div>
+              <div className="text-xl font-bold text-emerald-400 font-mono mt-1">{counts.suggestions}</div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08]">
+              <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                <span>Bug Reports</span>
+                <Bug className="w-3.5 h-3.5 text-rose-400" />
+              </div>
+              <div className="text-xl font-bold text-rose-400 font-mono mt-1">{counts.bugs}</div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08]">
+              <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                <span>Total Upvotes</span>
+                <Star className="w-3.5 h-3.5 text-amber-400" />
+              </div>
+              <div className="text-xl font-bold text-amber-400 font-mono mt-1">{totalUpvotes}</div>
+            </div>
+          </div>
+
         </div>
 
         {/* 2-Column Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
           
           {/* ================= LEFT COLUMN: FEEDBACK LIST & FILTERS (2 COLS) ================= */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-5">
             
             {/* Filter Bar & Controls */}
-            <div className="p-3 sm:p-4 rounded-2xl bg-[#0a0f16] border border-white/[0.08] space-y-3.5">
+            <div className="p-3 sm:p-4 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08] space-y-3">
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 
                 {/* Type Tabs (All / Suggestions / Bugs) */}
-                <div className="flex items-center p-1 bg-[#05070a] rounded-xl border border-white/[0.06] w-full sm:w-auto">
+                <div className="flex items-center p-1 bg-[#05070a] rounded-lg border border-white/[0.06] w-full sm:w-auto">
                   <button
                     onClick={() => setActiveTypeTab('all')}
-                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
+                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center justify-center space-x-1.5 ${
                       activeTypeTab === 'all'
                         ? 'bg-emerald-600 text-white'
                         : 'text-zinc-400 hover:text-white'
@@ -471,7 +565,7 @@ export default function FeedbackPage() {
 
                   <button
                     onClick={() => setActiveTypeTab('suggestions')}
-                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
+                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center justify-center space-x-1.5 ${
                       activeTypeTab === 'suggestions'
                         ? 'bg-emerald-600 text-white'
                         : 'text-zinc-400 hover:text-white'
@@ -485,7 +579,7 @@ export default function FeedbackPage() {
 
                   <button
                     onClick={() => setActiveTypeTab('bugs')}
-                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center space-x-1.5 ${
+                    className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center justify-center space-x-1.5 ${
                       activeTypeTab === 'bugs'
                         ? 'bg-emerald-600 text-white'
                         : 'text-zinc-400 hover:text-white'
@@ -502,7 +596,7 @@ export default function FeedbackPage() {
                 <div className="flex items-center space-x-1.5 self-end sm:self-center">
                   <button
                     onClick={() => setActiveSort('hot')}
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border ${
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
                       activeSort === 'hot'
                         ? 'bg-emerald-600 text-white border-emerald-500'
                         : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
@@ -514,7 +608,7 @@ export default function FeedbackPage() {
 
                   <button
                     onClick={() => setActiveSort('top')}
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border ${
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
                       activeSort === 'top'
                         ? 'bg-emerald-600 text-white border-emerald-500'
                         : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
@@ -526,7 +620,7 @@ export default function FeedbackPage() {
 
                   <button
                     onClick={() => setActiveSort('new')}
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border ${
+                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
                       activeSort === 'new'
                         ? 'bg-emerald-600 text-white border-emerald-500'
                         : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
@@ -547,8 +641,8 @@ export default function FeedbackPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search feedback by keywords..."
-                    className="w-full pl-10 pr-4 py-2 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-white/30 transition-colors"
+                    placeholder="Search feedback or RFC keywords..."
+                    className="w-full pl-10 pr-4 py-2 bg-[#05070a] border border-white/[0.08] rounded-lg text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-white/30 transition-colors font-sans"
                   />
                 </div>
 
@@ -558,13 +652,13 @@ export default function FeedbackPage() {
                     <button
                       key={st}
                       onClick={() => setStatusFilter(st)}
-                      className={`px-2.5 py-1 rounded-lg text-xs capitalize transition-colors border ${
+                      className={`px-2.5 py-1 rounded-md text-xs capitalize transition-colors border font-mono ${
                         statusFilter === st
                           ? 'bg-zinc-800 text-white border-white/20 font-semibold'
                           : 'bg-[#05070a] text-zinc-400 border-white/[0.04] hover:text-zinc-200'
                       }`}
                     >
-                      {st}
+                      {st === 'closed' ? 'resolved' : st}
                     </button>
                   ))}
                 </div>
@@ -574,50 +668,62 @@ export default function FeedbackPage() {
 
             {/* List of Feedback Items */}
             {isLoading ? (
-              <div className="py-20 text-center space-y-3 rounded-2xl bg-[#0a0f16] border border-white/[0.06]">
+              <div className="py-20 text-center space-y-3 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.06]">
                 <Loader2 className="w-7 h-7 animate-spin text-zinc-400 mx-auto" />
-                <p className="text-xs text-zinc-400 font-mono">Loading feedback from database...</p>
+                <p className="text-xs text-zinc-400 font-mono">Loading records from database...</p>
               </div>
             ) : displayedFeedbacks.length === 0 ? (
-              <div className="py-16 text-center space-y-3 rounded-2xl bg-[#0a0f16] border border-white/[0.06] p-8">
+              <div className="py-16 text-center space-y-3 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.06] p-8">
                 <MessageCircle className="w-10 h-10 text-zinc-600 mx-auto" />
-                <h3 className="text-base font-bold text-white">No feedback submissions yet</h3>
+                <h3 className="text-sm font-bold text-white font-mono">No feedback records found</h3>
                 <p className="text-xs text-zinc-400 max-w-sm mx-auto">
                   {searchQuery
                     ? 'No submissions matched your search query.'
-                    : 'Be the first to suggest a challenge idea or report an issue using the form!'}
+                    : 'Be the first to submit a feature proposal or report an issue!'}
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {displayedFeedbacks.map((item) => {
+              <div className="space-y-3.5">
+                {displayedFeedbacks.map((item, index) => {
                   const hasVoted = item.upvotedBy.includes(currentUserId);
 
                   return (
                     <div
                       key={item.id}
                       onClick={() => setSelectedFeedback(item)}
-                      className="p-5 sm:p-6 rounded-2xl bg-[#0a0f16] border border-white/[0.08] hover:border-white/20 hover:bg-[#0d131d] transition-colors cursor-pointer group flex items-start gap-4 sm:gap-6 relative"
+                      className="p-5 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08] hover:border-white/20 hover:bg-[#0d131f]/90 transition-all cursor-pointer group flex items-start gap-4 sm:gap-5 relative active:scale-[0.99]"
                     >
-                      {/* Left / Center Body */}
-                      <div className="flex-1 min-w-0 space-y-2.5">
+                      {/* Left: Tactile Vertical Upvote Button */}
+                      <div className="shrink-0 pt-0.5">
+                        <button
+                          type="button"
+                          onClick={(e) => handleVote(item.id, e)}
+                          className={`flex flex-col items-center justify-center min-w-[50px] sm:min-w-[52px] py-2 px-2 rounded-lg border transition-colors ${
+                            hasVoted
+                              ? 'bg-emerald-600 border-emerald-500 text-white'
+                              : 'bg-[#05070a] border-white/[0.08] hover:bg-zinc-900 hover:border-white/20 text-zinc-400 hover:text-white'
+                          }`}
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                          <span className="text-xs font-bold font-mono mt-0.5">
+                            {item.upvotesCount}
+                          </span>
+                        </button>
+                      </div>
+
+                      {/* Center Content Body */}
+                      <div className="flex-1 min-w-0 space-y-2">
                         
-                        {/* Title */}
-                        <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug">
-                          {item.title}
-                        </h3>
+                        {/* Top Metadata Row */}
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          {/* Ticket Number */}
+                          <span className="text-[11px] font-mono text-zinc-500 font-semibold">
+                            {formatTicketNumber(item.id, index)}
+                          </span>
 
-                        {/* Description (Truncated) */}
-                        <p className="text-xs sm:text-sm text-zinc-400 line-clamp-2 leading-relaxed">
-                          {item.description}
-                        </p>
-
-                        {/* Meta Tags Row */}
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-zinc-400 pt-1">
-                          
                           {/* Type Pill */}
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border flex items-center space-x-1 ${
+                            className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold border flex items-center space-x-1 ${
                               item.type === 'bug'
                                 ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                                 : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
@@ -628,86 +734,83 @@ export default function FeedbackPage() {
                             ) : (
                               <Zap className="w-3 h-3" />
                             )}
-                            <span className="capitalize">{item.type === 'bug' ? 'Bug' : 'Feature'}</span>
+                            <span className="capitalize">{item.type === 'bug' ? 'Bug Report' : 'Feature RFC'}</span>
                           </span>
 
-                          {/* Comments Counter */}
-                          <div className="flex items-center space-x-1 text-zinc-400 font-medium">
-                            <MessageSquare className="w-3.5 h-3.5" />
-                            <span>{item.commentsCount || item.comments?.length || 0}</span>
-                          </div>
+                          {/* Status Pill */}
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono tracking-wider flex items-center space-x-1 ${
+                              item.status === 'open'
+                                ? 'bg-zinc-900 text-emerald-400 border border-emerald-500/20'
+                                : 'bg-zinc-900 text-zinc-400 border border-zinc-700'
+                            }`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'open' ? 'bg-emerald-400' : 'bg-zinc-500'}`} />
+                            <span>{item.status === 'closed' ? 'Resolved' : 'Open'}</span>
+                          </span>
 
                           <span className="text-zinc-600 hidden sm:inline">•</span>
 
-                          {/* Author (Always Anonymous) */}
-                          <div className="flex items-center space-x-1.5">
-                            <div className="w-4 h-4 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
-                              <UserIcon className="w-2.5 h-2.5" />
-                            </div>
-                            <span className="text-zinc-300">
-                              Anonymous Developer
-                            </span>
-                          </div>
-
-                          <span className="text-zinc-600 hidden sm:inline">•</span>
-
-                          {/* Date */}
+                          {/* Relative Date */}
                           <span className="text-zinc-500 font-mono text-[11px]">
                             {formatDate(item.createdAt)}
                           </span>
+                        </div>
 
-                          {/* Status Badge */}
-                          <span
-                            className={`px-2 py-0.5 rounded-md text-[10px] uppercase font-mono tracking-wider ${
-                              item.status === 'open'
-                                ? 'bg-zinc-800 text-emerald-400 border border-emerald-500/20'
-                                : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
-                            }`}
-                          >
-                            {item.status}
-                          </span>
+                        {/* Title */}
+                        <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-emerald-300 transition-colors leading-snug">
+                          {item.title}
+                        </h3>
 
+                        {/* Description Snippet */}
+                        <p className="text-xs sm:text-sm text-zinc-400 line-clamp-2 leading-relaxed font-sans">
+                          {item.description}
+                        </p>
+
+                        {/* Bottom Meta Tags Row */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/[0.04] text-xs text-zinc-500">
+                          <div className="flex items-center space-x-3">
+                            {/* Author */}
+                            <div className="flex items-center space-x-1.5 text-zinc-400">
+                              <UserIcon className="w-3.5 h-3.5 text-zinc-500" />
+                              <span className="font-mono text-[11px]">Anonymous Engineer</span>
+                            </div>
+
+                            <span>•</span>
+
+                            {/* Discussion Counter */}
+                            <div className="flex items-center space-x-1 text-zinc-400">
+                              <MessageSquare className="w-3.5 h-3.5 text-zinc-500" />
+                              <span className="font-mono text-[11px]">{item.commentsCount || item.comments?.length || 0} replies</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-1.5 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity text-[11px] font-mono">
+                            <span>Open Thread</span>
+                            <ChevronRight className="w-3 h-3" />
+                          </div>
                         </div>
 
                       </div>
 
-                      {/* Right Action Controls: Moderator Delete & Upvote */}
-                      <div className="shrink-0 flex items-center space-x-2 pt-0.5">
-                        
-                        {/* Moderator Delete Button */}
-                        {isAdmin && (
+                      {/* Moderator Delete Control (if admin logged in) */}
+                      {isAdmin && (
+                        <div className="shrink-0 pt-0.5">
                           <button
                             type="button"
                             title="Delete this feedback permanently (Moderator)"
                             disabled={deletingId === item.id}
                             onClick={(e) => handleDeleteFeedback(item.id, e)}
-                            className="p-2.5 rounded-xl bg-zinc-800 hover:bg-rose-950/40 text-zinc-400 hover:text-rose-400 border border-white/[0.08] hover:border-rose-500/30 transition-colors"
+                            className="p-2 rounded-lg bg-zinc-900 hover:bg-rose-950/40 text-zinc-400 hover:text-rose-400 border border-white/[0.08] hover:border-rose-500/30 transition-colors"
                           >
                             {deletingId === item.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             ) : (
                               <Trash2 className="w-4 h-4" />
                             )}
                           </button>
-                        )}
-
-                        {/* Upvote Button */}
-                        <button
-                          type="button"
-                          onClick={(e) => handleVote(item.id, e)}
-                          className={`flex flex-col items-center justify-center min-w-[50px] sm:min-w-[54px] py-2 px-2.5 rounded-xl border transition-colors ${
-                            hasVoted
-                              ? 'bg-emerald-600 border-emerald-500 text-white'
-                              : 'bg-[#05070a] border-white/[0.08] hover:bg-zinc-900 hover:border-white/20 text-zinc-400 hover:text-white'
-                          }`}
-                        >
-                          <ChevronUp className="w-5 h-5" />
-                          <span className="text-xs font-bold font-mono mt-0.5">
-                            {item.upvotesCount}
-                          </span>
-                        </button>
-
-                      </div>
+                        </div>
+                      )}
 
                     </div>
                   );
@@ -719,39 +822,42 @@ export default function FeedbackPage() {
 
           {/* ================= RIGHT COLUMN: STICKY SUBMISSION FORM (1 COL) ================= */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-2xl bg-[#0a0f16] border border-white/[0.08] p-6 sm:p-7 space-y-5">
+            <div className="sticky top-24 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08] p-5 sm:p-6 space-y-4">
               
-              <div>
-                <h2 className="text-lg font-bold text-white font-display">
+              <div className="border-b border-white/[0.06] pb-3">
+                <div className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider font-semibold">
+                  DEVELOPER RFC
+                </div>
+                <h2 className="text-base font-bold text-white font-display mt-0.5">
                   Suggest a feature or Report a bug
                 </h2>
                 <p className="text-xs text-zinc-400 mt-1">
-                  Submissions are posted anonymously to protect developer privacy.
+                  Submissions are posted anonymously to the public roadmap.
                 </p>
               </div>
 
               {formSuccessMessage && (
-                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs flex items-center space-x-2">
+                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs flex items-center space-x-2">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{formSuccessMessage}</span>
                 </div>
               )}
 
               {formErrorMessage && (
-                <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs flex items-center space-x-2">
+                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs flex items-center space-x-2">
                   <X className="w-4 h-4 shrink-0" />
                   <span>{formErrorMessage}</span>
                 </div>
               )}
 
-              <form onSubmit={handleSubmitFeedback} className="space-y-4">
+              <form onSubmit={handleSubmitFeedback} className="space-y-3.5">
                 
                 {/* Type Switcher */}
-                <div className="grid grid-cols-2 gap-2 p-1 bg-[#05070a] rounded-xl border border-white/[0.06]">
+                <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#05070a] rounded-lg border border-white/[0.06]">
                   <button
                     type="button"
                     onClick={() => setFormType('suggestion')}
-                    className={`flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-bold transition-colors ${
+                    className={`flex items-center justify-center space-x-1.5 py-2 px-3 rounded-md text-xs font-bold transition-colors ${
                       formType === 'suggestion'
                         ? 'bg-emerald-600 text-white'
                         : 'text-zinc-400 hover:text-white'
@@ -764,7 +870,7 @@ export default function FeedbackPage() {
                   <button
                     type="button"
                     onClick={() => setFormType('bug')}
-                    className={`flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-bold transition-colors ${
+                    className={`flex items-center justify-center space-x-1.5 py-2 px-3 rounded-md text-xs font-bold transition-colors ${
                       formType === 'bug'
                         ? 'bg-rose-600 text-white'
                         : 'text-zinc-400 hover:text-white'
@@ -776,9 +882,9 @@ export default function FeedbackPage() {
                 </div>
 
                 {/* Title Input */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-300">
-                    Short, descriptive title
+                <div className="space-y-1">
+                  <label className="text-[11px] font-mono text-zinc-300 uppercase tracking-wider">
+                    Title / Summary
                   </label>
                   <input
                     type="text"
@@ -790,15 +896,20 @@ export default function FeedbackPage() {
                         ? 'e.g. Add Redis Distributed Lock challenge'
                         : 'e.g. Content-Type parser error on multipart'
                     }
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 text-xs transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 text-xs transition-colors font-sans"
                   />
                 </div>
 
                 {/* Description Textarea */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-300">
-                    Description
-                  </label>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-mono text-zinc-300 uppercase tracking-wider">
+                      Description
+                    </label>
+                    <span className="text-[10px] font-mono text-zinc-500">
+                      {formDescription.length} chars
+                    </span>
+                  </div>
                   <textarea
                     rows={4}
                     required
@@ -806,24 +917,24 @@ export default function FeedbackPage() {
                     onChange={(e) => setFormDescription(e.target.value)}
                     placeholder={
                       formType === 'suggestion'
-                        ? 'I want to see real-world scenarios covering...'
-                        : 'Steps to reproduce the issue or expected behaviour...'
+                        ? 'Describe the backend scenario, assertions, or test requirements...'
+                        : 'Steps to reproduce the error or assertion mismatch...'
                     }
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 text-xs resize-y transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 text-xs resize-y transition-colors font-sans"
                   />
                 </div>
 
-                {/* Anonymous Privacy Badge */}
-                <div className="p-2.5 rounded-xl bg-[#05070a] border border-white/[0.06] flex items-center space-x-2 text-[11px] text-zinc-400">
-                  <UserIcon className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>Your feedback will be posted anonymously.</span>
+                {/* Privacy Badge */}
+                <div className="p-2.5 rounded-lg bg-[#05070a] border border-white/[0.04] flex items-center space-x-2 text-[11px] text-zinc-400">
+                  <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>100% Anonymous. Stored directly in database.</span>
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={isSubmittingForm}
-                  className={`w-full py-3 px-4 rounded-xl text-white font-bold text-xs sm:text-sm transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 ${
+                  className={`w-full py-2.5 px-4 rounded-lg text-white font-bold text-xs sm:text-sm transition-colors flex items-center justify-center space-x-2 active:scale-[0.98] disabled:opacity-50 ${
                     formType === 'bug'
                       ? 'bg-rose-600 hover:bg-rose-700'
                       : 'bg-emerald-600 hover:bg-emerald-700'
@@ -832,13 +943,13 @@ export default function FeedbackPage() {
                   {isSubmittingForm ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Submitting...</span>
+                      <span>Recording Feedback...</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
                       <span>
-                        Suggest {formType === 'bug' ? 'Bug Report' : 'Feature'}
+                        Submit {formType === 'bug' ? 'Bug Report' : 'Feature RFC'}
                       </span>
                     </>
                   )}
@@ -852,7 +963,7 @@ export default function FeedbackPage() {
                   Direct question or urgent issue? Contact maintainers at{' '}
                   <a
                     href="mailto:joshimayank646@gmail.com"
-                    className="text-emerald-400 hover:underline"
+                    className="text-emerald-400 hover:underline font-mono"
                   >
                     joshimayank646@gmail.com
                   </a>
@@ -871,7 +982,7 @@ export default function FeedbackPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in-0">
           
           <div 
-            className="relative w-full max-w-2xl max-h-[90vh] bg-[#0a0f16] border border-white/[0.12] rounded-2xl overflow-hidden flex flex-col"
+            className="relative w-full max-w-2xl max-h-[90vh] bg-[#090d14] border border-white/[0.12] rounded-2xl overflow-hidden flex flex-col shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             
@@ -883,7 +994,7 @@ export default function FeedbackPage() {
                 {/* Header Vote Counter */}
                 <button
                   onClick={() => handleVote(selectedFeedback.id)}
-                  className={`flex flex-col items-center justify-center min-w-[48px] py-2 px-2 rounded-xl border transition-colors shrink-0 ${
+                  className={`flex flex-col items-center justify-center min-w-[48px] py-2 px-2 rounded-lg border transition-colors shrink-0 ${
                     selectedFeedback.upvotedBy.includes(currentUserId)
                       ? 'bg-emerald-600 border-emerald-500 text-white'
                       : 'bg-[#05070a] border-white/[0.08] hover:bg-zinc-900 text-zinc-400 hover:text-white'
@@ -895,18 +1006,19 @@ export default function FeedbackPage() {
                   </span>
                 </button>
 
-                <div className="space-y-1 flex-1 min-w-0">
+                <div className="space-y-1.5 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 text-xs">
                     
                     {/* Status Badge */}
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider ${
+                      className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 ${
                         selectedFeedback.status === 'open'
-                          ? 'bg-zinc-800 text-emerald-400 border border-emerald-500/20'
-                          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                          ? 'bg-zinc-900 text-emerald-400 border border-emerald-500/20'
+                          : 'bg-zinc-900 text-zinc-400 border border-zinc-700'
                       }`}
                     >
-                      {selectedFeedback.status}
+                      <span className={`w-1.5 h-1.5 rounded-full ${selectedFeedback.status === 'open' ? 'bg-emerald-400' : 'bg-zinc-500'}`} />
+                      <span>{selectedFeedback.status === 'closed' ? 'Resolved' : 'Open'}</span>
                     </span>
 
                     {/* Type Badge */}
@@ -921,10 +1033,10 @@ export default function FeedbackPage() {
                     </span>
 
                     <span className="text-zinc-500">•</span>
-                    <span className="text-zinc-400">{formatDate(selectedFeedback.createdAt)}</span>
+                    <span className="text-zinc-400 font-mono">{formatDate(selectedFeedback.createdAt)}</span>
                     <span className="text-zinc-500">•</span>
-                    <span className="text-zinc-300 font-medium">
-                      Anonymous Developer
+                    <span className="text-zinc-300 font-mono text-[11px]">
+                      Anonymous Engineer
                     </span>
                   </div>
 
@@ -960,25 +1072,25 @@ export default function FeedbackPage() {
             <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6">
               
               {/* Full Description */}
-              <div className="p-4 rounded-xl bg-[#05070a] border border-white/[0.06] text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
+              <div className="p-4 rounded-xl bg-[#05070a] border border-white/[0.06] text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap font-sans">
                 {selectedFeedback.description}
               </div>
 
               {/* Status Notice if Closed */}
               {selectedFeedback.status === 'closed' && (
-                <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-white/[0.1] text-xs text-zinc-400 flex items-center justify-between">
+                <div className="p-3.5 rounded-xl bg-[#05070a] border border-emerald-500/20 text-xs text-emerald-400 flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Lock className="w-4 h-4 text-zinc-400 shrink-0" />
+                    <CheckCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>
-                      Ticket marked as closed {selectedFeedback.closedBy ? `by ${selectedFeedback.closedBy}` : ''}.
+                      Marked as resolved {selectedFeedback.closedBy ? `by ${selectedFeedback.closedBy}` : ''}.
                     </span>
                   </div>
                   <button
                     onClick={() => handleToggleTicketStatus('open')}
                     disabled={isClosingTicket}
-                    className="text-emerald-400 hover:underline font-semibold"
+                    className="text-white hover:underline font-mono font-semibold"
                   >
-                    Reopen Ticket
+                    Reopen
                   </button>
                 </div>
               )}
@@ -986,9 +1098,9 @@ export default function FeedbackPage() {
               {/* Discussion Section */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-white flex items-center space-x-2">
-                    <MessageSquare className="w-4 h-4 text-emerald-400" />
-                    <span>Discussion ({selectedFeedback.comments?.length || 0})</span>
+                  <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-400 flex items-center space-x-2">
+                    <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Discussion Thread ({selectedFeedback.comments?.length || 0})</span>
                   </h4>
                 </div>
 
@@ -999,13 +1111,13 @@ export default function FeedbackPage() {
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Write an anonymous reply or resolution note..."
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-xl text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-emerald-500 transition-colors resize-y"
+                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.08] rounded-lg text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-emerald-500 transition-colors resize-y font-sans"
                   />
 
                   <div className="flex flex-wrap items-center justify-between gap-2.5">
                     
-                    <span className="text-xs text-zinc-500">
-                      {isAdmin ? 'Posting as Moderator' : 'Posting anonymously'}
+                    <span className="text-xs text-zinc-500 font-mono">
+                      {isAdmin ? 'Posting as Maintainer' : 'Posting as Anonymous'}
                     </span>
 
                     <div className="flex items-center space-x-2">
@@ -1023,7 +1135,7 @@ export default function FeedbackPage() {
                           ) : (
                             <Lock className="w-3.5 h-3.5" />
                           )}
-                          <span>Close Ticket</span>
+                          <span>Close as Resolved</span>
                         </button>
                       )}
 
@@ -1032,14 +1144,14 @@ export default function FeedbackPage() {
                         type="button"
                         onClick={handleAddComment}
                         disabled={isSubmittingComment || !commentText.trim()}
-                        className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors disabled:opacity-50 flex items-center space-x-1.5"
+                        className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors disabled:opacity-50 flex items-center space-x-1.5 active:scale-[0.98]"
                       >
                         {isSubmittingComment ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         ) : (
                           <Send className="w-3.5 h-3.5" />
                         )}
-                        <span>Post Comment</span>
+                        <span>Post Reply</span>
                       </button>
 
                     </div>
@@ -1057,15 +1169,15 @@ export default function FeedbackPage() {
                       >
                         <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center space-x-2">
-                            <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">
+                            <div className="w-5 h-5 rounded-full bg-zinc-800 text-zinc-300 flex items-center justify-center text-[10px] font-mono font-bold">
                               {c.userRole === 'admin' ? 'M' : 'A'}
                             </div>
-                            <span className="font-semibold text-white">
-                              {c.userRole === 'admin' ? 'Moderator' : 'Anonymous'}
+                            <span className="font-semibold text-white font-mono text-[11px]">
+                              {c.userRole === 'admin' ? 'Maintainer' : 'Anonymous Engineer'}
                             </span>
                             {c.userRole === 'admin' && (
                               <span className="px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 text-[9px] font-mono border border-emerald-500/20">
-                                Maintainer
+                                Verified
                               </span>
                             )}
                           </div>
@@ -1073,15 +1185,15 @@ export default function FeedbackPage() {
                             {formatDate(c.createdAt)}
                           </span>
                         </div>
-                        <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap pl-7">
+                        <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap pl-7 font-sans">
                           {c.content}
                         </p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-zinc-500 italic py-2 text-center">
-                    No comments yet. Start the discussion!
+                  <p className="text-xs text-zinc-500 italic py-2 text-center font-mono">
+                    No replies yet. Start the thread!
                   </p>
                 )}
 
@@ -1094,7 +1206,7 @@ export default function FeedbackPage() {
         </div>
       )}
 
-      {/* Global Footer */}
+      {/* Global Footer (Crisp, Normal, Not dimmed) */}
       <Footer />
     </div>
   );

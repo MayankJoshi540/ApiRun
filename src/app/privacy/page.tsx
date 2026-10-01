@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Shield, Lock, Server, Activity } from '@/components/ui/GoogleIcon';
 import { BackendRankNavbar } from '@/components/BackendRankNavbar';
 import { Footer } from '@/components/Footer';
+import { AppBackground } from '@/components/ui/AppBackground';
 
 export default function PrivacyPage() {
   const router = useRouter();
@@ -17,7 +18,9 @@ export default function PrivacyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between overflow-hidden">
+      {/* Home Page Background Artwork */}
+      <AppBackground />
       
       {/* Floating Top Navbar */}
       <BackendRankNavbar
@@ -55,30 +58,30 @@ export default function PrivacyPage() {
           <div className="p-4 rounded-xl bg-[#0a0f16] border border-white/[0.08] space-y-1.5">
             <div className="flex items-center space-x-2 text-emerald-400 font-bold">
               <Lock className="w-4 h-4 text-emerald-400" />
-              <span>100% In-Memory Sandboxes</span>
+              <span>Isolated Code Runs</span>
             </div>
             <p className="text-zinc-400 leading-relaxed">
-              Execution code runs exclusively in RAM and is wiped immediately upon test conclusion.
+              Code runs in secure temporary sandboxes and is wiped immediately after test completion.
             </p>
           </div>
 
           <div className="p-4 rounded-xl bg-[#0a0f16] border border-white/[0.08] space-y-1.5">
             <div className="flex items-center space-x-2 text-sky-400 font-bold">
               <Server className="w-4 h-4 text-sky-400" />
-              <span>Zero Target Relaying</span>
+              <span>Private Local Testing</span>
             </div>
             <p className="text-zinc-400 leading-relaxed">
-              Localhost verification stays strictly in your browser. Internal payloads never hit our servers.
+              Localhost tests run directly on your machine. Your internal data stays private and never leaves your computer.
             </p>
           </div>
 
           <div className="p-4 rounded-xl bg-[#0a0f16] border border-white/[0.08] space-y-1.5">
             <div className="flex items-center space-x-2 text-amber-400 font-bold">
               <Activity className="w-4 h-4 text-amber-400" />
-              <span>Telemetry Transparency</span>
+              <span>Minimal Stats</span>
             </div>
             <p className="text-zinc-400 leading-relaxed">
-              We collect minimal metrics (pass/fail status, challenge latency) solely to compute ranks and streaks.
+              We only track challenge completion status and solve times to save your personal progress.
             </p>
           </div>
         </div>
@@ -92,17 +95,17 @@ export default function PrivacyPage() {
               <span>Information We Collect</span>
             </h2>
             <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
-              When you authenticate with APIRun via Clerk or Google OAuth, we store basic profile metadata (your email, name, and optional avatar URL) to maintain your submission streaks, challenge completion history, and leaderboard ranking.
+              When you sign up or sign in to APIRun, we store basic profile details (your email and name) to save your challenge progress and completion streaks.
             </p>
           </section>
 
           <section className="space-y-2.5">
             <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center space-x-2">
               <span className="text-emerald-400 font-mono">02.</span>
-              <span>Developer Code &amp; Submission Privacy</span>
+              <span>Your Code Privacy</span>
             </h2>
             <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
-              Your algorithmic and server implementations belong exclusively to you. APIRun does not sell, license, or share user code with third parties. Code executed via our serverless runner is executed ephemerally and discarded once test assertions complete.
+              Your solution code belongs exclusively to you. APIRun does not sell or share user code with third parties. Code executed in test runs is discarded as soon as tests finish.
             </p>
           </section>
 
