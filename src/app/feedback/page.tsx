@@ -493,28 +493,28 @@ export default function FeedbackPage() {
       {/* Main Feedback Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-20 flex-grow w-full relative z-10">
         
-        {/* Moderator Info Banner (Visible for Admin) */}
+        {/* Moderator Info Banner (Visible for Admin - Fully Mobile Responsive) */}
         {isAdmin && (
-          <div className="mb-8 p-4 rounded-xl bg-[#090e17]/90 backdrop-blur-md border border-white/[0.12] flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <div className="mb-6 sm:mb-8 p-3.5 sm:p-4 rounded-xl bg-[#090e17]/95 backdrop-blur-md border border-emerald-500/20 shadow-[0_4px_20px_rgba(16,185,129,0.06)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-start sm:items-center space-x-3 w-full sm:w-auto min-w-0 flex-1">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5 sm:mt-0">
                 <ShieldCheck className="w-4 h-4" />
               </div>
-              <div>
-                <div className="text-xs font-bold text-white flex items-center space-x-2">
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-bold text-white flex flex-wrap items-center gap-1.5 sm:gap-2">
                   <span>Moderator Access Active</span>
-                  <span className="px-2 py-0.5 rounded bg-white/[0.06] text-zinc-300 text-[10px] font-mono border border-white/[0.1]">
+                  <span className="px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-300 text-[10px] font-mono border border-emerald-500/30 break-all max-w-full">
                     {user?.email}
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-400">
+                <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-1 leading-snug">
                   You can permanently delete feedback items, resolve tickets, and post as Moderator.
                 </p>
               </div>
             </div>
             <button
               onClick={fetchFeedbacks}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-white/[0.08] text-xs font-semibold text-white transition-colors"
+              className="inline-flex items-center justify-center space-x-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-white/[0.08] text-xs font-semibold text-white transition-colors shrink-0 self-stretch sm:self-auto"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Refresh</span>
@@ -1010,11 +1010,11 @@ export default function FeedbackPage() {
 
               {/* Bottom Support Link */}
               <div className="pt-2 border-t border-white/[0.06] text-center">
-                <p className="text-[11px] text-zinc-500">
+                <p className="text-[11px] text-zinc-500 leading-relaxed break-words">
                   Direct question or urgent issue? Contact maintainers at{' '}
                   <a
                     href="mailto:joshimayank646@gmail.com"
-                    className="text-emerald-400 hover:underline font-mono"
+                    className="text-emerald-400 hover:underline font-mono inline-block break-all"
                   >
                     joshimayank646@gmail.com
                   </a>
