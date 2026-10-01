@@ -13,8 +13,11 @@ export const Footer: React.FC<FooterProps> = ({
   onNavigateProgress 
 }) => {
   return (
-    <footer className="w-full bg-[#050708] border-t border-white/[0.08] text-slate-400 font-sans">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 lg:py-16">
+    <footer className="relative w-full bg-[#050708] text-slate-400 font-sans border-t border-emerald-500/20">
+      {/* Top subtle emerald gradient highlight line */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
+
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 lg:py-16">
         {/* Main Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-10 pb-12 border-b border-white/[0.08]">
           {/* Brand Column (spans 2 on lg) */}
