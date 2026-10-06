@@ -811,3 +811,79 @@ export const GoogleIcon: React.FC<DynamicIconProps> = ({ name, ...props }) => {
   }
 };
 
+export const BookOpen: React.FC<IconProps> = (props) => (
+  <BaseSvg {...props}>
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+  </BaseSvg>
+);
+
+export const ListChecks: React.FC<IconProps> = (props) => (
+  <BaseSvg {...props}>
+    <path d="m3 17 2 2 4-4" />
+    <path d="m3 7 2 2 4-4" />
+    <path d="M13 6h8" />
+    <path d="M13 12h8" />
+    <path d="M13 18h8" />
+  </BaseSvg>
+);
+
+export const ChevronLeft: React.FC<IconProps> = (props) => (
+  <BaseSvg {...props}>
+    <path d="m15 18-6-6 6-6" />
+  </BaseSvg>
+);
+
+export const ThumbsDown: React.FC<IconProps> = (props) => (
+  <BaseSvg {...props}>
+    <path d="M17 14V2" />
+    <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3" />
+  </BaseSvg>
+);
+
+export const Shuffle: React.FC<IconProps> = (props) => (
+  <BaseSvg {...props}>
+    <path d="m16 3 4 4-4 4" />
+    <path d="M20 7H9a4 4 0 0 0-4 4v2" />
+    <path d="m16 21 4-4-4-4" />
+    <path d="M4 7h4a4 4 0 0 1 4 4v2a4 4 0 0 0 4 4h4" />
+  </BaseSvg>
+);
+
+export const Bookmark: React.FC<IconProps> = (props) => (
+  <BaseSvg {...props}>
+    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
+  </BaseSvg>
+);
+
+export const Bell: React.FC<IconProps> = (props) => (
+  <BaseSvg {...props}>
+    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+  </BaseSvg>
+);
+
+export const GripVertical: React.FC<IconProps> = (props) => (
+  <BaseSvg {...props}>
+    <circle cx="9" cy="12" r="1" />
+    <circle cx="9" cy="5" r="1" />
+    <circle cx="9" cy="19" r="1" />
+    <circle cx="15" cy="12" r="1" />
+    <circle cx="15" cy="5" r="1" />
+    <circle cx="15" cy="19" r="1" />
+  </BaseSvg>
+);
+
+export const GripHorizontal: React.FC<IconProps> = (props) => (
+  <BaseSvg {...props}>
+    <circle cx="12" cy="9" r="1" />
+    <circle cx="5" cy="9" r="1" />
+    <circle cx="19" cy="9" r="1" />
+    <circle cx="12" cy="15" r="1" />
+    <circle cx="5" cy="15" r="1" />
+    <circle cx="19" cy="15" r="1" />
+  </BaseSvg>
+);
+
+
+
