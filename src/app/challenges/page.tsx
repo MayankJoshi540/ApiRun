@@ -54,7 +54,7 @@ export default function ChallengesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#0c0f17] text-slate-200 font-sans antialiased relative selection:bg-emerald-500/25 selection:text-slate-100 flex flex-col justify-between">
       
       <BackendRankNavbar
         activeTab="challenges"
