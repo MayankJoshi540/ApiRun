@@ -4,40 +4,44 @@ import { Difficulty } from '../types';
 interface Props {
   difficulty: Difficulty;
   size?: 'sm' | 'md';
+  className?: string;
 }
 
-export const DifficultyBadge: React.FC<Props> = ({ difficulty, size = 'sm' }) => {
-  const styles: Record<Difficulty, { bg: string; text: string; border: string; label: string }> = {
+export const DifficultyBadge: React.FC<Props> = ({ 
+  difficulty, 
+  size = 'sm', 
+  className = '' 
+}) => {
+  const configs: Record<Difficulty, { 
+    label: string;
+    bg: string;
+    text: string;
+  }> = {
     BEGINNER: {
-      bg: 'bg-emerald-950/50',
-      text: 'text-emerald-400',
-      border: 'border-emerald-800/60',
-      label: 'Beginner'
+      label: 'Beginner',
+      bg: 'bg-[#1b2a24]',
+      text: 'text-[#00b8a3]'
     },
     INTERMEDIATE: {
-      bg: 'bg-amber-950/50',
-      text: 'text-amber-400',
-      border: 'border-amber-800/60',
-      label: 'Intermediate'
+      label: 'Intermediate',
+      bg: 'bg-[#2b2518]',
+      text: 'text-[#ffc01e]'
     },
     ADVANCED: {
-      bg: 'bg-red-950/50',
-      text: 'text-red-400',
-      border: 'border-red-800/60',
-      label: 'Advanced'
+      label: 'Advanced',
+      bg: 'bg-[#2f1b1d]',
+      text: 'text-[#ff375f]'
     }
   };
 
-  const current = styles[difficulty] || styles.BEGINNER;
-  const sizeClasses = size === 'sm' 
-    ? 'text-xs px-2.5 py-0.5' 
-    : 'text-xs px-3 py-1 font-semibold';
+  const current = configs[difficulty] || configs.BEGINNER;
 
   return (
     <span
-      className={`inline-flex items-center font-sans font-medium rounded-md border ${current.bg} ${current.text} ${current.border} ${sizeClasses}`}
+      className={`inline-flex items-center rounded-full font-medium select-none ${current.bg} ${current.text} ${
+        size === 'sm' ? 'px-2.5 py-0.5 text-xs' : 'px-3 py-1 text-sm'
+      } ${className}`}
     >
-      <span className="w-1.5 h-1.5 rounded-full mr-1.5 bg-current opacity-90" />
       {current.label}
     </span>
   );
