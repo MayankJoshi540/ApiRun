@@ -97,7 +97,7 @@ export const TestResult: React.FC<Props> = ({
       </div>
 
       {isExpanded && (
-        <div className="p-4 bg-[#070a0f] border-t border-white/[0.06] space-y-3 text-xs font-sans animate-in fade-in duration-200">
+        <div className="p-4 bg-[#070a0f] border-t border-white/[0.06] space-y-3 text-xs font-sans animate-emil-fade">
           {testResult.failureReason && (
             <div className="p-3 rounded-lg bg-red-950/30 border border-red-900/50 text-red-300">
               <div className="text-[11px] font-semibold uppercase tracking-wider text-red-400">Failure Reason</div>
