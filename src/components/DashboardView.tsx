@@ -72,11 +72,11 @@ export const DashboardView: React.FC<Props> = ({
   return (
     <div className="flex-1 space-y-6 font-sans">
       {/* 1. Header Banner */}
-      <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 sm:p-7 space-y-5 shadow-xl">
+      <div className="rounded-2xl bg-[#111622] border border-slate-800/80 p-6 sm:p-7 space-y-5 shadow-lg">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
           {/* Title and Intro */}
           <div className="space-y-1.5 max-w-2xl">
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-100 tracking-tight">
               Backend Challenges
             </h1>
 
@@ -86,16 +86,16 @@ export const DashboardView: React.FC<Props> = ({
           </div>
 
           {/* Quick Stats */}
-          <div className="flex items-center space-x-2.5 shrink-0 text-xs font-mono">
-            <div className="px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.08] shadow-inner">
+          <div className="flex items-center space-x-3 shrink-0 text-xs sm:text-sm font-mono">
+            <div className="px-4 py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 shadow-inner">
               <span className="text-slate-400">TOTAL: </span>
-              <span className="text-white font-bold">{challenges.length} APIs</span>
+              <span className="text-slate-200 font-bold">{challenges.length} APIs</span>
             </div>
-            <div className="px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.08] shadow-inner">
+            <div className="px-4 py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 shadow-inner">
               <span className="text-slate-400">SOLVED: </span>
               <span className="text-emerald-400 font-bold">{solvedCount}</span>
             </div>
-            <div className="px-3.5 py-2 rounded-xl bg-black/40 border border-white/[0.08] shadow-inner">
+            <div className="px-4 py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 shadow-inner">
               <span className="text-slate-400">MASTERY: </span>
               <span className="text-sky-400 font-bold">{completionPercentage}%</span>
             </div>
@@ -103,52 +103,52 @@ export const DashboardView: React.FC<Props> = ({
         </div>
 
         {/* Global Progress Bar */}
-        <div className="pt-4 border-t border-white/[0.06] flex items-center space-x-3">
-          <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+        <div className="pt-4 border-t border-slate-800/70 flex items-center space-x-3">
+          <div className="flex-1 h-2 rounded-full bg-slate-800/80 overflow-hidden">
             <div 
               className="h-full bg-emerald-400 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${Math.max(completionPercentage, 2)}%` }}
             />
           </div>
-          <span className="text-xs font-mono text-slate-400 shrink-0">
+          <span className="text-xs sm:text-sm font-mono text-slate-400 shrink-0">
             {solvedCount} of {challenges.length} completed
           </span>
         </div>
       </div>
 
       {/* 2. Search & Filter Bar */}
-      <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="space-y-3.5">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3.5">
           {/* Search Input */}
           <div className="relative flex-1 w-full">
-            <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-4 top-3.5 w-4.5 h-4.5 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search challenges, routes (e.g. POST /users), Redis locks..."
-              className="w-full pl-9 pr-8 py-2.5 bg-[#0b0f17] border border-white/[0.08] rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 font-sans transition-all"
+              className="w-full pl-11 pr-10 py-3 bg-[#0e131d] border border-slate-800 rounded-xl text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 font-sans transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white transition-colors"
+                className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-200 transition-colors"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
 
           {/* Status Filter Toggle */}
-          <div className="flex items-center rounded-xl bg-[#0b0f17] border border-white/[0.08] p-1 text-xs w-full sm:w-auto">
+          <div className="flex items-center rounded-xl bg-[#111622] border border-slate-800/80 p-1.5 text-xs sm:text-sm w-full sm:w-auto">
             {(['ALL', 'SOLVED', 'UNSOLVED'] as const).map((status) => (
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-all duration-150 active:scale-[0.97] flex-1 sm:flex-none ${
+                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 active:scale-[0.97] flex-1 sm:flex-none ${
                   statusFilter === status 
-                    ? 'bg-white/[0.12] text-white font-semibold shadow-sm' 
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-slate-800 text-slate-100 border border-slate-700/60 shadow-xs' 
+                    : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 {status === 'ALL' ? 'All' : status === 'SOLVED' ? 'Solved' : 'Unsolved'}
@@ -158,18 +158,18 @@ export const DashboardView: React.FC<Props> = ({
         </div>
 
         {/* Category & Difficulty Quick Chips */}
-        <div className="flex flex-wrap items-center justify-between gap-2.5 pt-0.5">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           {/* Track Filter */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-mono text-slate-500 mr-1 hidden sm:inline">Track:</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-mono text-slate-400 font-semibold mr-1 hidden sm:inline">Track:</span>
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1 rounded-xl text-xs transition-all duration-150 active:scale-[0.96] border ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm transition-all duration-150 active:scale-[0.96] border ${
                   selectedCategory === cat
-                    ? 'bg-white/[0.12] border-white/[0.22] text-white font-semibold shadow-sm'
-                    : 'bg-[#0b0f17] border-white/[0.06] text-slate-400 hover:text-white hover:border-white/[0.12]'
+                    ? 'bg-slate-800 border-slate-700 text-slate-100 font-semibold shadow-xs'
+                    : 'bg-[#0e131d] border-slate-800/70 text-slate-400 hover:text-slate-200 hover:border-slate-700 font-medium'
                 }`}
               >
                 {cat === 'ALL' ? 'All' : cat}
@@ -178,16 +178,16 @@ export const DashboardView: React.FC<Props> = ({
           </div>
 
           {/* Difficulty Filter */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-mono text-slate-500 mr-1 hidden sm:inline">Tier:</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-slate-400 font-semibold mr-1 hidden sm:inline">Tier:</span>
             {(['ALL', 'BEGINNER', 'INTERMEDIATE', 'ADVANCED'] as const).map((diff) => (
               <button
                 key={diff}
                 onClick={() => onSelectDifficulty(diff)}
-                className={`px-3 py-1 rounded-xl text-xs transition-all duration-150 active:scale-[0.96] border ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm transition-all duration-150 active:scale-[0.96] border ${
                   selectedDifficulty === diff
-                    ? 'bg-white/[0.12] border-white/[0.22] text-white font-semibold shadow-sm'
-                    : 'bg-[#0b0f17] border-white/[0.06] text-slate-400 hover:text-white hover:border-white/[0.12]'
+                    ? 'bg-slate-800 border-slate-700 text-slate-100 font-semibold shadow-xs'
+                    : 'bg-[#0e131d] border-slate-800/70 text-slate-400 hover:text-slate-200 hover:border-slate-700 font-medium'
                 }`}
               >
                 {diff === 'ALL' ? 'All' : diff.charAt(0) + diff.slice(1).toLowerCase()}
@@ -198,19 +198,19 @@ export const DashboardView: React.FC<Props> = ({
 
         {/* Active Filters Summary */}
         {hasActiveFilters && (
-          <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-slate-900/50 border border-slate-800/80 text-xs">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-slate-400 text-[11px] font-mono">Active:</span>
               
               {selectedCategory !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
+                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-[11px]">
                   <span>track: {selectedCategory}</span>
                   <button onClick={() => setSelectedCategory('ALL')} className="hover:text-emerald-400"><X className="w-3 h-3 ml-1" /></button>
                 </span>
               )}
 
               {selectedDifficulty !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
+                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-[11px]">
                   <span>tier: {selectedDifficulty}</span>
                   <button onClick={() => onSelectDifficulty('ALL')} className="hover:text-emerald-400"><X className="w-3 h-3 ml-1" /></button>
                 </span>
@@ -224,14 +224,14 @@ export const DashboardView: React.FC<Props> = ({
               )}
 
               {statusFilter !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
+                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-[11px]">
                   <span>status: {statusFilter.toLowerCase()}</span>
                   <button onClick={() => setStatusFilter('ALL')} className="hover:text-emerald-400"><X className="w-3 h-3 ml-1" /></button>
                 </span>
               )}
 
               {searchQuery && (
-                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/[0.1] text-white text-[11px]">
+                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-[11px]">
                   <span>query: "{searchQuery}"</span>
                   <button onClick={() => setSearchQuery('')} className="hover:text-emerald-400"><X className="w-3 h-3 ml-1" /></button>
                 </span>
@@ -251,29 +251,35 @@ export const DashboardView: React.FC<Props> = ({
       {/* 3. Challenges Cards List */}
       <div className="space-y-3">
         {filteredChallenges.length > 0 ? (
-          filteredChallenges.map((challenge) => (
-            <ChallengeCard
+          filteredChallenges.map((challenge, index) => (
+            <div
               key={challenge.id}
-              challenge={challenge}
-              onSelect={onSelectChallenge}
-              onClickConcept={onSelectConcept}
-            />
+              style={{
+                animation: `emilModalIn 240ms var(--ease-out) ${Math.min(index * 40, 240)}ms both`,
+              }}
+            >
+              <ChallengeCard
+                challenge={challenge}
+                onSelect={onSelectChallenge}
+                onClickConcept={onSelectConcept}
+              />
+            </div>
           ))
         ) : (
           /* Empty Search State */
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0b0f17] p-12 text-center space-y-4 shadow-xl">
-            <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto text-slate-400">
+          <div className="rounded-2xl border border-slate-800/80 bg-[#111622] p-12 text-center space-y-4 shadow-lg">
+            <div className="w-12 h-12 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center mx-auto text-slate-400">
               <Search className="w-5 h-5" />
             </div>
             <div className="space-y-1 max-w-sm mx-auto">
-              <h3 className="text-sm font-bold text-white">No matching challenges found</h3>
+              <h3 className="text-sm font-bold text-slate-100">No matching challenges found</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Try adjusting your search criteria, tier filter, or concept selection.
               </p>
             </div>
             <button
               onClick={handleResetFilters}
-              className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold transition-all duration-150 active:scale-95 shadow-lg shadow-emerald-500/10"
+              className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold transition-all duration-150 active:scale-95 shadow-md shadow-emerald-500/10"
             >
               Reset Filters
             </button>

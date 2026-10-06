@@ -37,7 +37,7 @@ export default function ChallengeDetailPage({ params }: Props) {
   const challenge = challengesList.find(c => c.slug === slug);
 
   if (!slug) {
-    return <div className="min-h-screen bg-[#050708]" />;
+    return <div className="min-h-screen bg-[#0c0f17]" />;
   }
 
   if (!challenge) {
@@ -59,9 +59,10 @@ export default function ChallengeDetailPage({ params }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-slate-100 font-sans antialiased">
+    <div className="h-screen w-screen overflow-hidden bg-[#0c0f17] text-slate-200 font-sans antialiased">
       <ChallengeDetailView
         challenge={challenge}
+        challengesList={challengesList}
         onBack={() => router.push('/challenges')}
         onChallengeSolved={handleChallengeSolved}
         onNavigateProgress={() => router.push('/progress')}

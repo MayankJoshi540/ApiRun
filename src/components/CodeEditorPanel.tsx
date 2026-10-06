@@ -7,12 +7,13 @@ import {
   RotateCcw, 
   Copy, 
   Check, 
-  FileCode, 
-  Code2, 
   Maximize2, 
   Minimize2,
-  Terminal,
-  Settings2
+  Lock,
+  Code2,
+  Send,
+  Loader2,
+  Bookmark
 } from '@/components/ui/GoogleIcon';
 import { Challenge } from '../types';
 
@@ -23,7 +24,9 @@ interface Props {
   code: string;
   onChangeCode: (newCode: string) => void;
   onRunTests: () => void;
+  onSubmitSolution?: () => void;
   isRunning: boolean;
+  isSubmitting?: boolean;
 }
 
 export const CodeEditorPanel: React.FC<Props> = ({
@@ -33,16 +36,16 @@ export const CodeEditorPanel: React.FC<Props> = ({
   code,
   onChangeCode,
   onRunTests,
-  isRunning
+  onSubmitSolution,
+  isRunning,
+  isSubmitting = false
 }) => {
   const editorRef = useRef<any>(null);
   const [copied, setCopied] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
-  const [lineCount, setLineCount] = useState(() => code.split('\n').length);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showMinimap, setShowMinimap] = useState(true);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
-  // Map language to Monaco language identifier
   const monacoLanguages = {
     nodejs: 'typescript',
     go: 'go',
@@ -55,22 +58,15 @@ export const CodeEditorPanel: React.FC<Props> = ({
     python: 'main.py'
   };
 
-  const languageBadges = {
-    nodejs: 'TypeScript / Node.js 20',
-    go: 'Go 1.22',
-    python: 'Python 3.12 (FastAPI)'
-  };
-
-  // Configure Monaco Editor Theme and Keybindings on mount
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
 
-    // Define Custom Dark VS Code Theme with emerald accents
-    monaco.editor.defineTheme('apirun-vscode-dark', {
+    // APIRun VS Code Theme (Comfortable Soft Dark Slate)
+    monaco.editor.defineTheme('apirun-theme', {
       base: 'vs-dark',
       inherit: true,
       rules: [
-        { token: '', foreground: 'E2E8F0', background: '07080B' },
+        { token: '', foreground: 'CBD5E1', background: '111622' },
         { token: 'comment', foreground: '64748B', fontStyle: 'italic' },
         { token: 'keyword', foreground: 'F43F5E', fontStyle: 'bold' },
         { token: 'keyword.control', foreground: 'C084FC' },
@@ -79,41 +75,34 @@ export const CodeEditorPanel: React.FC<Props> = ({
         { token: 'number', foreground: 'FB923C' },
         { token: 'type', foreground: '38BDF8', fontStyle: 'bold' },
         { token: 'class', foreground: '38BDF8' },
-        { token: 'function', foreground: 'FBBF24' },
-        { token: 'variable', foreground: 'E2E8F0' },
+        { token: 'function', foreground: 'DCDCAA' },
+        { token: 'variable', foreground: 'CBD5E1' },
         { token: 'variable.parameter', foreground: '93C5FD' },
         { token: 'operator', foreground: '94A3B8' },
-        { token: 'delimiter', foreground: '94A3B8' },
-        { token: 'tag', foreground: 'F43F5E' },
-        { token: 'attribute.name', foreground: 'FBBF24' },
-        { token: 'attribute.value', foreground: '34D399' }
+        { token: 'delimiter', foreground: '94A3B8' }
       ],
       colors: {
-        'editor.background': '#07080B',
-        'editor.foreground': '#E2E8F0',
-        'editor.lineHighlightBackground': '#12161F80',
-        'editor.lineHighlightBorder': '#1B202A',
+        'editor.background': '#111622',
+        'editor.foreground': '#CBD5E1',
+        'editor.lineHighlightBackground': '#18203060',
+        'editor.lineHighlightBorder': '#1F293D',
         'editorCursor.foreground': '#34D399',
-        'editorWhitespace.foreground': '#262D3A',
-        'editorIndentGuide.background': '#1B202A',
-        'editorIndentGuide.activeBackground': '#374151',
+        'editorWhitespace.foreground': '#263346',
+        'editorIndentGuide.background': '#1E293B',
+        'editorIndentGuide.activeBackground': '#334155',
         'editorLineNumber.foreground': '#475569',
         'editorLineNumber.activeForeground': '#34D399',
-        'editorGutter.background': '#07080B',
-        'editor.selectionBackground': '#10B98133',
-        'editor.inactiveSelectionBackground': '#10B9811A',
-        'editorBracketMatch.background': '#10B9812A',
-        'editorBracketMatch.border': '#10B98180',
-        'scrollbarSlider.background': '#1E243080',
+        'editorGutter.background': '#111622',
+        'editor.selectionBackground': '#10B9812A',
+        'editor.inactiveSelectionBackground': '#10B98115',
+        'scrollbarSlider.background': '#1E293B80',
         'scrollbarSlider.hoverBackground': '#334155',
-        'scrollbarSlider.activeBackground': '#10B98160',
-        'minimap.background': '#07080B'
+        'scrollbarSlider.activeBackground': '#10B98150',
       }
     });
 
-    monaco.editor.setTheme('apirun-vscode-dark');
+    monaco.editor.setTheme('apirun-theme');
 
-    // Configure Monaco TypeScript & JavaScript Compiler Options and Diagnostics
     if (monaco.languages?.typescript) {
       monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
         target: monaco.languages.typescript.ScriptTarget.ESNext,
@@ -126,36 +115,22 @@ export const CodeEditorPanel: React.FC<Props> = ({
         moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
       });
 
-      // Disable false-positive module resolution errors (e.g. 'Cannot find module express') in browser
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: true,
         noSyntaxValidation: true,
         noSuggestionDiagnostics: true,
       });
 
-      monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-        noSemanticValidation: true,
-        noSyntaxValidation: true,
-        noSuggestionDiagnostics: true,
-      });
-
-      // Provide ambient declaration for express/node so autocomplete stays smart
       monaco.languages.typescript.typescriptDefaults.addExtraLib(
-        `declare module 'express';
-declare module 'http';
-declare module 'crypto';
-declare module 'fs';
-declare module 'path';`,
+        `declare module 'express';\ndeclare module 'http';\ndeclare module 'crypto';`,
         'node-ambient.d.ts'
       );
     }
 
-    // Bind Ctrl+Enter / Cmd+Enter to Run Tests
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
       onRunTests();
     });
 
-    // Track Cursor position line and column
     editor.onDidChangeCursorPosition((e) => {
       setCursorPos({
         line: e.position.lineNumber,
@@ -163,15 +138,6 @@ declare module 'path';`,
       });
     });
 
-    // Track Model content changes
-    editor.onDidChangeModelContent(() => {
-      const model = editor.getModel();
-      if (model) {
-        setLineCount(model.getLineCount());
-      }
-    });
-
-    // Auto-focus the editor
     editor.focus();
   };
 
@@ -182,7 +148,7 @@ declare module 'path';`,
   };
 
   const handleResetCode = () => {
-    if (window.confirm('Reset code to the original challenge template?')) {
+    if (window.confirm('Reset code to starter template?')) {
       const defaultStarter = challenge.starterCode?.[selectedLang] || '';
       if (typeof window !== 'undefined') {
         try {
@@ -203,112 +169,100 @@ declare module 'path';`,
   };
 
   return (
-    <div className={`rounded-lg border border-[#262d3a] bg-[#07080b] overflow-hidden flex flex-col shadow-2xl transition-all ${
-      isFullscreen ? 'fixed inset-4 z-50 h-[calc(100vh-2rem)]' : 'h-[680px]'
+    <div className={`h-full w-full rounded-xl bg-[#111622] border border-slate-800/80 flex flex-col overflow-hidden shadow-lg ${
+      isFullscreen ? 'fixed inset-3 z-50 rounded-2xl' : ''
     }`}>
-      {/* Top VS Code Tab & Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-3.5 py-2 bg-[#0c0e14] border-b border-[#262d3a] gap-2 select-none">
-        {/* Left: Language Switcher & File Tab */}
-        <div className="flex items-center space-x-2">
-          {/* Language Selector */}
-          <div className="flex items-center space-x-1 bg-[#050608] p-0.5 rounded border border-[#262d3a] font-mono text-xs">
-            {(['nodejs', 'go', 'python'] as const).map((lang) => (
-              <button
-                key={lang}
-                onClick={() => onSelectLang(lang)}
-                className={`px-2.5 py-1 rounded transition-colors text-[11px] font-medium ${
-                  selectedLang === lang
-                    ? 'bg-[#171c26] text-emerald-400 font-semibold border border-[#374151]'
-                    : 'text-[#8b949e] hover:text-[#e6edf3]'
-                }`}
-              >
-                {lang === 'nodejs' ? 'TypeScript' : lang === 'go' ? 'Go' : 'Python'}
-              </button>
-            ))}
+      {/* ── Top Header: </> Code Tab + Language Switcher + Tools ── */}
+      <div className="h-11 px-3.5 bg-[#141a27] border-b border-slate-800/80 flex items-center justify-between shrink-0 select-none">
+        {/* Left: Code Tab indicator + Language Selector + Auto */}
+        <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
+            <span className="text-[12px] font-mono font-bold leading-none">&lt;/&gt;</span>
+            <span>Code</span>
           </div>
 
-          {/* VS Code Style File Tab */}
-          <div className="flex items-center space-x-1.5 px-3 py-1 bg-[#12161f] border border-[#262d3a] border-b-0 rounded-t text-xs font-mono text-[#e6edf3]">
-            <FileCode className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="font-medium">{fileNames[selectedLang]}</span>
+          {/* Language Selector Dropdown */}
+          <div className="relative">
+            <select
+              value={selectedLang}
+              onChange={(e) => onSelectLang(e.target.value as 'nodejs' | 'go' | 'python')}
+              className="bg-slate-800/70 hover:bg-slate-800 text-slate-200 text-xs font-medium px-2.5 py-1 rounded-lg border border-slate-700/60 cursor-pointer outline-none transition focus:border-emerald-500/50"
+            >
+              <option value="nodejs" className="bg-[#141a27] text-slate-200">TypeScript (Node.js)</option>
+              <option value="go" className="bg-[#141a27] text-slate-200">Go 1.22</option>
+              <option value="python" className="bg-[#141a27] text-slate-200">Python 3.12 (FastAPI)</option>
+            </select>
+          </div>
+
+          {/* Auto Saved Status */}
+          <div className="hidden sm:flex items-center gap-1 text-[11px] text-slate-400">
+            <Lock className="w-3 h-3 text-slate-500" />
+            <span>Saved</span>
           </div>
         </div>
 
-        {/* Right: Quick Actions (Format, Copy, Reset, Minimap, Fullscreen, Run Tests) */}
-        <div className="flex items-center space-x-1.5 font-mono text-xs">
+        {/* Right Tools: Format, Bookmark, Copy, Reset, Fullscreen */}
+        <div className="flex items-center gap-1">
           <button
             onClick={handleFormatCode}
-            className="hidden sm:flex items-center space-x-1 px-2.5 py-1 rounded bg-[#12161f] hover:bg-[#171c26] text-[#8b949e] hover:text-[#e6edf3] border border-[#262d3a] transition-colors"
-            title="Format Document"
+            className="px-2 py-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition cursor-pointer text-xs font-mono"
+            title="Format Code"
           >
-            <Code2 className="w-3 h-3 text-emerald-400" />
-            <span className="text-[11px]">Format</span>
+            {'{ }'}
           </button>
 
           <button
             onClick={handleCopyCode}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded bg-[#12161f] hover:bg-[#171c26] text-[#8b949e] hover:text-[#e6edf3] border border-[#262d3a] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition cursor-pointer"
             title="Copy Code"
           >
-            {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-            <span className="text-[11px]">{copied ? 'Copied' : 'Copy'}</span>
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+          </button>
+
+          <button
+            onClick={() => setIsBookmarked(!isBookmarked)}
+            className={`p-1.5 rounded-lg hover:bg-slate-800 transition cursor-pointer ${
+              isBookmarked ? 'text-amber-400' : 'text-slate-400 hover:text-slate-200'
+            }`}
+            title="Bookmark"
+          >
+            <Bookmark className="w-3.5 h-3.5" />
           </button>
 
           <button
             onClick={handleResetCode}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded bg-[#12161f] hover:bg-[#171c26] text-[#8b949e] hover:text-[#e6edf3] border border-[#262d3a] transition-colors"
-            title="Reset to starter template"
+            className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition cursor-pointer"
+            title="Reset code"
           >
-            <RotateCcw className="w-3 h-3" />
-            <span className="text-[11px]">Reset</span>
-          </button>
-
-          <button
-            onClick={() => setShowMinimap(!showMinimap)}
-            className={`hidden md:flex items-center px-2 py-1 rounded border transition-colors ${
-              showMinimap ? 'bg-[#171c26] text-emerald-400 border-[#374151]' : 'bg-[#12161f] text-[#8b949e] border-[#262d3a]'
-            }`}
-            title="Toggle Minimap"
-          >
-            <span className="text-[10px]">MAP</span>
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
 
           <button
             onClick={() => setIsFullscreen(!isFullscreen)}
-            className="hidden sm:flex items-center p-1.5 rounded bg-[#12161f] hover:bg-[#171c26] text-[#8b949e] hover:text-[#e6edf3] border border-[#262d3a] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition cursor-pointer"
             title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
           >
             {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
-
-          {/* Primary Action: Run Tests */}
-          <button
-            onClick={onRunTests}
-            disabled={isRunning}
-            className="flex items-center space-x-1.5 px-3.5 py-1 rounded bg-emerald-500 hover:bg-emerald-400 text-black font-medium font-sans text-xs transition-all disabled:opacity-50 active:scale-[0.98]"
-            title="Run test suite against this code (Ctrl+Enter)"
-          >
-            <Play className="w-3 h-3 fill-current" />
-            <span>{isRunning ? 'Testing...' : 'Run Tests'}</span>
-          </button>
         </div>
       </div>
 
-      {/* Main Monaco VS Code Editor Surface */}
-      <div className="flex-1 relative overflow-hidden bg-[#07080b]">
+      {/* ── Monaco Editor Surface (Flex-1) ── */}
+      <div className="flex-1 relative overflow-hidden bg-[#111622]">
         <Editor
           height="100%"
           path={fileNames[selectedLang]}
           language={monacoLanguages[selectedLang]}
           value={code}
-          theme="apirun-vscode-dark"
+          theme="apirun-theme"
           onChange={(value) => onChangeCode(value || '')}
           onMount={handleEditorDidMount}
           options={{
-            fontFamily: "'Fira Code', 'Cascadia Code', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace",
-            fontSize: 17,
-            lineHeight: 28,
-            fontLigatures: true,
+            fontFamily: "Consolas, 'Courier New', monospace",
+            fontSize: 20,
+            lineHeight: 30,
+            mouseWheelZoom: true,
+            fontLigatures: false,
             tabSize: 2,
             insertSpaces: true,
             detectIndentation: false,
@@ -316,71 +270,66 @@ declare module 'path';`,
             scrollBeyondLastLine: false,
             smoothScrolling: true,
             cursorBlinking: 'smooth',
-            cursorSmoothCaretAnimation: 'on',
-            bracketPairColorization: {
-              enabled: true
-            },
-            guides: {
-              bracketPairs: true,
-              indentation: true
-            },
-            minimap: {
-              enabled: showMinimap,
-              maxColumn: 60,
-              renderCharacters: false
-            },
+            bracketPairColorization: { enabled: true },
+            minimap: { enabled: false },
             folding: true,
-            foldingHighlight: true,
-            renderLineHighlight: 'all',
-            suggestOnTriggerCharacters: true,
-            quickSuggestions: {
-              other: true,
-              comments: true,
-              strings: true
-            },
-            parameterHints: {
-              enabled: true
-            },
+            renderLineHighlight: 'line',
             wordWrap: 'off',
-            padding: {
-              top: 12,
-              bottom: 12
-            }
+            padding: { top: 10, bottom: 10 }
           }}
           loading={
-            <div className="flex items-center justify-center h-full space-x-2 text-xs font-mono text-[#8b949e]">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>Loading VS Code Engine...</span>
+            <div className="flex items-center justify-center h-full gap-2 text-xs font-mono text-slate-400">
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+              <span>Loading Editor...</span>
             </div>
           }
         />
       </div>
 
-      {/* VS Code Style Status Bar */}
-      <div className="flex items-center justify-between px-3 py-1 bg-[#0c0e14] border-t border-[#262d3a] font-mono text-[11px] text-[#8b949e] select-none">
-        {/* Left Status: Language + Shortcut Tip */}
-        <div className="flex items-center space-x-3">
-          <span className="flex items-center space-x-1 text-emerald-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-semibold">{languageBadges[selectedLang]}</span>
-          </span>
-          <span className="hidden sm:inline text-[#484f58]">|</span>
-          <span className="hidden sm:inline text-[#8b949e]">
-            Press <kbd className="px-1 py-0.2 rounded bg-[#171c26] text-[#c9d1d9] border border-[#272e3a] font-mono">Ctrl+Enter</kbd> to Run
+      {/* ── Bottom Status Bar with Run & Submit Buttons ── */}
+      <div className="h-11 px-3.5 bg-[#141a27] border-t border-slate-800/80 flex items-center justify-between shrink-0 select-none text-[11px] text-slate-400">
+        {/* Left: Cursor position & Shortcut hint */}
+        <div className="flex items-center gap-3">
+          <span>Ln {cursorPos.line}, Col {cursorPos.col}</span>
+          <span className="hidden sm:inline text-slate-700">|</span>
+          <span className="hidden sm:inline text-slate-400">
+            Press <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[10px] border border-slate-700/60">Ctrl + Enter</kbd> to Run
           </span>
         </div>
 
-        {/* Right Status: Line/Col, Line Count, Encoding */}
-        <div className="flex items-center space-x-3">
-          <span className="text-[#c9d1d9]">
-            Ln {cursorPos.line}, Col {cursorPos.col}
-          </span>
-          <span className="text-[#484f58]">|</span>
-          <span>{lineCount} lines</span>
-          <span className="hidden sm:inline text-[#484f58]">|</span>
-          <span className="hidden sm:inline text-[#8b949e]">Spaces: 2</span>
-          <span className="hidden sm:inline text-[#484f58]">|</span>
-          <span className="hidden sm:inline text-[#8b949e]">UTF-8</span>
+        {/* Right: Run Tests & Submit Solution Buttons */}
+        <div className="flex items-center gap-2">
+          {/* Run Tests Button */}
+          <button
+            onClick={onRunTests}
+            disabled={isRunning || isSubmitting}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700/80 text-slate-200 border border-slate-700/60 text-xs font-semibold transition cursor-pointer disabled:opacity-40 active:scale-95 shadow-xs"
+            title="Run tests against implementation"
+          >
+            {isRunning ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+            ) : (
+              <Play className="w-3.5 h-3.5 text-emerald-400 fill-current" />
+            )}
+            <span>{isRunning ? 'Running...' : 'Run Tests'}</span>
+          </button>
+
+          {/* Submit Solution Button */}
+          {onSubmitSolution && (
+            <button
+              onClick={onSubmitSolution}
+              disabled={isRunning || isSubmitting}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold transition cursor-pointer disabled:opacity-40 active:scale-95 shadow-sm"
+              title="Submit solution for full grading"
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-black" />
+              ) : (
+                <Send className="w-3.5 h-3.5 text-black" />
+              )}
+              <span>{isSubmitting ? 'Evaluating...' : 'Submit'}</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -88,7 +88,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans antialiased selection:bg-[#10b981] selection:text-white relative">
       {/* Route-Specific Navbar */}
-      {currentRoute === 'landing' && !activeChallenge ? (
+      {activeChallenge ? null : currentRoute === 'landing' ? (
         <LandingNavbar
           onNavigate={navigateTo}
           onStartBuilding={() => handleSelectChallenge(challengesList[0])}
@@ -112,6 +112,7 @@ export default function App() {
       {activeChallenge ? (
         <ChallengeDetailView
           challenge={activeChallenge}
+          challengesList={challengesList}
           onBack={() => {
             setActiveChallenge(null);
             navigateTo('challenges');

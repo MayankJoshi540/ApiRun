@@ -28,10 +28,9 @@ export const SubmissionModal: React.FC<Props> = ({
   const hiddenPassed = hiddenTests.filter(r => r.status === 'PASSED').length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-emil-fade">
       <div 
-        className="w-full max-w-2xl bg-[#080d14] border border-white/[0.12] rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.8)] overflow-hidden font-sans animate-in zoom-in-95 duration-200"
-        style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+        className="w-full max-w-2xl bg-[#080d14] border border-white/[0.12] rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.8)] overflow-hidden font-sans animate-emil-modal"
       >
         <div className="flex items-center justify-between p-5 bg-[#05070a] border-b border-white/[0.08]">
           <div className="flex items-center space-x-3">
