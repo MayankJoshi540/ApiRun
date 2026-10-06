@@ -46,6 +46,46 @@
   }
 }
 
+/* Emil Kowalski Animation Foundation */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes emilModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes emilFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-emil-modal {
+  animation: emilModalIn 220ms var(--ease-out) both;
+}
+
+.animate-emil-fade {
+  animation: emilFadeIn 180ms var(--ease-out) both;
+}
+
 /* Ensure micro-text and arbitrary small classes scale up to readable sizes */
 .text-\[9px\],
 .text-\[10px\],
