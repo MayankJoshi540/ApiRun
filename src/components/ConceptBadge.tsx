@@ -15,18 +15,18 @@ export const ConceptBadge: React.FC<Props> = ({
   onClick
 }) => {
   const isClickable = !!onClick;
-  const sizeClasses = size === 'sm' ? 'text-[11px] px-2 py-0.5' : 'text-xs px-2.5 py-1';
+  const sizeClasses = size === 'sm' ? 'text-xs px-2.5 py-1 rounded-lg' : 'text-xs sm:text-sm px-3 py-1.5 rounded-lg';
   
   return (
     <span
       onClick={onClick}
-      className={'inline-flex items-center font-sans font-medium rounded-md border transition-colors ' + sizeClasses + ' ' + (
+      className={'inline-flex items-center font-sans font-medium border transition-colors ' + sizeClasses + ' ' + (
         active 
-          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40 font-medium'
-          : 'bg-[#12161f] text-[#8b949e] border-[#262d3a] hover:text-[#e6edf3] hover:border-[#374151]'
-      ) + (isClickable ? ' cursor-pointer select-none' : '')}
+          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 font-semibold'
+          : 'bg-[#141a27] text-slate-400 border-slate-800 hover:text-slate-200 hover:border-slate-700'
+      ) + (isClickable ? ' cursor-pointer select-none active:scale-95' : '')}
     >
-      <span className="text-[#10b981] mr-1 text-[10px] opacity-70 font-semibold">#</span>
+      <span className="text-emerald-400 mr-1 text-xs opacity-80 font-bold">#</span>
       {concept}
     </span>
   );
