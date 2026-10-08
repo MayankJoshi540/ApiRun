@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Flame, Info, Calendar, Activity } from '@/components/ui/GoogleIcon';
+import { Flame } from '@/components/ui/GoogleIcon';
 import { UserSubmission } from '@/lib/userProgress';
 
 interface SubmissionHeatmapProps {
@@ -34,7 +34,7 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
   const [hoveredDay, setHoveredDay] = useState<DayData | null>(null);
 
   // Process real submission timestamps into a date-to-count map
-  const { dateToCount, last30DaysSubmissions, maxStreak, currentCalculatedStreak } = useMemo(() => {
+  const { dateToCount, last30DaysSubmissions, currentCalculatedStreak } = useMemo(() => {
     const counts: Record<string, number> = {};
     let recentSubmissions = 0;
     
@@ -59,27 +59,7 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
 
     const activeDates = Object.keys(counts).filter(k => counts[k] > 0).sort();
 
-    // Calculate max streak & current streak from real active dates
-    let maxS = 0;
-    let tempStreak = 0;
-    let prevDate: Date | null = null;
-
-    activeDates.forEach(dateStr => {
-      const curDate = new Date(dateStr);
-      if (prevDate) {
-        const diffDays = Math.round((curDate.getTime() - prevDate.getTime()) / (1000 * 3600 * 24));
-        if (diffDays === 1) {
-          tempStreak++;
-        } else {
-          tempStreak = 1;
-        }
-      } else {
-        tempStreak = 1;
-      }
-      if (tempStreak > maxS) maxS = tempStreak;
-      prevDate = curDate;
-    });
-
+    // Calculate current streak from real active dates
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const yesterday = new Date(today);
@@ -105,7 +85,6 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
     return {
       dateToCount: counts,
       last30DaysSubmissions: recentSubmissions || (solvedCount > 0 ? 12 : 0), // fallback for visuals
-      maxStreak: Math.max(maxS, curS, streak || 0),
       currentCalculatedStreak: Math.max(curS, streak || (solvedCount > 0 ? 3 : 0)), // fallback for visuals
     };
   }, [submissions, streak, solvedCount]);
@@ -175,122 +154,98 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
   }, [dateToCount]);
 
   return (
-    <div className="rounded-xl border border-white/[0.08] bg-[#0c0e12] p-5 space-y-5 select-none font-sans">
-      
-      {/* Analytics Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center space-x-2">
-          <Activity className="w-4 h-4 text-[#a1a1aa]" />
-          <h2 className="text-sm font-semibold text-[#f4f4f5]">Activity Overview</h2>
-        </div>
-        
-        <div className="flex items-center space-x-4 text-sm text-[#a1a1aa]">
-          <div>
-            <span className="font-semibold text-[#f4f4f5]">{last30DaysSubmissions}</span> submissions in the last 30 days
-          </div>
-          <span className="text-[#52525b] hidden sm:block">•</span>
-          <div className="hidden sm:block">
-            Current streak: <span className="font-semibold text-[#34d399]">{currentCalculatedStreak} days</span>
-          </div>
-        </div>
+    <div className="w-full flex flex-col font-sans select-none h-full">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-6">
+        <h2 className="text-sm font-semibold text-[#f4f4f5]">Streak & Activity</h2>
+        <span className="text-xs text-[#a1a1aa]">{last30DaysSubmissions} submissions in the last 30 days</span>
       </div>
+      
+      <div className="flex flex-col xl:flex-row xl:items-start gap-6 flex-grow">
+        {/* Left: Streak info */}
+        <div className="flex items-center space-x-4 xl:w-1/3 xl:mt-2">
+          <div className="w-12 h-12 rounded-full bg-[#f59e0b]/10 flex items-center justify-center shrink-0">
+            <Flame className="w-6 h-6 text-[#f59e0b]" />
+          </div>
+          <div>
+            <div className="text-2xl font-semibold text-[#f4f4f5] tracking-tight">{currentCalculatedStreak} days</div>
+            <div className="text-xs text-[#a1a1aa] mt-0.5">Current Streak</div>
+          </div>
+        </div>
 
-      {/* Heatmap Container */}
-      <div className="space-y-3">
-        <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-          <div className="min-w-[760px] space-y-2">
-            
-            {/* Month Header Labels */}
-            <div className="flex pl-8 text-xs font-medium text-[#71717a] h-4 relative">
-              {monthHeaders.map((m, idx) => (
-                <div
-                  key={idx}
-                  className="absolute"
-                  style={{ left: `${m.weekIndex * 14 + 32}px` }}
-                >
-                  {m.label}
-                </div>
-              ))}
-            </div>
-
-            {/* Grid with Day of Week labels */}
-            <div className="flex items-start space-x-2">
-              {/* Day Labels (Sun, Mon, Wed, Fri) */}
-              <div className="flex flex-col justify-between text-[10px] font-medium text-[#71717a] pr-1 select-none pt-0.5" style={{ height: '90px' }}>
-                <span className="leading-none">Sun</span>
-                <span className="leading-none">Tue</span>
-                <span className="leading-none">Thu</span>
-                <span className="leading-none">Sat</span>
-              </div>
-
-              {/* 52-Week Activity Grid */}
-              <div className="flex space-x-[4px]">
-                {weeks.map((week, wIdx) => (
-                  <div key={wIdx} className="flex flex-col space-y-[4px]">
-                    {week.days.map((day, dIdx) => {
-                      const isFuture = day.isFuture;
-
-                      let bgClass = 'bg-black/40 border border-white/[0.04]';
-                      if (isFuture) {
-                        bgClass = 'bg-transparent border border-transparent opacity-0';
-                      } else if (day.count >= 4) {
-                        bgClass = 'bg-[#10b981] border border-[#10b981] shadow-sm shadow-[#10b981]/20';
-                      } else if (day.count >= 2) {
-                        bgClass = 'bg-[#10b981]/80 border border-[#10b981]/80';
-                      } else if (day.count === 1) {
-                        bgClass = 'bg-[#10b981]/40 border border-[#10b981]/40';
-                      } else if (day.isToday) {
-                        bgClass = 'bg-black/60 border border-white/[0.2]';
-                      }
-
-                      return (
-                        <div
-                          key={dIdx}
-                          onMouseEnter={() => setHoveredDay(day)}
-                          onMouseLeave={() => setHoveredDay(null)}
-                          className={`w-2.5 h-2.5 rounded-sm cursor-pointer transition-all duration-150 hover:scale-125 hover:z-20 ${bgClass}`}
-                        />
-                      );
-                    })}
+        {/* Right: Heatmap */}
+        <div className="xl:w-2/3 flex flex-col justify-end xl:items-end w-full overflow-hidden">
+          <div className="overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent w-full xl:w-auto">
+            <div className="min-w-[700px] flex flex-col">
+              
+              {/* Month Header Labels */}
+              <div className="flex pl-8 text-[10px] font-medium text-[#71717a] h-4 relative">
+                {monthHeaders.map((m, idx) => (
+                  <div
+                    key={idx}
+                    className="absolute"
+                    style={{ left: `${m.weekIndex * 14 + 32}px` }}
+                  >
+                    {m.label}
                   </div>
                 ))}
               </div>
+
+              {/* Grid with Day of Week labels */}
+              <div className="flex items-start space-x-2">
+                {/* Day Labels (Mon, Wed, Fri) */}
+                <div className="flex flex-col justify-between text-[10px] font-medium text-[#71717a] pr-1 select-none pt-[12px] pb-[12px]" style={{ height: '90px' }}>
+                  <span className="leading-none h-[10px]">Mon</span>
+                  <span className="leading-none h-[10px]">Wed</span>
+                  <span className="leading-none h-[10px]">Fri</span>
+                </div>
+
+                {/* 52-Week Activity Grid */}
+                <div className="flex space-x-[4px]">
+                  {weeks.map((week, wIdx) => (
+                    <div key={wIdx} className="flex flex-col space-y-[4px]">
+                      {week.days.map((day, dIdx) => {
+                        const isFuture = day.isFuture;
+
+                        let bgClass = 'bg-[#18181b] border border-white/[0.04]'; // Darker cell background
+                        if (isFuture) {
+                          bgClass = 'bg-transparent border border-transparent opacity-0';
+                        } else if (day.count >= 4) {
+                          bgClass = 'bg-[#10b981] border border-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.3)]'; // Brighter glow
+                        } else if (day.count >= 2) {
+                          bgClass = 'bg-[#10b981]/80 border border-[#10b981]/80';
+                        } else if (day.count === 1) {
+                          bgClass = 'bg-[#10b981]/40 border border-[#10b981]/40';
+                        } else if (day.isToday) {
+                          bgClass = 'bg-[#27272a] border border-white/[0.2]';
+                        }
+
+                        return (
+                          <div
+                            key={dIdx}
+                            onMouseEnter={() => setHoveredDay(day)}
+                            onMouseLeave={() => setHoveredDay(null)}
+                            title={`${day.count} submissions on ${day.monthName} ${day.dayOfMonth}`}
+                            className={`w-[10px] h-[10px] rounded-[2px] cursor-pointer transition-all duration-150 hover:border-white hover:z-20 ${bgClass}`}
+                          />
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-
-          </div>
-        </div>
-
-        {/* Dynamic Tooltip & Legend Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-[#a1a1aa] pt-2">
-          
-          {/* Hover Information / Live Date Indicator */}
-          <div className="flex items-center space-x-2 min-h-[20px]">
-            {hoveredDay ? (
-              <span className="text-[#f4f4f5]">
-                <strong className={hoveredDay.count > 0 ? 'text-[#34d399]' : 'text-[#a1a1aa]'}>
-                  {hoveredDay.count === 0
-                    ? 'No submissions'
-                    : `${hoveredDay.count} ${hoveredDay.count === 1 ? 'submission' : 'submissions'}`}
-                </strong>{' '}
-                on {hoveredDay.monthName} {hoveredDay.dayOfMonth}, {hoveredDay.date.getFullYear()}
-              </span>
-            ) : (
-              <span className="text-[#71717a]">
-                Hover over a cell to view daily submission activity
-              </span>
-            )}
           </div>
 
-          {/* Color Scale Legend */}
-          <div className="flex items-center space-x-1.5 text-xs text-[#71717a]">
+          {/* Legend */}
+          <div className="flex justify-end w-full mt-2 text-[10px] text-[#71717a] items-center space-x-1.5">
             <span className="mr-1">Less</span>
-            <span className="w-3 h-3 rounded-[3px] bg-black/40 border border-white/[0.04]" />
-            <span className="w-3 h-3 rounded-[3px] bg-[#10b981]/40 border border-[#10b981]/40" />
-            <span className="w-3 h-3 rounded-[3px] bg-[#10b981]/80 border border-[#10b981]/80" />
-            <span className="w-3 h-3 rounded-[3px] bg-[#10b981] border border-[#10b981]" />
+            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#18181b] border border-white/[0.04]" />
+            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#10b981]/40 border border-[#10b981]/40" />
+            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#10b981]/80 border border-[#10b981]/80" />
+            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#10b981] border border-[#10b981]" />
             <span className="ml-1">More</span>
           </div>
-
         </div>
       </div>
     </div>
