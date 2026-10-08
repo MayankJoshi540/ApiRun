@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { challenges as defaultChallenges, initialUserStats } from '@/data/challenges';
 import { BackendRankNavbar } from '@/components/BackendRankNavbar';
@@ -48,7 +49,24 @@ export default function ProgressPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between overflow-x-hidden">
+      
+      {/* Background Decor & Image */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <Image
+          src="/progress-background.png"
+          alt="Atmospheric Background"
+          fill
+          className="object-cover object-top opacity-100"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050708]/70 to-[#050708]/95 pointer-events-none" />
+        
+        {/* Ambient Color Blobs - Vibrant Green Theme */}
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-500/15 rounded-full blur-[120px]" />
+        <div className="absolute top-[20%] right-[-10%] w-[700px] h-[700px] bg-[#10b981]/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[800px] h-[800px] bg-emerald-600/15 rounded-full blur-[150px]" />
+      </div>
       
       <BackendRankNavbar
         activeTab="progress"

@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
-  variant?: 'fade-up' | 'fade-down' | 'fade-left' | 'fade-right' | 'scale' | 'fade';
+  variant?: 'fade-up' | 'fade-down' | 'fade-left' | 'fade-right' | 'scale' | 'fade' | 'blur-up' | 'scale-rotate' | 'clip-up';
   delay?: number; // in ms
   duration?: number; // in ms
   distance?: number; // in px
@@ -74,6 +74,12 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
         return `translate3d(-${distance}px, 0, 0)`;
       case 'scale':
         return 'scale3d(0.94, 0.94, 1)';
+      case 'blur-up':
+        return `translate3d(0, ${distance}px, 0)`;
+      case 'scale-rotate':
+        return 'scale3d(0.9, 0.9, 1) rotate3d(0, 0, 1, 3deg)';
+      case 'clip-up':
+        return 'translate3d(0, 0, 0)';
       case 'fade':
       default:
         return 'translate3d(0, 0, 0)';
@@ -87,7 +93,13 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translate3d(0, 0, 0) scale3d(1, 1, 1)' : getHiddenTransform(),
-        transitionProperty: 'opacity, transform',
+        ...(variant === 'blur-up' ? { filter: isVisible ? 'blur(0px)' : 'blur(8px)' } : {}),
+        ...(variant === 'clip-up' ? { clipPath: isVisible ? 'inset(0 0 0 0)' : 'inset(100% 0 0 0)' } : {}),
+        transitionProperty: variant === 'blur-up'
+          ? 'opacity, transform, filter'
+          : variant === 'clip-up'
+            ? 'opacity, transform, clip-path'
+            : 'opacity, transform',
         transitionDuration: `${duration}ms`,
         transitionDelay: `${delay}ms`,
         transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)', // Emil Kowalski snappy deceleration curve

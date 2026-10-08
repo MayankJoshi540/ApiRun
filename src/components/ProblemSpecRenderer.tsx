@@ -227,19 +227,20 @@ export const ProblemSpecRenderer: React.FC<Props> = ({ challenge }) => {
                   </div>
 
                   {/* Response */}
-                  <div className="rounded-lg border border-slate-800/80 bg-[#111622] p-3.5 space-y-2">
-                    <div className="flex items-center justify-between">
+                  <div className="rounded-xl border border-slate-800/80 bg-[#111622] p-3.5 space-y-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-1 border-b border-slate-800/60">
                       <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
                         Expected Response
                       </div>
                       {successResp && (
-                        <span className="text-[11px] font-mono font-bold text-[#34d399] bg-[#0d2a1f] border border-[#18533b] px-2 py-0.5 rounded">
-                          HTTP {successResp.statusCode} {successResp.statusText}
-                        </span>
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 shrink-0 shadow-sm">
+                          <span>HTTP {successResp.statusCode}</span>
+                          <span className="text-emerald-300/80 font-sans font-medium text-[10.5px]">{successResp.statusText}</span>
+                        </div>
                       )}
                     </div>
                     {successResp?.exampleJson && (
-                      <div className="pt-1">
+                      <div className="pt-0.5">
                         <CodeBlock code={successResp.exampleJson} language="json" />
                       </div>
                     )}
@@ -248,13 +249,14 @@ export const ProblemSpecRenderer: React.FC<Props> = ({ challenge }) => {
 
                 {/* Validation / Error Case */}
                 {errorResp && (
-                  <div className="rounded-lg border border-[#574015] bg-[#1a140a] p-3.5 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-mono font-bold text-[#fbbf24] uppercase tracking-wider">
+                  <div className="rounded-xl border border-[#574015]/80 bg-[#1a140a] p-3.5 space-y-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-1 border-b border-[#574015]/40">
+                      <span className="text-[11px] font-mono font-bold text-amber-400 uppercase tracking-wider">
                         Validation Error Case
                       </span>
-                      <span className="text-[11px] font-mono font-bold text-[#fbbf24] bg-[#2d210b] border border-[#574015] px-2 py-0.5 rounded">
-                        HTTP {errorResp.statusCode} {errorResp.statusText}
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 shrink-0 shadow-sm">
+                        <span>HTTP {errorResp.statusCode}</span>
+                        <span className="text-amber-300/80 font-sans font-medium text-[10.5px]">{errorResp.statusText}</span>
                       </span>
                     </div>
                     {errorResp.description && (
