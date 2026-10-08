@@ -36,22 +36,18 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#050708] flex flex-col items-center justify-center text-white select-none px-4">
-        <div className="flex flex-col items-center space-y-5">
-          <div className="relative flex items-center justify-center">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-sm">
-              <span className="font-mono text-2xl font-extrabold text-emerald-400 tracking-tighter">
-                &#123;&bull;&gt;&#125;
-              </span>
-            </div>
+        <div className="flex flex-col items-center space-y-6">
+          <div className="relative flex items-center justify-center w-12 h-12">
+            <div className="absolute inset-0 border-[3px] border-[#18181b] rounded-full"></div>
+            <div className="absolute inset-0 border-[3px] border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
           </div>
 
-          <div className="space-y-1.5 text-center">
-            <div className="flex items-center justify-center space-x-2 text-sm font-semibold text-slate-200">
-              <Loader2 className="w-4 h-4 text-emerald-400" />
-              <span>Verifying Developer Session</span>
+          <div className="space-y-2 text-center">
+            <div className="text-sm font-semibold text-slate-200 tracking-wide">
+              APIRun Workspace
             </div>
-            <p className="text-xs text-zinc-500 font-mono">
-              Loading challenges workspace &amp; progress...
+            <p className="text-xs text-zinc-500 font-medium">
+              Loading your environment...
             </p>
           </div>
         </div>
@@ -67,12 +63,13 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   if (!user) {
     return (
       <div className="min-h-screen bg-[#050708] flex flex-col items-center justify-center text-white select-none px-4">
-        <div className="flex flex-col items-center space-y-3">
-          <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center">
-            <span className="font-mono text-lg font-bold text-emerald-400">&#123;&bull;&gt;&#125;</span>
+        <div className="flex flex-col items-center space-y-4">
+          <div className="relative flex items-center justify-center w-8 h-8">
+            <div className="absolute inset-0 border-2 border-[#18181b] rounded-full"></div>
+            <div className="absolute inset-0 border-2 border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
           </div>
-          <div className="text-xs font-mono text-zinc-400">
-            Redirecting to authentication portal...
+          <div className="text-xs font-medium text-zinc-400">
+            Redirecting to authentication...
           </div>
         </div>
       </div>
