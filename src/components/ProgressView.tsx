@@ -67,7 +67,7 @@ export const ProgressView: React.FC<Props> = ({
 
   // Profile data states
   const [profileBio, setProfileBio] = useState('Practicing production-grade backend engineering with Express, Go, and Python. Focused on resilient APIs, clean validation, and sub-20ms SLAs.');
-  const [profileLocation, setProfileLocation] = useState('San Francisco, CA');
+  const [profileLocation, setProfileLocation] = useState('India');
   const [profileGithub, setProfileGithub] = useState('');
   const [profileTitle, setProfileTitle] = useState('Backend Engineer');
   const [customDisplayName, setCustomDisplayName] = useState('');
@@ -145,7 +145,7 @@ export const ProgressView: React.FC<Props> = ({
       });
 
       setProfileBio(editForm.bio.trim());
-      setProfileLocation(editForm.location.trim() || 'San Francisco, CA');
+      setProfileLocation(editForm.location.trim() || 'India');
       setProfileGithub(editForm.github.trim());
       setProfileTitle(editForm.title.trim() || 'Backend Engineer');
       if (editForm.displayName.trim()) {
@@ -163,14 +163,17 @@ export const ProgressView: React.FC<Props> = ({
   };
 
   const [selectedSubmissionsTab, setSelectedSubmissionsTab] = useState<'ALL' | 'AC' | 'IN_PROGRESS'>('ALL');
-  const [selectedSkillCategory, setSelectedSkillCategory] = useState<'ALL' | 'CORE' | 'SECURITY' | 'DISTRIBUTED'>('ALL');
   const [searchHistory, setSearchHistory] = useState('');
 
   const solvedChallenges = useMemo(() => challenges.filter(c => c.status === 'SOLVED'), [challenges]);
   const inProgressChallenges = useMemo(() => challenges.filter(c => c.status === 'IN_PROGRESS'), [challenges]);
   const totalChallenges = challenges.length;
   const solvedCount = solvedChallenges.length;
-  const solvedPercent = totalChallenges > 0 ? Math.round((solvedCount / totalChallenges) * 100) : 0;
+  
+  // Analytics calculations
+  const totalAttempted = solvedCount + inProgressChallenges.length || (solvedCount > 0 ? solvedCount + 10 : 12);
+  const successRate = totalAttempted > 0 ? Math.round((solvedCount / totalAttempted) * 100) : 0;
+  const failedCount = totalAttempted > solvedCount ? totalAttempted - solvedCount : 0;
 
   // Breakdown by LeetCode difficulty tiers
   const easyChallenges = useMemo(() => challenges.filter(c => c.difficulty === 'BEGINNER'), [challenges]);
@@ -181,34 +184,13 @@ export const ProgressView: React.FC<Props> = ({
   const mediumSolved = useMemo(() => solvedChallenges.filter(c => c.difficulty === 'INTERMEDIATE').length, [solvedChallenges]);
   const hardSolved = useMemo(() => solvedChallenges.filter(c => c.difficulty === 'ADVANCED').length, [solvedChallenges]);
 
-  // Skill Tags (LeetCode style: Advanced, Intermediate, Fundamental)
+  // Skill Tags mapped to list
   const skillTags = [
-    { name: 'Input Validation', count: 1, total: 2, level: 'CORE' },
-    { name: 'HTTP Protocol & REST', count: 1, total: 3, level: 'CORE' },
-    { name: 'Database CRUD & SQL', count: 0, total: 2, level: 'CORE' },
-    { name: 'JWT Authentication', count: 0, total: 1, level: 'SECURITY' },
-    { name: 'Rate Limiting Algorithms', count: 0, total: 1, level: 'SECURITY' },
-    { name: 'Security & CORS Headers', count: 0, total: 1, level: 'SECURITY' },
-    { name: 'Redis In-Memory Cache', count: 0, total: 2, level: 'DISTRIBUTED' },
-    { name: 'Concurrency & Mutex Locks', count: 0, total: 1, level: 'DISTRIBUTED' },
-    { name: 'Idempotency Keys', count: 0, total: 1, level: 'DISTRIBUTED' },
-    { name: 'Webhook Event Dispatch', count: 0, total: 1, level: 'DISTRIBUTED' },
-    { name: 'Background Message Queues', count: 0, total: 1, level: 'DISTRIBUTED' },
-  ];
-
-  const filteredSkills = useMemo(() => {
-    if (selectedSkillCategory === 'ALL') return skillTags;
-    return skillTags.filter(s => s.level === selectedSkillCategory);
-  }, [selectedSkillCategory]);
-
-  // Badges showcase (LeetCode Badges)
-  const badges = [
-    { id: 'b1', name: 'First AC', desc: 'Solved 1st backend challenge', date: 'Sep 2026', unlocked: true, icon: Zap, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
-    { id: 'b2', name: 'Validation Master', desc: 'Passed all input validation suites', date: 'Sep 2026', unlocked: true, icon: CheckCircle2, color: 'text-sky-400 bg-sky-500/10 border-sky-500/20' },
-    { id: 'b3', name: 'Sub-15ms Latency', desc: 'Average latency under 20ms', date: 'Active', unlocked: true, icon: Cpu, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
-    { id: 'b4', name: 'Idempotency Key', desc: 'Completed safe retry API', date: 'Locked', unlocked: false, icon: RefreshCw, color: 'text-zinc-500 bg-zinc-900/40 border-zinc-800/80' },
-    { id: 'b5', name: 'JWT Auth Sentinel', desc: 'Bearer token crypto verify', date: 'Locked', unlocked: false, icon: Key, color: 'text-zinc-500 bg-zinc-900/40 border-zinc-800/80' },
-    { id: 'b6', name: 'Production 50 AC', desc: '50 challenges completed', date: 'Locked', unlocked: false, icon: Award, color: 'text-zinc-500 bg-zinc-900/40 border-zinc-800/80' }
+    { name: 'HTTP Protocol & REST', count: 1, total: 3 },
+    { name: 'Input Validation', count: 1, total: 2 },
+    { name: 'Database CRUD & SQL', count: 0, total: 2 },
+    { name: 'JWT Authentication', count: 0, total: 1 },
+    { name: 'Rate Limiting Algorithms', count: 0, total: 1 },
   ];
 
   // Filtered Submissions List
@@ -225,572 +207,435 @@ export const ProgressView: React.FC<Props> = ({
   }, [challenges, searchHistory, selectedSubmissionsTab]);
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans select-none text-slate-100 antialiased">
+    <div className="w-full space-y-5 sm:space-y-6 font-sans select-none antialiased">
       
       {/* Save Success Alert */}
       {saveSuccessMsg && (
-        <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center justify-between shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="p-3.5 rounded-lg bg-[#10b981]/10 border border-[#10b981]/20 text-[#34d399] text-sm font-medium flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="flex items-center space-x-2">
-            <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
-            <span>Profile and bio updated successfully!</span>
+            <Check className="w-4 h-4" />
+            <span>Profile updated successfully</span>
           </div>
-          <button onClick={() => setSaveSuccessMsg(false)} className="text-zinc-400 hover:text-white">
-            <X className="w-3.5 h-3.5" />
+          <button onClick={() => setSaveSuccessMsg(false)} className="text-[#34d399]/70 hover:text-[#34d399] transition-colors">
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* 2-COLUMN LEETCODE DASHBOARD GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* ========================================================================= */}
+      {/* 1. PROFILE HEADER                                                         */}
+      {/* ========================================================================= */}
+      <div className="rounded-xl border border-white/[0.08] bg-[#0c0e12] p-5 lg:p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative group hover:border-white/[0.12] transition-colors duration-200">
         
-        {/* ========================================================================= */}
-        {/* LEFT COLUMN: USER PROFILE, STATS & LANGUAGE METRICS (LEETCODE PROFILE)   */}
-        {/* ========================================================================= */}
-        <div className="lg:col-span-4 space-y-6">
-          
-          {/* Main Profile Card */}
-          <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 sm:p-7 space-y-6 shadow-xl relative overflow-hidden group">
-            {/* Edit Profile Action Button */}
-            <div className="absolute top-5 right-5 z-10">
-              <button
-                onClick={handleOpenEditModal}
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.08] hover:border-emerald-500/50 text-xs font-semibold text-zinc-300 hover:text-emerald-400 transition-all duration-150 active:scale-95 shadow-sm group"
-                title="Edit bio and profile info"
-              >
-                <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Edit Bio</span>
-              </button>
-            </div>
-
-            {/* Avatar & Identifiers */}
-            <div className="flex items-center space-x-4 pr-16">
-              <div className="relative shrink-0">
-                {displayPhoto ? (
-                  <img
-                    src={displayPhoto}
-                    alt={displayName}
-                    className="w-16 h-16 rounded-2xl object-cover border border-white/[0.12] shadow-inner"
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-[#0f172a] border border-white/[0.12] flex items-center justify-center text-xl font-bold text-emerald-400 shadow-inner font-sans">
-                    {initials}
-                  </div>
-                )}
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-[#0b0f17] flex items-center justify-center">
-                  <Check className="w-3 h-3 text-black stroke-[3]" />
-                </div>
-              </div>
-
-              <div className="space-y-1 min-w-0">
-                <h1 className="text-xl font-bold text-white tracking-tight font-sans truncate">
-                  {displayName}
-                </h1>
-                <div className="text-xs text-slate-400 font-sans truncate">{handle}</div>
-                <div className="text-xs text-emerald-400 font-medium flex items-center space-x-1.5 pt-0.5">
-                  <Shield className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">
-                    {profileTitle} · {solvedCount > 3 ? 'Level 3 Architect' : solvedCount > 0 ? 'Level 2 Engineer' : 'Level 1 Initiate'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Custom Bio Section */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
-                <span>About Developer</span>
-              </div>
-              <p className="text-sm text-slate-300 leading-relaxed font-sans bg-white/[0.02] p-3.5 rounded-xl border border-white/[0.04]">
-                {profileBio}
-              </p>
-            </div>
-
-            {/* Bio Metadata */}
-            <div className="space-y-2.5 pt-4 border-t border-white/[0.08] text-xs text-slate-400">
-              <div className="flex items-center space-x-2.5">
-                <MapPin className="w-4 h-4 text-slate-500 shrink-0" />
-                <span>{profileLocation}</span>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <Code2 className="w-4 h-4 text-slate-500 shrink-0" />
-                <a
-                  href={`https://github.com/${(profileGithub || handle).replace(/^@/, '')}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-slate-300 hover:text-emerald-400 transition-colors cursor-pointer truncate"
-                >
-                  github.com/{(profileGithub || handle).replace(/^@/, '')}
-                </a>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
-                <span>Joined APIRun Beta</span>
-              </div>
-            </div>
-
-            {/* Community Stats */}
-            <div className="grid grid-cols-3 gap-2.5 pt-4 border-t border-white/[0.08] text-center">
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-                <div className="text-lg font-bold text-white">{solvedCount > 0 ? solvedCount + 3 : 4}</div>
-                <div className="text-xs text-slate-400 font-medium">Submissions</div>
-              </div>
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-                <div className="text-lg font-bold text-emerald-400">{solvedPercent > 0 ? `${solvedPercent}%` : '100%'}</div>
-                <div className="text-xs text-slate-400 font-medium">Pass Rate</div>
-              </div>
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-                <div className="text-lg font-bold text-sky-400">14.8ms</div>
-                <div className="text-xs text-slate-400 font-medium">Avg Latency</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Language Breakdown (LeetCode Language Widget) */}
-          <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-white flex items-center space-x-2">
-                <Code2 className="w-4 h-4 text-emerald-400" />
-                <span>Languages Used</span>
-              </h2>
-              <span className="text-xs text-slate-400">3 Runtimes</span>
-            </div>
-
-            <div className="space-y-2.5 text-xs">
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
-                <div className="flex items-center space-x-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                  <span className="text-white font-medium">TypeScript / Node.js</span>
-                </div>
-                <span className="text-emerald-400 font-bold">1 solved <span className="text-slate-500 font-normal">/ 11 tests</span></span>
-              </div>
-
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
-                <div className="flex items-center space-x-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-sky-400" />
-                  <span className="text-slate-300 font-medium">Go 1.22</span>
-                </div>
-                <span className="text-slate-400">0 solved</span>
-              </div>
-
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
-                <div className="flex items-center space-x-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                  <span className="text-slate-300 font-medium">Python (FastAPI)</span>
-                </div>
-                <span className="text-slate-400">0 solved</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Badges Showcase (LeetCode Badges Widget) */}
-          <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-white flex items-center space-x-2">
-                <Award className="w-4 h-4 text-amber-400" />
-                <span>Earned Badges</span>
-              </h2>
-              <span className="text-xs text-emerald-400 font-semibold">3 Unlocked</span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2.5">
-              {badges.map(badge => {
-                const Icon = badge.icon;
-                return (
-                  <div
-                    key={badge.id}
-                    className={`p-3 rounded-xl border flex flex-col items-center text-center space-y-1.5 transition-all ${
-                      badge.unlocked
-                        ? `${badge.color} shadow-sm`
-                        : 'bg-white/[0.01] border-white/[0.04] text-zinc-600 opacity-60'
-                    }`}
-                    title={`${badge.name}: ${badge.desc}`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="text-xs font-semibold text-white line-clamp-1">{badge.name}</span>
-                    <span className="text-[11px] text-slate-400">{badge.date}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
+        {/* Edit Button */}
+        <div className="absolute top-4 right-4 lg:top-6 lg:right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+          <button
+            onClick={handleOpenEditModal}
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md border border-white/[0.08] hover:border-[#10b981]/50 text-xs font-medium text-[#a1a1aa] hover:text-[#34d399] transition-all duration-150 active:scale-95 bg-black/40 backdrop-blur-sm"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+            <span>Edit</span>
+          </button>
         </div>
 
-        {/* ========================================================================= */}
-        {/* RIGHT COLUMN: LEETCODE SOLVED GAUGE, HEATMAP, SKILL TAGS & SUBMISSIONS   */}
-        {/* ========================================================================= */}
-        <div className="lg:col-span-8 space-y-6">
+        {/* Left Side: Avatar & Identity */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+          <div className="relative shrink-0">
+            {displayPhoto ? (
+              <img
+                src={displayPhoto}
+                alt={displayName}
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border border-white/[0.12]"
+              />
+            ) : (
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/40 border border-white/[0.12] flex items-center justify-center text-2xl font-semibold text-[#f4f4f5]">
+                {initials}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <h1 className="text-xl sm:text-2xl font-semibold text-[#f4f4f5] tracking-tight">
+              {displayName}
+            </h1>
+            
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#a1a1aa]">
+              <span className="text-[#34d399] font-medium">{handle}</span>
+              <div className="flex items-center space-x-1.5">
+                <Shield className="w-3.5 h-3.5 text-[#52525b]" />
+                <span>{profileTitle}</span>
+              </div>
+              <div className="flex items-center space-x-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#52525b]" />
+                <span>{profileLocation}</span>
+              </div>
+              <div className="flex items-center space-x-1.5 hover:text-[#f4f4f5] transition-colors">
+                <Code2 className="w-3.5 h-3.5 text-[#52525b]" />
+                <a href={`https://github.com/${(profileGithub || handle).replace(/^@/, '')}`} target="_blank" rel="noreferrer">
+                  GitHub
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: Horizontal Key Metrics */}
+        <div className="flex items-center w-full lg:w-auto pt-5 lg:pt-0 border-t border-white/[0.08] lg:border-t-0 divide-x divide-white/[0.08] overflow-x-auto overflow-y-hidden pb-1 lg:pb-0">
+          <div className="flex flex-col pr-6 sm:pr-8 shrink-0">
+            <span className="text-[11px] font-medium text-[#71717a] uppercase tracking-wider mb-1">Solved</span>
+            <span className="text-2xl sm:text-3xl font-semibold text-[#f4f4f5]">{solvedCount}</span>
+          </div>
+          <div className="flex flex-col px-6 sm:px-8 shrink-0">
+            <span className="text-[11px] font-medium text-[#71717a] uppercase tracking-wider mb-1">Total</span>
+            <span className="text-2xl sm:text-3xl font-semibold text-[#f4f4f5]">{totalChallenges}</span>
+          </div>
+          <div className="flex flex-col px-6 sm:px-8 shrink-0">
+            <span className="text-[11px] font-medium text-[#71717a] uppercase tracking-wider mb-1">Acceptance Rate</span>
+            <span className="text-2xl sm:text-3xl font-semibold text-[#34d399]">{successRate}%</span>
+            {totalAttempted > 0 && <span className="text-[10px] text-[#71717a] mt-0.5 whitespace-nowrap">{solvedCount} / {totalAttempted} accepted</span>}
+          </div>
+          <div className="flex flex-col pl-6 sm:pl-8 hidden sm:flex shrink-0">
+            <span className="text-[11px] font-medium text-[#71717a] uppercase tracking-wider mb-1">Avg Latency</span>
+            <span className="text-2xl sm:text-3xl font-semibold text-[#f4f4f5]">14.8ms</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. ANALYTICS OVERVIEW GRID (4 Columns on large screens)                   */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        
+        {/* A. Overall Progress */}
+        <div className="rounded-xl border border-white/[0.08] bg-[#0c0e12] p-5 flex flex-col hover:border-white/[0.12] transition-colors duration-200">
+          <h2 className="text-sm font-semibold text-[#f4f4f5] mb-6">Overall Progress</h2>
+          <div className="flex-grow flex flex-col items-center justify-center">
+            <div className="relative w-36 h-36 flex items-center justify-center mb-4">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="44" stroke="rgba(255,255,255,0.04)" strokeWidth="4" fill="transparent" />
+                <circle 
+                  cx="50" cy="50" r="44" stroke="#10b981" strokeWidth="4" fill="transparent" 
+                  strokeDasharray="276.46" strokeDashoffset={276.46 - (276.46 * (solvedCount / totalChallenges))} 
+                  strokeLinecap="round" className="transition-all duration-1000 ease-out" 
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span className="text-4xl font-semibold text-[#f4f4f5] tracking-tight">{solvedCount}</span>
+                <span className="text-[10px] font-medium text-[#71717a] uppercase tracking-widest mt-1">Solved</span>
+              </div>
+            </div>
+            <div className="text-sm font-medium text-[#a1a1aa]">
+              {solvedCount} / {totalChallenges} challenges
+            </div>
+          </div>
+        </div>
+
+        {/* B. Difficulty Breakdown */}
+        <div className="rounded-xl border border-white/[0.08] bg-[#0c0e12] p-5 flex flex-col hover:border-white/[0.12] transition-colors duration-200">
+          <h2 className="text-sm font-semibold text-[#f4f4f5] mb-6">Difficulty Breakdown</h2>
+          <div className="flex-grow flex flex-col justify-center space-y-6">
+            
+            {/* Easy */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-[#a1a1aa] font-medium w-16">Easy</span>
+                <div className="flex-grow text-center">
+                  <span className="text-[#f4f4f5] font-semibold">{easySolved} <span className="text-[#71717a] font-normal">/ {easyChallenges.length}</span></span>
+                </div>
+                <span className="text-[#10b981] font-medium w-12 text-right">
+                  {easyChallenges.length > 0 ? Math.round((easySolved / easyChallenges.length) * 100) : 0}%
+                </span>
+              </div>
+              <div className="w-full bg-black/40 rounded-full h-1.5 overflow-hidden">
+                <div className="h-full bg-[#10b981] rounded-full transition-all duration-500" style={{ width: `${easyChallenges.length > 0 ? (easySolved / easyChallenges.length) * 100 : 0}%` }} />
+              </div>
+            </div>
+
+            {/* Medium */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-[#a1a1aa] font-medium w-16">Medium</span>
+                <div className="flex-grow text-center">
+                  <span className="text-[#f4f4f5] font-semibold">{mediumSolved} <span className="text-[#71717a] font-normal">/ {mediumChallenges.length}</span></span>
+                </div>
+                <span className="text-[#f59e0b] font-medium w-12 text-right">
+                  {mediumChallenges.length > 0 ? Math.round((mediumSolved / mediumChallenges.length) * 100) : 0}%
+                </span>
+              </div>
+              <div className="w-full bg-black/40 rounded-full h-1.5 overflow-hidden">
+                <div className="h-full bg-[#f59e0b] rounded-full transition-all duration-500" style={{ width: `${mediumChallenges.length > 0 ? (mediumSolved / mediumChallenges.length) * 100 : 0}%` }} />
+              </div>
+            </div>
+
+            {/* Hard */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-[#a1a1aa] font-medium w-16">Hard</span>
+                <div className="flex-grow text-center">
+                  <span className="text-[#f4f4f5] font-semibold">{hardSolved} <span className="text-[#71717a] font-normal">/ {hardChallenges.length}</span></span>
+                </div>
+                <span className="text-[#f43f5e] font-medium w-12 text-right">
+                  {hardChallenges.length > 0 ? Math.round((hardSolved / hardChallenges.length) * 100) : 0}%
+                </span>
+              </div>
+              <div className="w-full bg-black/40 rounded-full h-1.5 overflow-hidden">
+                <div className="h-full bg-[#f43f5e] rounded-full transition-all duration-500" style={{ width: `${hardChallenges.length > 0 ? (hardSolved / hardChallenges.length) * 100 : 0}%` }} />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* C. Submission Performance */}
+        <div className="rounded-xl border border-white/[0.08] bg-[#0c0e12] p-5 flex flex-col hover:border-white/[0.12] transition-colors duration-200">
+          <h2 className="text-sm font-semibold text-[#f4f4f5] mb-5">Submission Performance</h2>
           
-          {/* 1. FAMOUS LEETCODE CIRCULAR SOLVED PROGRESS WIDGET */}
-          <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 sm:p-7 shadow-xl">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          <div className="space-y-5 flex-grow flex flex-col justify-center">
+            <div className="flex flex-col">
+              <div className="flex items-end justify-between mb-2">
+                <span className="text-[11px] font-medium text-[#71717a] uppercase tracking-wider">Acceptance Rate</span>
+                <span className="text-2xl font-semibold text-[#34d399] leading-none">{successRate}%</span>
+              </div>
               
-              {/* Circular Gauge Ring */}
-              <div className="md:col-span-5 flex flex-col items-center justify-center p-2">
-                <div className="relative w-44 h-44 flex items-center justify-center">
-                  {/* SVG Donut Ring */}
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      stroke="#1e293b"
-                      strokeWidth="8"
-                      fill="transparent"
-                    />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      stroke="#10b981"
-                      strokeWidth="8"
-                      fill="transparent"
-                      strokeDasharray="251.2"
-                      strokeDashoffset={251.2 - (251.2 * (solvedCount / totalChallenges))}
-                      strokeLinecap="round"
-                      className="transition-all duration-1000 ease-out"
-                    />
-                  </svg>
-                  
-                  {/* Inner text inside circle */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <span className="text-3xl font-extrabold text-white tracking-tight">{solvedCount}</span>
-                    <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">Solved</span>
-                    <span className="text-xs text-emerald-400 font-semibold mt-0.5">{solvedPercent}% Total</span>
-                  </div>
-                </div>
-                <div className="text-xs text-slate-400 mt-2 font-medium">
-                  {solvedCount} of {totalChallenges} Challenges Completed
-                </div>
+              <div className="h-1.5 w-full rounded-full bg-black/40 flex overflow-hidden border border-white/[0.04]">
+                <div className="h-full bg-[#10b981] transition-all duration-500" style={{ width: `${successRate}%` }} />
+                <div className="h-full bg-zinc-700 transition-all duration-500" style={{ width: `${100 - successRate}%` }} />
               </div>
+            </div>
 
-              {/* Stacked Difficulty Bars (Easy, Medium, Hard) */}
-              <div className="md:col-span-7 space-y-3.5">
-                {/* Easy / Beginner */}
-                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-emerald-400 font-bold text-sm">Easy</span>
-                      <span className="text-white font-bold">{easySolved} <span className="text-slate-500 font-normal">/ {easyChallenges.length}</span></span>
-                    </div>
-                    <span className="text-emerald-400 text-xs font-semibold">Beats 84.2%</span>
-                  </div>
-                  <div className="w-full bg-white/[0.08] rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="h-full bg-emerald-400 rounded-full transition-all duration-500" 
-                      style={{ width: `${easyChallenges.length > 0 ? (easySolved / easyChallenges.length) * 100 : 0}%` }} 
-                    />
-                  </div>
-                </div>
-
-                {/* Medium / Intermediate */}
-                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sky-400 font-bold text-sm">Medium</span>
-                      <span className="text-white font-bold">{mediumSolved} <span className="text-slate-500 font-normal">/ {mediumChallenges.length}</span></span>
-                    </div>
-                    <span className="text-slate-400 text-xs">Beats 0.0%</span>
-                  </div>
-                  <div className="w-full bg-white/[0.08] rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="h-full bg-sky-400 rounded-full transition-all duration-500" 
-                      style={{ width: `${mediumChallenges.length > 0 ? (mediumSolved / mediumChallenges.length) * 100 : 0}%` }} 
-                    />
-                  </div>
-                </div>
-
-                {/* Hard / Advanced */}
-                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-rose-400 font-bold text-sm">Hard</span>
-                      <span className="text-white font-bold">{hardSolved} <span className="text-slate-500 font-normal">/ {hardChallenges.length}</span></span>
-                    </div>
-                    <span className="text-slate-400 text-xs">Beats 0.0%</span>
-                  </div>
-                  <div className="w-full bg-white/[0.08] rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="h-full bg-rose-400 rounded-full transition-all duration-500" 
-                      style={{ width: `${hardChallenges.length > 0 ? (hardSolved / hardChallenges.length) * 100 : 0}%` }} 
-                    />
-                  </div>
-                </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-black/20 border border-white/[0.04] p-3 rounded-lg flex flex-col">
+                <span className="text-xs font-medium text-[#71717a] mb-1">Accepted</span>
+                <span className="text-lg font-semibold text-[#10b981]">{solvedCount}</span>
               </div>
+              <div className="bg-black/20 border border-white/[0.04] p-3 rounded-lg flex flex-col">
+                <span className="text-xs font-medium text-[#71717a] mb-1">Failed</span>
+                <span className="text-lg font-semibold text-[#a1a1aa]">{failedCount}</span>
+              </div>
+            </div>
 
+            <div className="flex items-center justify-between pt-3 border-t border-white/[0.04] mt-auto">
+              <span className="text-[11px] font-medium text-[#71717a] uppercase tracking-wider">Avg Runtime</span>
+              <span className="text-sm font-semibold text-[#f4f4f5]">14.8ms</span>
+            </div>
+          </div>
+        </div>
+
+        {/* D. Skills & Languages */}
+        <div className="rounded-xl border border-white/[0.08] bg-[#0c0e12] p-5 flex flex-col hover:border-white/[0.12] transition-colors duration-200">
+          
+          <div className="mb-5">
+            <h2 className="text-sm font-semibold text-[#f4f4f5] mb-4">Top Skills</h2>
+            <div className="flex flex-wrap gap-2">
+              {skillTags.map(skill => (
+                <div key={skill.name} className="px-2.5 py-1.5 rounded-md bg-black/40 border border-white/[0.06] hover:border-[#10b981]/40 hover:bg-[#10b981]/5 transition-colors cursor-default group flex items-center">
+                  <span className="text-xs font-medium text-[#a1a1aa] group-hover:text-[#f4f4f5]">{skill.name}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* 2. REAL SUBMISSION HEATMAP ACTIVITY CALENDAR */}
-          <SubmissionHeatmap
-            submissions={userProgress?.submissions || {}}
-            streak={userProgress?.streak || userStats.currentStreak}
-            solvedCount={solvedCount}
-          />
-
-          {/* 3. SKILL TAGS (LEETCODE SKILL TAGS MATRIX) */}
-          <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] p-6 sm:p-7 space-y-5 shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex items-center space-x-2">
-                <Tag className="w-4 h-4 text-emerald-400" />
-                <h2 className="text-sm font-bold text-white">
-                  Skills &amp; Concept Mastery
-                </h2>
+          <div className="pt-5 border-t border-white/[0.04] mt-auto">
+            <h2 className="text-sm font-semibold text-[#f4f4f5] mb-3">Languages</h2>
+            <div className="flex items-center gap-3">
+              <div className="px-2.5 py-1 rounded bg-[#38bdf8]/10 border border-[#38bdf8]/20 flex items-center space-x-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
+                <span className="text-xs font-medium text-[#38bdf8]">TS <span className="opacity-70 ml-1">1</span></span>
               </div>
-
-              {/* Tag Categories */}
-              <div className="flex items-center space-x-1 bg-white/[0.03] border border-white/[0.08] p-1 rounded-xl text-xs">
-                {(['ALL', 'CORE', 'SECURITY', 'DISTRIBUTED'] as const).map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedSkillCategory(cat)}
-                    className={`px-3 py-1 rounded-lg font-medium text-xs transition-all duration-150 active:scale-95 ${
-                      selectedSkillCategory === cat
-                        ? 'bg-white/[0.12] text-white font-bold shadow-sm'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    {cat === 'ALL' ? 'All' : cat === 'CORE' ? 'Core HTTP' : cat === 'SECURITY' ? 'Security' : 'Distributed'}
-                  </button>
-                ))}
+              <div className="px-2.5 py-1 rounded bg-black/40 border border-white/[0.04] flex items-center space-x-1.5 opacity-50">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
+                <span className="text-xs font-medium text-[#a1a1aa]">Go <span className="opacity-70 ml-1">0</span></span>
               </div>
-            </div>
-
-            {/* LeetCode Style Pill Tags */}
-            <div className="flex flex-wrap gap-2.5 text-xs">
-              {filteredSkills.map(skill => {
-                const isCompleted = skill.count >= skill.total && skill.total > 0;
-                const isInProgress = skill.count > 0;
-
-                return (
-                  <div
-                    key={skill.name}
-                    className={`px-3.5 py-1.5 rounded-xl border flex items-center space-x-2 transition-all duration-150 hover:scale-[1.02] ${
-                      isCompleted
-                        ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 font-bold shadow-sm'
-                        : isInProgress
-                        ? 'bg-sky-500/15 border-sky-500/40 text-sky-400 font-semibold'
-                        : 'bg-white/[0.02] border-white/[0.08] text-slate-300'
-                    }`}
-                  >
-                    <span>{skill.name}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${
-                      isCompleted ? 'bg-emerald-500/20 text-emerald-300' : isInProgress ? 'bg-sky-500/20 text-sky-300' : 'bg-white/[0.06] text-slate-400'
-                    }`}>
-                      x{skill.count}
-                    </span>
-                  </div>
-                );
-              })}
+              <div className="px-2.5 py-1 rounded bg-black/40 border border-white/[0.04] flex items-center space-x-1.5 opacity-50">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
+                <span className="text-xs font-medium text-[#a1a1aa]">Py <span className="opacity-70 ml-1">0</span></span>
+              </div>
             </div>
           </div>
-
-          {/* 4. RECENT SUBMISSIONS / CHALLENGE ACTIVITY (LEETCODE TABLE) */}
-          <div className="rounded-2xl bg-[#0b0f17] border border-white/[0.08] overflow-hidden shadow-xl">
-            {/* Header with Search and Tab filters */}
-            <div className="p-5 bg-white/[0.02] border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex items-center space-x-2">
-                <Terminal className="w-4 h-4 text-emerald-400" />
-                <h2 className="text-sm font-bold text-white">
-                  Recent Submissions ({filteredSubmissions.length})
-                </h2>
-              </div>
-
-              <div className="flex items-center space-x-2.5">
-                {/* Search */}
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={searchHistory}
-                    onChange={e => setSearchHistory(e.target.value)}
-                    placeholder="Search challenges..."
-                    className="w-48 pl-8 pr-3 py-1.5 bg-[#080c14] border border-white/[0.1] rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500/50"
-                  />
-                </div>
-
-                {/* Status Tabs */}
-                <div className="flex items-center space-x-1 bg-[#080c14] border border-white/[0.08] p-1 rounded-xl text-xs">
-                  {(['ALL', 'AC', 'IN_PROGRESS'] as const).map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setSelectedSubmissionsTab(tab)}
-                      className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-150 active:scale-95 ${
-                        selectedSubmissionsTab === tab
-                          ? 'bg-white/[0.12] text-white font-bold shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {tab === 'ALL' ? 'All' : tab === 'AC' ? 'Accepted' : 'In Progress'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Submissions Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-[#080c14] border-b border-white/[0.06] text-slate-400 font-semibold text-xs">
-                  <tr>
-                    <th className="py-3.5 px-5">CHALLENGE</th>
-                    <th className="py-3.5 px-5">TIME</th>
-                    <th className="py-3.5 px-5">STATUS</th>
-                    <th className="py-3.5 px-5">RUNTIME</th>
-                    <th className="py-3.5 px-5">LANGUAGE</th>
-                    <th className="py-3.5 px-5 text-right">ACTION</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/[0.04]">
-                  {filteredSubmissions.length > 0 ? (
-                    filteredSubmissions.map(c => {
-                      const isSolved = c.status === 'SOLVED';
-                      const isInProgress = c.status === 'IN_PROGRESS';
-
-                      return (
-                        <tr 
-                          key={c.id} 
-                          className="hover:bg-white/[0.02] transition-colors cursor-pointer"
-                          onClick={() => onSelectChallenge(c)}
-                        >
-                          <td className="py-4 px-5">
-                            <div className="font-bold text-white text-sm hover:text-emerald-400 transition-colors">
-                              {c.title}
-                            </div>
-                            <div className="text-xs text-slate-400 font-mono mt-0.5">
-                              {c.endpoints?.[0]?.path || '/api'}
-                            </div>
-                          </td>
-
-                          <td className="py-4 px-5 text-slate-300">
-                            {isSolved ? '2 hours ago' : 'Recently'}
-                          </td>
-
-                          <td className="py-4 px-5">
-                            {isSolved ? (
-                              <span className="text-emerald-400 font-bold flex items-center space-x-1.5">
-                                <CheckCircle className="w-4 h-4" />
-                                <span>Accepted</span>
-                              </span>
-                            ) : isInProgress ? (
-                              <span className="text-amber-400 font-semibold">In Progress</span>
-                            ) : (
-                              <span className="text-slate-500">Unsolved</span>
-                            )}
-                          </td>
-
-                          <td className="py-4 px-5 text-slate-200 font-mono">
-                            {isSolved ? '14.8 ms' : '—'}
-                          </td>
-
-                          <td className="py-4 px-5 text-slate-300">
-                            <span className="px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.06] text-xs">
-                              TypeScript
-                            </span>
-                          </td>
-
-                          <td className="py-4 px-5 text-right">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onSelectChallenge(c);
-                              }}
-                              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.06] hover:bg-emerald-500 text-white hover:text-black border border-white/[0.1] transition-all duration-150 active:scale-95"
-                            >
-                              <span>{isSolved ? 'Review' : 'Solve'}</span>
-                              <ArrowRight className="w-3.5 h-3.5" />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan={6} className="py-10 text-center text-slate-400 text-xs">
-                        No submissions matching your filter.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
+          
         </div>
 
       </div>
 
       {/* ========================================================================= */}
-      {/* EDIT DEVELOPER BIO & PROFILE MODAL                                         */}
+      {/* 5. ACTIVITY / SUBMISSION GRAPH                                            */}
+      {/* ========================================================================= */}
+      <SubmissionHeatmap
+        submissions={userProgress?.submissions || {}}
+        streak={userProgress?.streak || userStats.currentStreak}
+        solvedCount={solvedCount}
+      />
+
+      {/* ========================================================================= */}
+      {/* 8. RECENT SUBMISSIONS TABLE                                               */}
+      {/* ========================================================================= */}
+      <div className="rounded-xl border border-white/[0.08] overflow-hidden bg-[#0c0e12]">
+        
+        {/* Table Header Controls */}
+        <div className="p-4 sm:p-5 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 className="text-sm font-semibold text-[#f4f4f5]">
+            Recent Submissions
+          </h2>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-[#71717a] absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchHistory}
+                onChange={e => setSearchHistory(e.target.value)}
+                placeholder="Search challenges..."
+                className="w-full sm:w-56 pl-8 pr-3 py-1.5 bg-black/40 border border-white/[0.08] rounded-md text-sm text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-white/[0.2] transition-colors"
+              />
+            </div>
+
+            <div className="flex items-center p-0.5 bg-black/40 rounded-md border border-white/[0.04]">
+              {(['ALL', 'AC', 'IN_PROGRESS'] as const).map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setSelectedSubmissionsTab(tab)}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-all duration-150 ${
+                    selectedSubmissionsTab === tab
+                      ? 'bg-white/[0.08] text-[#f4f4f5] shadow-sm'
+                      : 'text-[#a1a1aa] hover:text-[#f4f4f5]'
+                  }`}
+                >
+                  {tab === 'ALL' ? 'All' : tab === 'AC' ? 'Accepted' : 'Working'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Dense Developer Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm whitespace-nowrap">
+            <thead className="border-b border-white/[0.04] text-[#a1a1aa] font-medium bg-black/20 text-xs uppercase tracking-wider">
+              <tr>
+                <th className="py-3 px-4 sm:px-5">Challenge</th>
+                <th className="py-3 px-4 sm:px-5">Status</th>
+                <th className="py-3 px-4 sm:px-5">Runtime</th>
+                <th className="py-3 px-4 sm:px-5">Language</th>
+                <th className="py-3 px-4 sm:px-5 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/[0.04]">
+              {filteredSubmissions.length > 0 ? (
+                filteredSubmissions.map(c => {
+                  const isSolved = c.status === 'SOLVED';
+                  const isInProgress = c.status === 'IN_PROGRESS';
+
+                  return (
+                    <tr 
+                      key={c.id} 
+                      className="hover:bg-white/[0.02] border-b border-transparent hover:border-white/[0.04] transition-all cursor-pointer group"
+                      onClick={() => onSelectChallenge(c)}
+                    >
+                      <td className="py-3 px-4 sm:px-5">
+                        <div className="font-medium text-[#f4f4f5] group-hover:text-[#34d399] transition-colors">
+                          {c.title}
+                        </div>
+                      </td>
+
+                      <td className="py-3 px-4 sm:px-5">
+                        {isSolved ? (
+                          <span className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded bg-[#10b981]/10 text-[#10b981] font-medium text-xs border border-[#10b981]/20">
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            <span>Accepted</span>
+                          </span>
+                        ) : isInProgress ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] text-[#a1a1aa] font-medium text-xs">
+                            In Progress
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[#71717a] text-xs">
+                            Unsolved
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-3 px-4 sm:px-5 text-[#a1a1aa] font-mono text-[11px]">
+                        {isSolved ? '14.8ms' : '—'}
+                      </td>
+
+                      <td className="py-3 px-4 sm:px-5">
+                        <span className="px-2 py-0.5 rounded-sm bg-[#38bdf8]/10 text-[#38bdf8] text-[11px] font-medium uppercase tracking-wider">
+                          TS
+                        </span>
+                      </td>
+
+                      <td className="py-3 px-4 sm:px-5 text-right">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectChallenge(c);
+                          }}
+                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-md text-xs font-medium text-[#a1a1aa] hover:text-[#f4f4f5] bg-black/40 hover:bg-[#10b981]/10 border border-white/[0.04] hover:border-[#10b981]/30 transition-all group-hover:bg-white/[0.04]"
+                        >
+                          <span>{isSolved ? 'Review' : 'Solve'}</span>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-[#71717a] text-sm">
+                    No submissions found matching your criteria.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* EDIT MODAL                                                                */}
       {/* ========================================================================= */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="rounded-3xl bg-[#0b0f17] border border-white/[0.12] p-6 sm:p-8 max-w-lg w-full space-y-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="rounded-xl bg-[#0c0e12] border border-white/[0.12] p-6 sm:p-8 max-w-lg w-full space-y-6 shadow-2xl animate-in zoom-in-95 duration-200">
             
-            {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-              <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <Edit3 className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white font-display">Edit Developer Bio &amp; Profile</h3>
-                  <p className="text-xs text-zinc-400">Personalize your public backend developer card</p>
-                </div>
+              <div>
+                <h3 className="text-lg font-semibold text-[#f4f4f5]">Edit Profile</h3>
+                <p className="text-xs text-[#a1a1aa] mt-1">Personalize your developer analytics card</p>
               </div>
-
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="w-7 h-7 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-zinc-400 hover:text-white flex items-center justify-center transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/[0.08] text-[#71717a] hover:text-[#f4f4f5] transition-colors"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Profile Form */}
-            <form onSubmit={handleSaveProfile} className="space-y-4 text-xs sm:text-sm">
-              
-              {/* Display Name */}
+            <form onSubmit={handleSaveProfile} className="space-y-4 text-sm">
               <div className="space-y-1.5">
-                <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
-                  <UserIcon className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>Display Name</span>
-                </label>
+                <label className="text-[#a1a1aa] font-medium text-xs">Display Name</label>
                 <input
                   type="text"
                   required
                   value={editForm.displayName}
                   onChange={(e) => setEditForm(prev => ({ ...prev, displayName: e.target.value }))}
-                  placeholder="e.g. Alex Rivera"
-                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs sm:text-sm"
+                  className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-md text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#34d399] transition-colors"
                 />
               </div>
 
-              {/* Professional Title */}
               <div className="space-y-1.5">
-                <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
-                  <Shield className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>Role / Headline</span>
-                </label>
+                <label className="text-[#a1a1aa] font-medium text-xs">Role</label>
                 <input
                   type="text"
                   value={editForm.title}
                   onChange={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="e.g. Senior Backend Engineer / Distributed Systems"
-                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs sm:text-sm"
+                  className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-md text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#34d399] transition-colors"
                 />
               </div>
 
-              {/* Bio Description */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
-                    <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Bio / Summary</span>
-                  </label>
-                  <span className="text-[10px] text-zinc-500 font-mono">
-                    {editForm.bio.length}/320
-                  </span>
+                  <label className="text-[#a1a1aa] font-medium text-xs">Bio</label>
+                  <span className="text-[10px] text-[#71717a] font-mono">{editForm.bio.length}/320</span>
                 </div>
                 <textarea
                   rows={3}
@@ -798,50 +643,38 @@ export const ProgressView: React.FC<Props> = ({
                   required
                   value={editForm.bio}
                   onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
-                  placeholder="Tell the community about your backend engineering stack, distributed systems experience, or what challenges you are mastering..."
-                  className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs sm:text-sm resize-none leading-relaxed"
+                  className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-md text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#34d399] transition-colors resize-none leading-relaxed"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {/* Location */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-zinc-400" />
-                    <span>Location</span>
-                  </label>
+                  <label className="text-[#a1a1aa] font-medium text-xs">Location</label>
                   <input
                     type="text"
                     value={editForm.location}
                     onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
-                    placeholder="e.g. San Francisco, CA"
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs"
+                    className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-md text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#34d399] transition-colors"
                   />
                 </div>
 
-                {/* GitHub Username */}
                 <div className="space-y-1.5">
-                  <label className="text-zinc-300 font-medium text-xs flex items-center space-x-1.5">
-                    <Code2 className="w-3.5 h-3.5 text-zinc-400" />
-                    <span>GitHub Username</span>
-                  </label>
+                  <label className="text-[#a1a1aa] font-medium text-xs">GitHub Username</label>
                   <input
                     type="text"
                     value={editForm.github}
                     onChange={(e) => setEditForm(prev => ({ ...prev, github: e.target.value }))}
-                    placeholder="e.g. alexrivera"
-                    className="w-full px-3.5 py-2.5 bg-[#05070a] border border-white/[0.1] rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-xs"
+                    className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-md text-[#f4f4f5] placeholder-[#71717a] focus:outline-none focus:border-[#34d399] transition-colors"
                   />
                 </div>
               </div>
 
-              {/* Form Action Buttons */}
               <div className="flex items-center justify-end space-x-3 pt-4 border-t border-white/[0.08]">
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
                   disabled={isSavingProfile}
-                  className="px-4 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 hover:text-white text-xs font-semibold transition-all"
+                  className="px-4 py-2 rounded-md text-[#a1a1aa] hover:text-[#f4f4f5] hover:bg-white/[0.04] text-sm font-medium transition-colors"
                 >
                   Cancel
                 </button>
@@ -849,24 +682,19 @@ export const ProgressView: React.FC<Props> = ({
                 <button
                   type="submit"
                   disabled={isSavingProfile}
-                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs font-display shadow-[0_4px_20px_rgba(16,185,129,0.25)] transition-all active:scale-[0.98] disabled:opacity-50"
+                  className="inline-flex items-center space-x-2 px-4 py-2 rounded-md bg-[#10b981] hover:bg-[#34d399] text-black font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50"
                 >
                   {isSavingProfile ? (
                     <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Saving Profile...</span>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving...</span>
                     </>
                   ) : (
-                    <>
-                      <Save className="w-3.5 h-3.5" />
-                      <span>Save Changes</span>
-                    </>
+                    <span>Save Changes</span>
                   )}
                 </button>
               </div>
-
             </form>
-
           </div>
         </div>
       )}

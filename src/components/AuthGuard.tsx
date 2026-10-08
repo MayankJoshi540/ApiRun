@@ -9,19 +9,29 @@ interface AuthGuardProps {
   children: React.ReactNode;
 }
 
+// Free demo challenge slug that can be accessed without login
+export const FREE_CHALLENGE_SLUG = 'ping-health-api';
+
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
+  // Allow access to the free ping-pong challenge and the challenges directory without login
+  const isFreeChallenge =
+    pathname === `/challenges/${FREE_CHALLENGE_SLUG}` ||
+    pathname?.startsWith(`/challenges/${FREE_CHALLENGE_SLUG}`);
+  const isChallengesCatalog = pathname === '/challenges';
+  const isPublicAllowed = isFreeChallenge || isChallengesCatalog;
+
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !user && !isPublicAllowed) {
       const redirectUrl = pathname 
         ? `/sign-in?redirect=${encodeURIComponent(pathname)}` 
         : '/sign-in';
       router.replace(redirectUrl);
     }
-  }, [user, loading, router, pathname]);
+  }, [user, loading, router, pathname, isPublicAllowed]);
 
   if (loading) {
     return (
@@ -47,6 +57,11 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         </div>
       </div>
     );
+  }
+
+  // Permit unauthenticated access on the free challenge or the catalog page
+  if (!user && isPublicAllowed) {
+    return <>{children}</>;
   }
 
   if (!user) {

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 import { Challenge, TestResultItem, TestSuiteSummary } from '../types';
 import { ChallengeHeader } from './ChallengeHeader';
 import { CodeBlock } from './CodeBlock';
@@ -18,7 +20,8 @@ import {
   ListChecks,
   FileCode2,
   Tag,
-  Lightbulb
+  Lightbulb,
+  Unlock
 } from '@/components/ui/GoogleIcon';
 import { runChallengeTests } from '../utils/challengeRunner';
 
@@ -38,6 +41,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
   onNavigateProgress
 }) => {
   const router = useRouter();
+  const { user } = useAuth();
   const [serverUrl, setServerUrl] = useState('http://localhost:8000');
   const [leftTab, setLeftTab] = useState<'DESCRIPTION' | 'REQUIREMENTS' | 'SCAFFOLD'>('DESCRIPTION');
 
@@ -307,18 +311,32 @@ export const ChallengeDetailView: React.FC<Props> = ({
   const currentIndex = challengesList.findIndex(c => c.id === challenge.id);
   const handleNavigatePrev = () => {
     if (currentIndex > 0) {
-      router.push(`/challenges/${challengesList[currentIndex - 1].slug}`);
+      const prevChallenge = challengesList[currentIndex - 1];
+      if (!user && prevChallenge.slug !== 'ping-health-api') {
+        router.push(`/sign-in?redirect=${encodeURIComponent(`/challenges/${prevChallenge.slug}`)}`);
+        return;
+      }
+      router.push(`/challenges/${prevChallenge.slug}`);
     }
   };
   const handleNavigateNext = () => {
     if (currentIndex >= 0 && currentIndex < challengesList.length - 1) {
-      router.push(`/challenges/${challengesList[currentIndex + 1].slug}`);
+      const nextChallenge = challengesList[currentIndex + 1];
+      if (!user && nextChallenge.slug !== 'ping-health-api') {
+        router.push(`/sign-in?redirect=${encodeURIComponent(`/challenges/${nextChallenge.slug}`)}`);
+        return;
+      }
+      router.push(`/challenges/${nextChallenge.slug}`);
     }
   };
   const handleNavigateRandom = () => {
     if (challengesList.length > 1) {
       const otherChallenges = challengesList.filter(c => c.id !== challenge.id);
       const randomChallenge = otherChallenges[Math.floor(Math.random() * otherChallenges.length)];
+      if (!user && randomChallenge.slug !== 'ping-health-api') {
+        router.push(`/sign-in?redirect=${encodeURIComponent(`/challenges/${randomChallenge.slug}`)}`);
+        return;
+      }
       router.push(`/challenges/${randomChallenge.slug}`);
     }
   };
@@ -351,6 +369,27 @@ export const ChallengeDetailView: React.FC<Props> = ({
         onChangeServerUrl={(url) => setServerUrl(url)}
         onOpenServerSettings={() => setIsServerSettingsOpen(true)}
       />
+
+      {/* ── Free Demo Preview Banner (for guests on ping-health-api) ── */}
+      {!user && challenge.slug === 'ping-health-api' && (
+        <div className="bg-gradient-to-r from-emerald-950/60 via-[#0a121f] to-slate-900 border-b border-emerald-500/30 px-4 py-2 flex items-center justify-between text-xs text-emerald-300 shrink-0 select-none">
+          <div className="flex items-center gap-2">
+            <Unlock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span>
+              <strong>Free Demo Access:</strong> You can code and execute test suites for this challenge without signing in.
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="hidden sm:inline text-slate-400">Want to save your score and unlock all challenges?</span>
+            <Link
+              href={`/sign-in?redirect=${encodeURIComponent('/challenges/ping-health-api')}`}
+              className="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 rounded-lg text-emerald-200 font-bold hover:text-white transition"
+            >
+              Sign In / Sign Up
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* ── Main Split Workbench (Floating Cards Layout) ── */}
       <div 

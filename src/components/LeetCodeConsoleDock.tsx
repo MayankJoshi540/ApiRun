@@ -147,11 +147,15 @@ export const LeetCodeConsoleDock: React.FC<Props> = ({
                   )}
 
                   <div>
-                    <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1 font-mono">
+                    <div className="text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5 font-mono">
                       Expected Response Status
                     </div>
-                    <div className="p-2.5 rounded-lg bg-[#141a27] border border-slate-800/80 font-mono text-emerald-400 font-bold">
-                      HTTP {activeTestCase.expectedStatus}
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#141a27] border border-emerald-500/30 font-mono text-xs shadow-sm">
+                      <span className="text-slate-400 font-semibold text-[11px]">HTTP</span>
+                      <span className="text-emerald-400 font-bold">{activeTestCase.expectedStatus}</span>
+                      <span className="text-slate-400 text-[11px] font-sans">
+                        {activeTestCase.expectedStatus === 200 ? 'OK' : activeTestCase.expectedStatus === 201 ? 'Created' : activeTestCase.expectedStatus === 204 ? 'No Content' : activeTestCase.expectedStatus === 400 ? 'Bad Request' : activeTestCase.expectedStatus === 401 ? 'Unauthorized' : activeTestCase.expectedStatus === 404 ? 'Not Found' : activeTestCase.expectedStatus === 429 ? 'Too Many Requests' : ''}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -229,32 +233,52 @@ export const LeetCodeConsoleDock: React.FC<Props> = ({
                       )}
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                          <div className="text-[10.5px] font-sans font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                            Actual Output
+                        {/* Actual Output */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10.5px] font-sans font-semibold text-slate-400 uppercase tracking-wider">
+                              Actual Output
+                            </span>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono font-bold border ${
+                              activeTestResult.status === 'PASSED'
+                                ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30'
+                                : 'text-rose-400 bg-rose-500/10 border-rose-500/30'
+                            }`}>
+                              HTTP {activeTestResult.actualStatus || '--'}
+                            </span>
                           </div>
                           <div className={`p-2.5 rounded-lg bg-[#141a27] border ${
-                            activeTestResult.status === 'PASSED' ? 'border-slate-800/80 text-emerald-400' : 'border-rose-900/50 text-rose-300'
-                          } space-y-1`}>
-                            <div className="font-bold">HTTP {activeTestResult.actualStatus || '--'}</div>
-                            {activeTestResult.actualResponse && (
-                              <pre className="text-slate-300 overflow-x-auto text-[11px] leading-relaxed max-h-36">
+                            activeTestResult.status === 'PASSED' ? 'border-slate-800/80' : 'border-rose-900/50'
+                          } min-h-[48px]`}>
+                            {activeTestResult.actualResponse ? (
+                              <pre className={`overflow-x-auto text-[11px] leading-relaxed max-h-36 font-mono ${
+                                activeTestResult.status === 'PASSED' ? 'text-slate-300' : 'text-rose-200'
+                              }`}>
                                 {activeTestResult.actualResponse}
                               </pre>
+                            ) : (
+                              <div className="text-slate-500 text-[11px] italic">No response body returned</div>
                             )}
                           </div>
                         </div>
 
-                        <div>
-                          <div className="text-[10.5px] font-sans font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                            Expected Output
+                        {/* Expected Output */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10.5px] font-sans font-semibold text-slate-400 uppercase tracking-wider">
+                              Expected Output
+                            </span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30">
+                              HTTP {activeTestResult.expectedStatus}
+                            </span>
                           </div>
-                          <div className="p-2.5 rounded-lg bg-[#141a27] border border-slate-800/80 text-emerald-400 space-y-1">
-                            <div className="font-bold">HTTP {activeTestResult.expectedStatus}</div>
-                            {activeTestResult.expectedResponse && (
-                              <pre className="text-slate-300 overflow-x-auto text-[11px] leading-relaxed max-h-36">
+                          <div className="p-2.5 rounded-lg bg-[#141a27] border border-slate-800/80 min-h-[48px]">
+                            {activeTestResult.expectedResponse ? (
+                              <pre className="text-slate-300 overflow-x-auto text-[11px] leading-relaxed max-h-36 font-mono">
                                 {activeTestResult.expectedResponse}
                               </pre>
+                            ) : (
+                              <div className="text-slate-500 text-[11px] italic">No response body expected</div>
                             )}
                           </div>
                         </div>

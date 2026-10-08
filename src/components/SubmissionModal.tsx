@@ -1,6 +1,8 @@
 import React from 'react';
-import { X, CheckCircle2, AlertTriangle, Loader2, Terminal, ArrowRight } from '@/components/ui/GoogleIcon';
+import { useRouter } from 'next/navigation';
+import { X, CheckCircle2, AlertTriangle, Loader2, Terminal, ArrowRight, Lock } from '@/components/ui/GoogleIcon';
 import { Challenge, TestSuiteSummary, TestResultItem } from '../types';
+import { useAuth } from '@/context/AuthContext';
 
 interface Props {
   isOpen: boolean;
@@ -21,6 +23,8 @@ export const SubmissionModal: React.FC<Props> = ({
   isSubmitting,
   onFeedbackProgress
 }) => {
+  const router = useRouter();
+  const { user } = useAuth();
   if (!isOpen) return null;
 
   const allPassed = summary.passed === summary.total && summary.total > 0;
@@ -77,7 +81,9 @@ export const SubmissionModal: React.FC<Props> = ({
                     </div>
                     <div className="text-xs text-[#cbd5e1] leading-relaxed">
                       {allPassed 
-                        ? 'Your backend successfully passed all public contracts and hidden edge cases. Progress recorded.'
+                        ? (!user 
+                            ? '🎉 Demo Challenge Conquered! Your backend passed all diagnostic contracts. Sign in to record your score, maintain your streak, and unlock the next challenge.'
+                            : 'Your backend successfully passed all public contracts and hidden edge cases. Progress recorded.')
                         : 'Some test cases failed. Inspect the request/response diffs in the terminal and patch your logic.'}
                     </div>
                   </div>
@@ -113,21 +119,35 @@ export const SubmissionModal: React.FC<Props> = ({
           )}
         </div>
 
-        <div className="p-4 bg-[#05070a] border-t border-white/[0.08] flex items-center justify-end space-x-3">
+        <div className="p-4 bg-[#05070a] border-t border-white/[0.08] flex items-center justify-between sm:justify-end space-x-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-white/[0.05] border border-white/[0.1] text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/[0.08] transition-all active:scale-95"
+            className="px-4 py-2 rounded-xl bg-white/[0.05] border border-white/[0.1] text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/[0.08] transition-all active:scale-95 cursor-pointer"
           >
             Close
           </button>
           {allPassed && (
-            <button
-              onClick={onFeedbackProgress}
-              className="flex items-center space-x-1.5 px-5 py-2 rounded-xl bg-emerald-500 text-black font-bold text-xs hover:bg-emerald-400 transition-all shadow-md active:scale-95"
-            >
-              <span>View Certified Progress</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            !user ? (
+              <button
+                onClick={() => {
+                  onClose();
+                  router.push('/sign-in?redirect=/challenges');
+                }}
+                className="flex items-center space-x-1.5 px-5 py-2 rounded-xl bg-emerald-500 text-black font-bold text-xs hover:bg-emerald-400 transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                <Lock className="w-3.5 h-3.5 text-black" />
+                <span>Sign In to Unlock Next Challenges</span>
+                <ArrowRight className="w-3.5 h-3.5 text-black" />
+              </button>
+            ) : (
+              <button
+                onClick={onFeedbackProgress}
+                className="flex items-center space-x-1.5 px-5 py-2 rounded-xl bg-emerald-500 text-black font-bold text-xs hover:bg-emerald-400 transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                <span>View Certified Progress</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )
           )}
         </div>
       </div>

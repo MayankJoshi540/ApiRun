@@ -1,8 +1,9 @@
 import React from 'react';
-import { CheckCircle2, ArrowRight, Clock, ShieldCheck } from '@/components/ui/GoogleIcon';
+import { CheckCircle2, ArrowRight, Clock, ShieldCheck, Lock, Unlock } from '@/components/ui/GoogleIcon';
 import { Challenge } from '../types';
 import { DifficultyBadge } from './DifficultyBadge';
 import { ConceptBadge } from './ConceptBadge';
+import { useAuth } from '@/context/AuthContext';
 
 interface Props {
   challenge: Challenge;
@@ -15,6 +16,9 @@ export const ChallengeCard: React.FC<Props> = ({
   onSelect,
   onClickConcept
 }) => {
+  const { user } = useAuth();
+  const isFree = challenge.slug === 'ping-health-api';
+  const isLocked = !user && !isFree;
   const isSolved = challenge.status === 'SOLVED';
   const isInProgress = challenge.status === 'IN_PROGRESS';
   const cardRef = React.useRef<HTMLDivElement>(null);
@@ -89,6 +93,20 @@ export const ChallengeCard: React.FC<Props> = ({
 
             <DifficultyBadge difficulty={challenge.difficulty} />
             
+            {isFree && !user && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-500/40 px-2.5 py-0.5 rounded-lg animate-pulse">
+                <Unlock className="w-3 h-3 text-emerald-400" />
+                <span>Free Demo (No Login)</span>
+              </span>
+            )}
+
+            {isLocked && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 rounded-lg">
+                <Lock className="w-3 h-3 text-amber-400" />
+                <span>Login Required</span>
+              </span>
+            )}
+
             {isSolved && (
               <span className="inline-flex items-center gap-1 text-xs font-medium text-[#00b8a3]">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00b8a3]" />
@@ -158,13 +176,29 @@ export const ChallengeCard: React.FC<Props> = ({
           <button
             onClick={(e) => { e.stopPropagation(); onSelect(challenge); }}
             className={`flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-150 active:scale-95 min-w-[145px] ${
-              isSolved
+              isLocked
+                ? 'bg-slate-800 text-slate-300 border border-slate-700/80 hover:border-amber-500/40 hover:text-white shadow-sm'
+                : isSolved
                 ? 'bg-slate-800 text-emerald-400 border border-emerald-500/40 hover:bg-slate-700/60 shadow-sm'
                 : 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-md shadow-emerald-500/10'
             }`}
           >
-            <span>{isSolved ? 'View Solution' : isInProgress ? 'Resume Lab' : 'Start Challenge'}</span>
-            <ArrowRight className="w-4 h-4" />
+            {isLocked ? (
+              <>
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                <span>Sign in to Unlock</span>
+              </>
+            ) : isFree && !user ? (
+              <>
+                <span>Try Free Demo</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            ) : (
+              <>
+                <span>{isSolved ? 'View Solution' : isInProgress ? 'Resume Lab' : 'Start Challenge'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         </div>
       </div>

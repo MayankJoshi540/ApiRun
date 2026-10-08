@@ -165,7 +165,7 @@ export const ChallengeHeader: React.FC<Props> = ({
           title="Target API Server URL (Click to edit directly)"
         >
           {/* Live Pulsing Emerald Dot */}
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+          
 
           {/* Label */}
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 shrink-0 font-mono">

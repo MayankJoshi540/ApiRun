@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { challenges as defaultChallenges, initialUserStats } from '@/data/challenges';
 import { BackendRankNavbar } from '@/components/BackendRankNavbar';
@@ -48,7 +49,19 @@ export default function ProgressPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#050708] text-[#F5F7FA] font-sans antialiased relative selection:bg-emerald-500/30 selection:text-white flex flex-col justify-between overflow-x-hidden">
+      
+      {/* Dimmed Background Image */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-25">
+        <Image
+          src="/background.png"
+          alt="Atmospheric Background"
+          fill
+          className="object-cover object-top mix-blend-screen"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050708]/50 via-[#050708]/80 to-[#050708] pointer-events-none" />
+      </div>
       
       <BackendRankNavbar
         activeTab="progress"

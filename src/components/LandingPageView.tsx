@@ -44,7 +44,6 @@ import { DifficultyBadge } from './DifficultyBadge';
 import { ConceptBadge } from './ConceptBadge';
 import { Hero } from './hero/Hero';
 import { Footer } from './Footer';
-import { ChallengeShowcaseScroll } from './ChallengeShowcaseScroll';
 import { BackendTechMarquee } from './BackendTechMarquee';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { ScrollProgress } from './ui/ScrollProgress';
@@ -52,6 +51,9 @@ import { GsapTilt } from './gsap/GsapTilt';
 import { GsapMagnetic } from './gsap/GsapMagnetic';
 import { GsapCounter } from './gsap/GsapCounter';
 import { gsap } from '@/lib/gsap';
+import { GsapParallax } from './gsap/GsapParallax';
+import { GsapTextReveal } from './gsap/GsapTextReveal';
+import { GsapScreenshotWall } from './gsap/GsapScreenshotWall';
 
 interface Props {
   challenges: Challenge[];
@@ -160,7 +162,7 @@ export const LandingPageView: React.FC<Props> = ({
   return (
     <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans selection:bg-emerald-500/30 selection:text-white relative overflow-x-hidden">
       {/* 1. Global Page Technical Background Atmosphere (Clean, Minimal Dark with Subtle Bottom Emerald Glow) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      <GsapParallax speed={0.15} className="absolute inset-0 pointer-events-none z-0">
         {/* Continuous Technical Dot Matrix with micro-luminescence */}
         <div 
           className="absolute inset-0 opacity-[0.06]"
@@ -189,7 +191,7 @@ export const LandingPageView: React.FC<Props> = ({
             background: 'radial-gradient(ellipse 60% 50% at 50% 100%, rgba(16, 185, 129, 0.25) 0%, transparent 75%)',
           }}
         />
-      </div>
+      </GsapParallax>
 
       {/* 2. Hero Section */}
       <Hero
@@ -197,12 +199,14 @@ export const LandingPageView: React.FC<Props> = ({
         onBrowseTracks={onExploreChallenges}
       />
 
+      {/* 3D Pinned Screenshot Wall Experience */}
+      <GsapScreenshotWall />
+
       <div className="relative z-10">
 
         {/* ========================================================= */}
         {/* HERO SHOWCASE: SCROLL-TRIGGERED CHALLENGES DASHBOARD PREVIEW */}
         {/* ========================================================= */}
-        <ChallengeShowcaseScroll onExploreChallenges={onExploreChallenges} />
 
         {/* ========================================================= */}
         {/* INFINITE BACKEND LANGUAGES & RUNTIMES 3D MARQUEE */}
@@ -214,7 +218,10 @@ export const LandingPageView: React.FC<Props> = ({
         {/* ========================================================= */}
         {/* GSAP ANIMATED METRICS COUNTER STRIP */}
         {/* ========================================================= */}
-        <section className="pt-2 pb-12 px-4 sm:px-6 max-w-5xl mx-auto">
+        <section className="pt-2 pb-12 px-4 sm:px-6 max-w-5xl mx-auto relative">
+          {/* Subtle Ambient Glow for Counter */}
+          <div className="absolute inset-0 top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[120px] bg-emerald-500/5 blur-[80px] pointer-events-none rounded-full -z-10 opacity-30" />
+          
           <ScrollReveal variant="fade-up" duration={600}>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-2xl bg-[#090d14]/90 border border-white/[0.08] backdrop-blur-xl">
               <div className="text-center p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
@@ -256,19 +263,30 @@ export const LandingPageView: React.FC<Props> = ({
         {/* ========================================================= */}
         {/* THE LEETCODE VS APIRUN COMPARISON MATRIX */}
         {/* ========================================================= */}
-        <section id="compare-matrix" className="py-16 sm:py-24 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans select-none">
-          <ScrollReveal variant="fade-up" duration={600}>
+        <section id="compare-matrix" className="py-16 sm:py-24 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans select-none relative">
+          {/* Atmospheric Dual-Tone Glow Behind Matrix */}
+          <div className="absolute top-1/4 -left-32 w-[600px] h-[500px] bg-blue-500/5 blur-[130px] pointer-events-none rounded-full -z-10 mix-blend-screen opacity-20" />
+          <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] pointer-events-none rounded-full -z-10 mix-blend-screen opacity-20" />
+          
+          <ScrollReveal variant="blur-up" duration={700}>
             <div className="text-center space-y-3 max-w-3xl mx-auto">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-[1.1]">
-                Why <span className="text-white">Leet</span><span className="text-[#FFA116]">Code</span> Doesn&apos;t Make You Ready for Real Backend Engineering
-              </h2>
+              <GsapTextReveal
+                text="Why LeetCode Doesn't Make You Ready for Real Backend Engineering"
+                tag="h2"
+                className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-[1.1]"
+                splitBy="word"
+                stagger={0.035}
+                duration={0.5}
+                highlightWords={['LeetCode']}
+                highlightClassName="text-[#FFA116]"
+              />
               <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed pt-1 font-normal">
                 Competitive programming tests whether you memorized abstract recursion. APIRun tests whether your service survives 50 concurrent transactions, distributed locks, and strict RFC standards.
               </p>
             </div>
           </ScrollReveal>
 
-          <ScrollReveal variant="fade-up" delay={150} duration={650}>
+          <ScrollReveal variant="scale" delay={150} duration={700}>
             <div className="sm:hidden text-right text-[11px] text-slate-400 pb-2 px-1">
               &larr; Swipe table to compare &rarr;
             </div>
@@ -327,15 +345,22 @@ export const LandingPageView: React.FC<Props> = ({
         {/* ========================================================= */}
         {/* 6 PRODUCTION ENGINEERING TRACKS */}
         {/* ========================================================= */}
-        <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans">
-          <ScrollReveal variant="fade-up" duration={600}>
+        <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans relative">
+          {/* Center ambient purple glow for variety */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-purple-500/5 blur-[140px] pointer-events-none rounded-[100%] -z-10 mix-blend-screen opacity-20" />
+          
+          <ScrollReveal variant="blur-up" duration={600}>
             <div className="text-center space-y-3">
               <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
                 CURRICULUM & DOMAIN MASTERY
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-                6 Core Backend Engineering Domains
-              </h2>
+              <GsapTextReveal
+                text="6 Core Backend Engineering Domains"
+                tag="h2"
+                className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight"
+                splitBy="word"
+                stagger={0.04}
+              />
               <p className="text-sm sm:text-base text-[#94a3b8] max-w-2xl mx-auto leading-relaxed">
                 Every track simulates real production architecture patterns required at Staff & Senior levels.
               </p>
@@ -383,83 +408,14 @@ export const LandingPageView: React.FC<Props> = ({
         </section>
 
         {/* ========================================================= */}
-        {/* HOW WE EVALUATE (PRODUCTION TEST PIPELINE) */}
-        {/* ========================================================= */}
-        <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans">
-          <ScrollReveal variant="fade-up" duration={600}>
-            <div className="text-center space-y-3">
-              <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">
-                TESTING PIPELINE
-              </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-                Automated testing, real-world verification
-              </h2>
-              <p className="text-sm sm:text-base text-[#94a3b8] max-w-2xl mx-auto font-normal leading-relaxed">
-                Every submission runs in a secure sandbox tested against real traffic spikes, edge cases, and API error states.
-              </p>
-            </div>
-          </ScrollReveal>
-
-          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch" staggerDelay={90}>
-            {/* Step 1 */}
-            <div className="h-full flex flex-col justify-start p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-emerald-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
-              <div className="font-mono text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-md w-fit">
-                01 &bull; Sandbox Isolation
-              </div>
-              <div className="space-y-1.5 flex-1">
-                <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Fast Environment</h3>
-                <p className="text-xs text-[#94a3b8] leading-relaxed">
-                  Spins up an isolated sandbox running your Node, Go, or Python service in under 50ms.
-                </p>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="h-full flex flex-col justify-start p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-sky-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
-              <div className="font-mono text-[11px] font-bold text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 rounded-md w-fit">
-                02 &bull; API Contracts
-              </div>
-              <div className="space-y-1.5 flex-1">
-                <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors">Response Validation</h3>
-                <p className="text-xs text-[#94a3b8] leading-relaxed">
-                  Asserts strict HTTP status codes, headers, and structured JSON response schemas.
-                </p>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="h-full flex flex-col justify-start p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-purple-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
-              <div className="font-mono text-[11px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2.5 py-0.5 rounded-md w-fit">
-                03 &bull; Traffic &amp; Concurrency
-              </div>
-              <div className="space-y-1.5 flex-1">
-                <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors">Race Condition Checks</h3>
-                <p className="text-xs text-[#94a3b8] leading-relaxed">
-                  Sends concurrent burst traffic to verify thread safety and prevent double writes.
-                </p>
-              </div>
-            </div>
-
-            {/* Step 4 */}
-            <div className="h-full flex flex-col justify-start p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08] hover:border-amber-500/30 hover:-translate-y-1 transition-all duration-200 space-y-3 backdrop-blur-xl group shadow-sm">
-              <div className="font-mono text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-md w-fit">
-                04 &bull; Detailed Scorecard
-              </div>
-              <div className="space-y-1.5 flex-1">
-                <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">Speed &amp; Diagnostics</h3>
-                <p className="text-xs text-[#94a3b8] leading-relaxed">
-                  Instant breakdown of passed test assertions, latency benchmarks, and traces.
-                </p>
-              </div>
-            </div>
-          </StaggerContainer>
-        </section>
-
-        {/* ========================================================= */}
         {/* POPULAR CHALLENGES SHOWCASE */}
         {/* ========================================================= */}
-        <section className="py-16 px-4 sm:px-6 max-w-6xl mx-auto space-y-10 font-sans">
-          <ScrollReveal variant="fade-up" duration={600}>
+        <section className="py-16 px-4 sm:px-6 max-w-6xl mx-auto space-y-10 font-sans relative">
+          {/* Edge glows to frame the section */}
+          <div className="absolute -top-20 -right-40 w-[500px] h-[500px] bg-sky-500/5 blur-[130px] pointer-events-none rounded-full -z-10 mix-blend-screen opacity-20" />
+          <div className="absolute -bottom-20 -left-40 w-[400px] h-[400px] bg-emerald-500/5 blur-[120px] pointer-events-none rounded-full -z-10 mix-blend-screen opacity-20" />
+          
+          <ScrollReveal variant="blur-up" duration={600}>
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
                 <div className="text-xs font-sans text-emerald-400 uppercase font-bold tracking-wider">CHALLENGE REPOSITORY</div>
@@ -510,7 +466,7 @@ export const LandingPageView: React.FC<Props> = ({
         {/* COMMUNITY FEEDBACK & CHALLENGE SUGGESTIONS */}
         {/* ========================================================= */}
         <section className="py-12 px-4 sm:px-6 max-w-5xl mx-auto font-sans">
-          <ScrollReveal variant="fade-up" duration={500}>
+          <ScrollReveal variant="scale" duration={500}>
             <div className="rounded-2xl bg-[#080c14] border border-white/[0.08] hover:border-white/[0.14] transition-colors p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-3 max-w-xl">
                 <div className="flex items-center space-x-2 text-xs font-mono text-slate-400">
