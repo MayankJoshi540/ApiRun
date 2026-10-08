@@ -44,6 +44,7 @@ import { DifficultyBadge } from './DifficultyBadge';
 import { ConceptBadge } from './ConceptBadge';
 import { Hero } from './hero/Hero';
 import { Footer } from './Footer';
+
 import { BackendTechMarquee } from './BackendTechMarquee';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { ScrollProgress } from './ui/ScrollProgress';
