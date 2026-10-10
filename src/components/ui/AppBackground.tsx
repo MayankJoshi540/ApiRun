@@ -24,7 +24,7 @@ export const AppBackground: React.FC<AppBackgroundProps> = ({
 
       {/* 2. High-Resolution Globe & Network Artwork */}
       <img
-        src="/background.png"
+        src="/backgrounds/background.png"
         alt="APIRun Background"
         className={`absolute inset-0 w-full h-full object-cover object-bottom select-none ${opacity} brightness-105 saturate-[1.05]`}
         style={{ 
