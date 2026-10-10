@@ -8,28 +8,28 @@ import { useGSAP } from '@gsap/react';
 const screenshots = [
   { 
     id: 1, 
-    src: '/new-catalog.png', 
+    src: '/currosel/new-catalog.png', 
     alt: 'Platform Overview',
     title: 'The Challenge Catalog',
     description: 'Browse our massive curriculum of real-world backend engineering challenges and architectural scenarios.'
   },
   { 
     id: 2, 
-    src: '/new-editor.png', 
+    src: '/currosel/new-editor.png', 
     alt: 'Interactive Editor',
     title: 'Browser-Based IDE',
     description: 'Write, debug, and execute your code in a professional workspace without ever leaving the browser.'
   },
   { 
     id: 3, 
-    src: '/new-tests.png', 
+    src: '/currosel/new-tests.png', 
     alt: 'Advanced Test Runner',
     title: 'Production Edge Cases',
     description: 'Our distributed runner hits your API with high concurrency to catch race conditions and strict RFC compliance issues.'
   },
   { 
     id: 4, 
-    src: '/new-success.png', 
+    src: '/currosel/new-progress.png', 
     alt: 'Analytics Dashboard',
     title: 'Track Your Mastery',
     description: 'Review your latency, memory usage, and build a verified portfolio of production-ready backend code.'
