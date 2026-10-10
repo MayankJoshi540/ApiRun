@@ -24,6 +24,19 @@
 
 ---
 
+## ⚡ The Paradigm Shift
+
+Traditional coding platforms focus primarily on abstract algorithmic puzzles (inverting binary trees, dynamic programming grids, graph traversals). While valuable for algorithmic fundamentals, they don't prepare developers for production backend systems.
+
+Most competitive programming sites evaluate developers in synthetic bubbles: single-threaded standard I/O, synchronous deterministic calls, and contrived puzzle algorithms. 
+
+**Backend reality is fundamentally different:**
+
+```
+Traditional Puzzle: Given an array, find the maximum subarray sum.
+Production Reality:   50 simultaneous webhook retries just hit your billing endpoint 
+                      with the same idempotency key while your cache expired. 
+                      Did you double-charge the customer?
 ## 💥 The Manifesto: The Great Disconnect
 
 For the past decade, technical interviews and coding platforms have trained millions of software engineers to solve synthetic, single-threaded puzzle algorithms:
@@ -68,14 +81,14 @@ When you join a backend team on Day 1, you aren't writing dynamic programming ta
 ### 2. Real-World Backend Challenge Catalog
 *Curriculum structured around actual production domains: HTTP Fundamentals, Concurrency, Database Transactions, and Distributed Systems.*
 
-<img src="./public/screenshots/challenges.png" alt="APIRun Challenges Catalog" width="100%" style="border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
+<img src="./public/reference.png" alt="APIRun Landing Page" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
 <br/><br/>
 
 ### 3. The Workbench & Live Test Arena
 *Full Monaco IDE featuring live target proxying (`http://localhost:8000`), interactive RFC specs, and multi-testcase console dock.*
 
-<img src="./public/screenshots/workbench.png" alt="APIRun Workbench Arena" width="100%" style="border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
+<img src="./public/new-editor.png" alt="APIRun Challenge Arena" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
 <br/><br/>
 
@@ -86,8 +99,8 @@ When you join a backend team on Day 1, you aren't writing dynamic programming ta
 
 <br/><br/>
 
-### 5. Developer Mastery, Activity Heatmap & Progress Spiral
-*Dynamic greeting, 52-week activity heatmap, 2x2 domain competencies grid, and an interactive Archimedean curriculum spiral.*
+### 5. Developer Mastery & 52-Week Activity Tracker
+*Full-scale commit & solve activity heatmap, curriculum milestones, and domain breakdown.*
 
 <img src="./public/screenshots/progress.png" alt="APIRun Developer Progress" width="100%" style="border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
 
@@ -238,18 +251,15 @@ Open **[`http://localhost:3000`](http://localhost:3000)** in your browser and st
 ```
 APIRun/
 ├── public/
-│   ├── screenshots/              # High-res platform screenshots
-│   │   ├── homepage.png          # Landing page overview
-│   │   ├── challenges.png        # Production challenge catalog
+│   ├── screenshots/              # High-res retina platform screenshots
+│   │   ├── landing.png           # Hero and platform overview
+│   │   ├── challenges.png        # Interactive challenge catalog
 │   │   ├── workbench.png         # Monaco workbench & live console
-│   │   ├── evaluation.png        # Precision test evaluation modal
-│   │   └── progress.png          # Developer heatmap & curriculum spiral
-│   ├── backgrounds/              # Ambient canvas artworks
-│   │   ├── background.png        # Landing hero canvas
-│   │   ├── challenges-bg.png     # Challenges ambient canvas
-│   │   └── progress-background.png # Progress ambient canvas
-│   ├── currosel/                 # Platform carousel showcases
-│   └── logo.png                  # APIRun brand emblem
+│   │   ├── evaluation.png        # Tactile test evaluation modal
+│   │   └── progress.png          # 52-week activity heatmap & stats
+│   ├── challenges-bg.png         # Ambient obsidian canvas background
+│   ├── progress-background.png   # Ambient dashboard canvas background
+│   └── logo.png                  # APIRun emblem
 ├── src/
 │   ├── app/                      # Next.js App Router
 │   │   ├── page.tsx              # Landing experience
