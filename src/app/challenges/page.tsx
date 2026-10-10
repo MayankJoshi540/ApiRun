@@ -65,18 +65,18 @@ export default function ChallengesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0c0f17] text-slate-200 font-sans antialiased relative selection:bg-emerald-500/25 selection:text-slate-100 flex flex-col justify-between">
+    <div className="min-h-screen bg-[#000000] text-[#f5f5f7] font-sans antialiased relative selection:bg-white/20 selection:text-white flex flex-col justify-between">
       
       {/* Background Decor & Image */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <Image
-          src="/challenges-bg.png"
+          src="/backgrounds/challenges-bg.png"
           alt="Challenges Background"
           fill
           className="object-cover object-top opacity-100"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0c0f17]/40 via-[#0c0f17]/60 to-[#0c0f17]/95 pointer-events-none" />
+        <div className="absolute inset-0 bg-[#000000]/40 pointer-events-none" />
       </div>
       <BackendRankNavbar
         activeTab="challenges"
@@ -100,30 +100,30 @@ export default function ChallengesPage() {
 
         <div className="flex-1 min-w-0">
           {!user && (
-            <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-[#0e1624] to-slate-900/60 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
-                  <span className="font-mono text-base font-extrabold">&lt;/&gt;</span>
+            <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-[#1c1c1e]/70 border border-white/[0.08] border-t-white/[0.14] shadow-[0_4px_20px_rgba(0,0,0,0.35)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-[#30d158] shrink-0 font-mono text-sm font-semibold">
+                  &lt;/&gt;
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-bold text-white">
-                    Free Demo Access: Try &quot;Ping &amp; Health Check API&quot; without logging in!
+                  <p className="text-sm font-semibold text-white tracking-[-0.01em]">
+                    Free Demo Access: Try &quot;Ping &amp; Health Check API&quot; without signing in
                   </p>
-                  <p className="text-[11px] text-slate-400">
-                    Sign in to unlock all other challenges, save code submissions, and track your streak.
+                  <p className="text-xs text-[#86868b] mt-0.5">
+                    Sign in with your developer account to save submissions, track test accuracy, and rank on leaderboards.
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2.5 shrink-0">
                 <button
                   onClick={() => router.push('/challenges/ping-health-api')}
-                  className="px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold rounded-xl transition cursor-pointer"
+                  className="px-4 py-2 bg-[#30d158] hover:bg-[#34c759] active:scale-95 text-black text-xs font-semibold rounded-full transition-all cursor-pointer shadow-[0_2px_8px_rgba(48,209,88,0.25)]"
                 >
-                  Try Ping Pong
+                  Try Demo
                 </button>
                 <button
                   onClick={() => router.push('/sign-in?redirect=/challenges')}
-                  className="px-3.5 py-1.5 bg-white/[0.08] hover:bg-white/[0.15] text-white text-xs font-semibold rounded-xl border border-white/[0.1] transition cursor-pointer"
+                  className="px-4 py-2 bg-white/[0.06] hover:bg-white/[0.12] active:scale-95 text-white text-xs font-medium rounded-full border border-white/[0.1] transition-all cursor-pointer"
                 >
                   Sign In
                 </button>
