@@ -454,7 +454,7 @@ export default function FeedbackPage() {
 
         {/* High-Resolution Globe / Grid Artwork (Visible & Crisp) */}
         <img
-          src="/background.png"
+          src="/backgrounds/background.png"
           alt="APIRun Background"
           className="absolute inset-0 w-full h-full object-cover object-bottom select-none opacity-75 brightness-105 saturate-[1.05]"
           style={{ 
