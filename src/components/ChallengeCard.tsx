@@ -32,9 +32,9 @@ export const ChallengeCard: React.FC<Props> = ({
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     
-    // Subtly tilt within [-3deg, 3deg] for natural physical depth
-    const rotateY = ((x - centerX) / centerX) * 3;
-    const rotateX = -((y - centerY) / centerY) * 3;
+    // Subtle tilt within [-2.5deg, 2.5deg] for natural Apple physical depth
+    const rotateY = ((x - centerX) / centerX) * 2.5;
+    const rotateX = -((y - centerY) / centerY) * 2.5;
     
     const spotlightX = (x / rect.width) * 100;
     const spotlightY = (y / rect.height) * 100;
@@ -54,99 +54,99 @@ export const ChallengeCard: React.FC<Props> = ({
       onClick={() => onSelect(challenge)}
       style={{
         transform: tilt.isHovered 
-          ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(-2px) scale3d(1.006, 1.006, 1.006)` 
+          ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(-2px) scale3d(1.004, 1.004, 1.004)` 
           : 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale3d(1, 1, 1)',
-        transition: tilt.isHovered ? 'transform 0.12s var(--ease-out)' : 'transform 0.35s var(--ease-out), border-color 0.2s var(--ease-out)',
+        transition: tilt.isHovered ? 'transform 0.1s cubic-bezier(0.16, 1, 0.3, 1)' : 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease',
         transformStyle: 'preserve-3d',
         willChange: 'transform'
       }}
-      className={`group relative rounded-2xl bg-[#111622] border p-5 sm:p-6 mb-3 cursor-pointer select-none overflow-hidden active:scale-[0.99] transition-all ${
+      className={`group relative rounded-2xl bg-[#1c1c1e]/60 border p-5 sm:p-6 mb-3 cursor-pointer select-none overflow-hidden active:scale-[0.985] transition-all shadow-[0_4px_16px_rgba(0,0,0,0.3)] ${
         isSolved 
-          ? 'border-emerald-500/30 hover:border-emerald-500/50 shadow-md' 
+          ? 'border-white/[0.12] hover:border-white/[0.22] border-t-white/[0.18]' 
           : isInProgress 
-          ? 'border-amber-500/30 hover:border-amber-500/50 shadow-md' 
-          : 'border-slate-800/80 hover:border-slate-700/90 shadow-sm'
+          ? 'border-[#ffd60a]/25 hover:border-[#ffd60a]/40 border-t-[#ffd60a]/35' 
+          : 'border-white/[0.08] border-t-white/[0.14] hover:border-white/[0.18]'
       }`}
     >
-      {/* Dynamic 3D Specular Spotlight Reflection */}
+      {/* Specular Spotlight Reflection */}
       {tilt.isHovered && (
         <div 
-          className="pointer-events-none absolute -inset-px rounded-2xl opacity-25 transition-opacity duration-300"
+          className="pointer-events-none absolute -inset-px rounded-2xl opacity-20 transition-opacity duration-200"
           style={{
-            background: `radial-gradient(400px circle at ${tilt.spotlightX}% ${tilt.spotlightY}%, rgba(255, 255, 255, 0.05), transparent 70%)`
+            background: `radial-gradient(350px circle at ${tilt.spotlightX}% ${tilt.spotlightY}%, rgba(255, 255, 255, 0.1), transparent 70%)`
           }}
         />
       )}
 
       <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         {/* Left Column: Title, Category, Summary, Endpoints & Concepts */}
-        <div className="flex-1 space-y-2.5">
+        <div className="flex-1 space-y-2">
           {/* Header Row: Title & Badges */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            <h3 className="text-base sm:text-lg font-bold text-slate-100 group-hover:text-emerald-400 transition-colors flex items-center tracking-tight font-sans">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-base sm:text-lg font-semibold text-white group-hover:text-white transition-colors tracking-[-0.02em]">
               {challenge.title}
             </h3>
 
-            <span className="text-xs font-sans font-medium text-slate-400 py-1 px-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
+            <span className="text-[11px] font-medium text-[#86868b] py-0.5 px-2.5 rounded-full bg-white/[0.05] border border-white/[0.08]">
               {challenge.category}
             </span>
 
             <DifficultyBadge difficulty={challenge.difficulty} />
             
             {isFree && !user && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-500/40 px-2.5 py-0.5 rounded-lg animate-pulse">
-                <Unlock className="w-3 h-3 text-emerald-400" />
-                <span>Free Demo (No Login)</span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#30d158] bg-[#30d158]/15 border border-[#30d158]/30 px-2 py-0.5 rounded-full">
+                <Unlock className="w-3 h-3 text-[#30d158]" />
+                <span>Free Demo</span>
               </span>
             )}
 
             {isLocked && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 rounded-lg">
-                <Lock className="w-3 h-3 text-amber-400" />
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#ffd60a] bg-[#ffd60a]/10 border border-[#ffd60a]/25 px-2 py-0.5 rounded-full">
+                <Lock className="w-3 h-3 text-[#ffd60a]" />
                 <span>Login Required</span>
               </span>
             )}
 
             {isSolved && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-[#00b8a3]">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#00b8a3]" />
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-[#30d158]">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#30d158]" />
                 <span>Solved</span>
               </span>
             )}
 
             {isInProgress && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-[#ffc01e]">
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-[#ffd60a]">
                 <span>In Progress</span>
               </span>
             )}
           </div>
 
           {/* Challenge Summary */}
-          <p className="text-xs sm:text-sm text-slate-400 line-clamp-2 max-w-3xl font-normal leading-relaxed font-sans">
+          <p className="text-xs sm:text-[13px] text-[#86868b] line-clamp-2 max-w-3xl leading-relaxed">
             {challenge.summary}
           </p>
 
           {/* Endpoint Route Pill & Tags */}
-          <div className="flex flex-wrap items-center gap-2.5 pt-1">
-            {/* Main Endpoint Pill */}
-            <div className="flex items-center rounded-lg bg-slate-900/70 border border-slate-800 px-3 py-1.5 text-xs sm:text-sm">
-              <span className={`font-mono font-bold mr-2 text-xs ${
-                challenge.endpoints[0]?.method === 'POST' ? 'text-emerald-400' :
-                challenge.endpoints[0]?.method === 'GET' ? 'text-sky-400' :
-                challenge.endpoints[0]?.method === 'DELETE' ? 'text-rose-400' : 'text-amber-400'
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            {/* Route Pill */}
+            <div className="flex items-center rounded-lg bg-white/[0.04] border border-white/[0.08] px-2.5 py-1 text-xs font-mono">
+              <span className={`font-bold mr-1.5 text-xs ${
+                challenge.endpoints[0]?.method === 'POST' ? 'text-[#30d158]' :
+                challenge.endpoints[0]?.method === 'GET' ? 'text-[#0a84ff]' :
+                challenge.endpoints[0]?.method === 'DELETE' ? 'text-[#ff453a]' : 'text-[#ff9f0a]'
               }`}>
                 {challenge.endpoints[0]?.method}
               </span>
-              <span className="font-mono text-slate-200 text-xs sm:text-sm">{challenge.endpoints[0]?.path}</span>
+              <span className="text-[#f5f5f7]">{challenge.endpoints[0]?.path}</span>
               {challenge.endpoints.length > 1 && (
-                <span className="text-slate-400 ml-2 text-xs font-mono font-medium">+{challenge.endpoints.length - 1} routes</span>
+                <span className="text-[#86868b] ml-1.5 text-[11px]">+{challenge.endpoints.length - 1}</span>
               )}
             </div>
 
-            <div className="hidden sm:block h-4 bg-slate-800 w-px" />
+            <div className="hidden sm:block h-3.5 bg-white/[0.1] w-px" />
 
             {/* Concept Pills */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {challenge.concepts.map((c) => (
                 <ConceptBadge 
                   key={c} 
@@ -158,45 +158,45 @@ export const ChallengeCard: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Right Column: Metadata & CTA Button */}
-        <div className="flex items-center justify-between lg:flex-col lg:items-end gap-3.5 pt-2.5 lg:pt-0 shrink-0 border-t lg:border-t-0 border-slate-800/80">
-          {/* Estimated Time & Test Count */}
-          <div className="flex items-center space-x-3.5 text-xs sm:text-sm text-slate-400 font-mono">
-            <span className="flex items-center space-x-1.5">
-              <Clock className="w-4 h-4 text-slate-500" />
+        {/* Right Column: Metadata & Action Button */}
+        <div className="flex items-center justify-between lg:flex-col lg:items-end gap-3 pt-2 lg:pt-0 shrink-0 border-t lg:border-t-0 border-white/[0.06]">
+          {/* Metadata */}
+          <div className="flex items-center space-x-3 text-xs text-[#86868b] tabular-nums">
+            <span className="flex items-center space-x-1">
+              <Clock className="w-3.5 h-3.5 text-[#636366]" />
               <span>{challenge.estimatedMinutes}m</span>
             </span>
-            <span className="flex items-center space-x-1.5">
-              <ShieldCheck className="w-4 h-4 text-slate-500" />
+            <span className="flex items-center space-x-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#636366]" />
               <span>{challenge.testCases.length} tests</span>
             </span>
           </div>
 
-          {/* Action CTA Button with Tactile Press */}
+          {/* Action CTA Button with Apple Pill Styling */}
           <button
             onClick={(e) => { e.stopPropagation(); onSelect(challenge); }}
-            className={`flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-150 active:scale-95 min-w-[145px] ${
+            className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-full text-xs font-semibold tracking-[-0.01em] transition-all duration-100 active:scale-[0.96] min-w-[135px] cursor-pointer ${
               isLocked
-                ? 'bg-slate-800 text-slate-300 border border-slate-700/80 hover:border-amber-500/40 hover:text-white shadow-sm'
+                ? 'bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/[0.1]'
                 : isSolved
-                ? 'bg-slate-800 text-emerald-400 border border-emerald-500/40 hover:bg-slate-700/60 shadow-sm'
-                : 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-md shadow-emerald-500/10'
+                ? 'bg-white/[0.08] hover:bg-white/[0.14] text-[#30d158] border border-[#30d158]/30'
+                : 'bg-[#30d158] hover:bg-[#34c759] text-black shadow-xs'
             }`}
           >
             {isLocked ? (
               <>
-                <Lock className="w-3.5 h-3.5 text-amber-400" />
-                <span>Sign in to Unlock</span>
+                <Lock className="w-3.5 h-3.5 text-[#ffd60a]" />
+                <span>Sign In to Unlock</span>
               </>
             ) : isFree && !user ? (
               <>
-                <span>Try Free Demo</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Try Demo</span>
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
               </>
             ) : (
               <>
-                <span>{isSolved ? 'View Solution' : isInProgress ? 'Resume Lab' : 'Start Challenge'}</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>{isSolved ? 'View Solution' : isInProgress ? 'Resume' : 'Start'}</span>
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
               </>
             )}
           </button>
