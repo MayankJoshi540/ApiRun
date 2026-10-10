@@ -26,7 +26,7 @@
 
 ## ⚡ Overview
 
-Traditional coding platforms focus primarily on abstract algorithmic puzzles (inverting binary trees, dynamic programming grids, graph traversals). While valuable for algorithmic fundamentals, they don't test the real-world skills that backend software engineers use every day.
+Traditional coding platforms focus primarily on abstract algorithmic puzzles (inverting binary trees, dynamic programming grids, graph traversals). While valuable for algorithmic fundamentals, they don't prepare developers for production backend systems.
 
 **APIRun** bridges this gap. It is an interactive engineering platform where you solve realistic backend challenges:
 
@@ -45,21 +45,21 @@ Traditional coding platforms focus primarily on abstract algorithmic puzzles (in
 ### 1. Modern High-Performance Landing Experience
 *Interactive 3D language ticker, interactive challenge showcases, and real-world backend metrics.*
 
-<img src="./public/homepage.png" alt="APIRun Landing Page" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
+<img src="./public/reference.png" alt="APIRun Landing Page" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
 <br/><br/>
 
 ### 2. Live Interactive Code Arena & Challenge Runner
 *Full Monaco code editor with multi-file support, automated test execution, and live concurrency assertions.*
 
-<img src="./public/image.png" alt="APIRun Challenge Arena" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
+<img src="./public/new-editor.png" alt="APIRun Challenge Arena" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
 <br/><br/>
 
 ### 3. Developer Progress & Mastery Dashboard
 *Track completed challenges across concurrency, authentication, distributed systems, and real-time backend domains.*
 
-<img src="./public/progress.png" alt="APIRun Progress Tracker" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
+<img src="./public/new-catalog.png" alt="APIRun Progress Tracker" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
 </div>
 
@@ -167,9 +167,9 @@ APIRun supports writing backend solutions in any major runtime:
 ```
 APIRun/
 ├── public/                       # Static branding & platform screenshot assets
-│   ├── homepage.png              # Landing page overview
-│   ├── image.png                 # Challenge arena screenshot
-│   ├── progress.png              # Mastery dashboard screenshot
+│   ├── reference.png             # Landing page overview
+│   ├── new-editor.png            # Challenge arena screenshot
+│   ├── new-catalog.png           # Mastery dashboard screenshot
 │   └── logo.png                  # APIRun platform logo
 ├── src/
 │   ├── app/                      # Next.js App Router
