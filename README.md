@@ -26,7 +26,7 @@
 
 ## ⚡ The Paradigm Shift
 
-### Why traditional coding platforms fall short for backend engineers
+Traditional coding platforms focus primarily on abstract algorithmic puzzles (inverting binary trees, dynamic programming grids, graph traversals). While valuable for algorithmic fundamentals, they don't prepare developers for production backend systems.
 
 Most competitive programming sites evaluate developers in synthetic bubbles: single-threaded standard I/O, synchronous deterministic calls, and contrived puzzle algorithms. 
 
@@ -57,28 +57,21 @@ Production Reality:   50 simultaneous webhook retries just hit your billing endp
 ### 2. Real-World Backend Challenges Catalog
 *Filter across HTTP Fundamentals, Distributed Systems, Transaction Locks, and Security Tiers.*
 
-<img src="./public/screenshots/challenges.png" alt="APIRun Challenges Catalog" width="100%" style="border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
+<img src="./public/reference.png" alt="APIRun Landing Page" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
 <br/><br/>
 
 ### 3. The Workbench & Live Test Arena
 *Full Monaco IDE featuring live target proxying (`http://localhost:8000`), contract specs, and integrated testcase console.*
 
-<img src="./public/screenshots/workbench.png" alt="APIRun Workbench Arena" width="100%" style="border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
+<img src="./public/new-editor.png" alt="APIRun Challenge Arena" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
 <br/><br/>
 
 ### 4. Precision Evaluation & Fuzzing Harness
 *De-slopped Apple-style feedback modal with spring physics, hidden edge-case audits, and microsecond latency telemetry.*
 
-<img src="./public/screenshots/evaluation.png" alt="APIRun Evaluation Modal" width="100%" style="border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
-
-<br/><br/>
-
-### 5. Developer Mastery & 52-Week Activity Tracker
-*Full-scale commit & solve activity heatmap, curriculum milestones, and domain breakdown.*
-
-<img src="./public/screenshots/progress.png" alt="APIRun Developer Progress" width="100%" style="border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
+<img src="./public/new-catalog.png" alt="APIRun Progress Tracker" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
 </div>
 
@@ -202,16 +195,11 @@ Visit **[`http://localhost:3000`](http://localhost:3000)** in your browser and s
 
 ```
 APIRun/
-├── public/
-│   ├── screenshots/              # High-res retina platform screenshots
-│   │   ├── landing.png           # Hero and platform overview
-│   │   ├── challenges.png        # Interactive challenge catalog
-│   │   ├── workbench.png         # Monaco workbench & live console
-│   │   ├── evaluation.png        # Tactile test evaluation modal
-│   │   └── progress.png          # 52-week activity heatmap & stats
-│   ├── challenges-bg.png         # Ambient obsidian canvas background
-│   ├── progress-background.png   # Ambient dashboard canvas background
-│   └── logo.png                  # APIRun emblem
+├── public/                       # Static branding & platform screenshot assets
+│   ├── reference.png             # Landing page overview
+│   ├── new-editor.png            # Challenge arena screenshot
+│   ├── new-catalog.png           # Mastery dashboard screenshot
+│   └── logo.png                  # APIRun platform logo
 ├── src/
 │   ├── app/                      # Next.js App Router
 │   │   ├── page.tsx              # High-conversion landing experience
