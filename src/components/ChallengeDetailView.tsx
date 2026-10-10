@@ -372,18 +372,18 @@ export const ChallengeDetailView: React.FC<Props> = ({
 
       {/* ── Free Demo Preview Banner (for guests on ping-health-api) ── */}
       {!user && challenge.slug === 'ping-health-api' && (
-        <div className="bg-gradient-to-r from-emerald-950/60 via-[#0a121f] to-slate-900 border-b border-emerald-500/30 px-4 py-2 flex items-center justify-between text-xs text-emerald-300 shrink-0 select-none">
+        <div className="bg-[#1c1c1e]/85 backdrop-blur-2xl border-b border-white/[0.08] px-4 py-2 flex items-center justify-between text-xs text-[#30d158] shrink-0 select-none">
           <div className="flex items-center gap-2">
-            <Unlock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span>
-              <strong>Free Demo Access:</strong> You can code and execute test suites for this challenge without signing in.
+            <Unlock className="w-3.5 h-3.5 text-[#30d158] shrink-0" />
+            <span className="text-[#d1d1d6]">
+              <strong className="text-white">Free Demo Access:</strong> You can code and execute test suites for this challenge without signing in.
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline text-slate-400">Want to save your score and unlock all challenges?</span>
+            <span className="hidden sm:inline text-[#86868b]">Want to save your score and unlock all challenges?</span>
             <Link
               href={`/sign-in?redirect=${encodeURIComponent('/challenges/ping-health-api')}`}
-              className="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 rounded-lg text-emerald-200 font-bold hover:text-white transition"
+              className="px-3 py-1 bg-[#30d158]/20 hover:bg-[#30d158]/30 active:scale-[0.97] border border-[#30d158]/40 rounded-lg text-white font-semibold transition-all shadow-xs"
             >
               Sign In / Sign Up
             </Link>
@@ -391,73 +391,73 @@ export const ChallengeDetailView: React.FC<Props> = ({
         </div>
       )}
 
-      {/* ── Main Split Workbench (Floating Cards Layout) ── */}
+      {/* ── Main Split Workbench (Floating Apple Obsidian Cards Layout) ── */}
       <div 
         ref={workbenchRef}
-        className="flex-1 flex overflow-hidden p-2 gap-0 relative bg-[#0c0f17]"
+        className="flex-1 flex overflow-hidden p-2.5 gap-0 relative bg-transparent"
       >
         {/* ── LEFT PANEL: Problem Specification Card ── */}
         <div 
           style={{ width: `${leftWidthPercent}%` }} 
-          className={`h-full flex flex-col bg-[#0f1420] rounded-2xl border border-slate-800/80 shadow-2xl overflow-hidden shrink-0 ${
+          className={`h-full flex flex-col bg-[#1c1c1e]/80 backdrop-blur-2xl rounded-2xl border border-white/[0.08] border-t-white/[0.14] shadow-[0_12px_40px_rgba(0,0,0,0.45)] overflow-hidden shrink-0 ${
             (isDraggingHorizontal || isDraggingVertical) ? 'transition-none pointer-events-none select-none' : 'transition-all duration-150 ease-out'
           }`}
         >
-          {/* Top Card Tabs */}
-          <div className="h-13 px-4 bg-[#141a27] border-b border-slate-800/80 flex items-center justify-between shrink-0 select-none">
-            <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+          {/* Top Card Tabs (Apple Segmented Bar) */}
+          <div className="h-12 px-3.5 bg-[#161618]/70 border-b border-white/[0.06] flex items-center justify-between shrink-0 select-none">
+            <div className="flex items-center gap-1.5 text-xs">
               <button
                 onClick={() => setLeftTab('DESCRIPTION')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.97] ${
                   leftTab === 'DESCRIPTION'
-                    ? 'bg-slate-800 text-slate-100 font-semibold border border-slate-700/60 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 font-medium'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/[0.1] shadow-xs'
+                    : 'text-[#86868b] hover:text-[#f5f5f7] hover:bg-white/[0.06] font-medium'
                 }`}
               >
-                <BookOpen className="w-4 h-4 text-emerald-400" />
+                <BookOpen className="w-3.5 h-3.5 text-[#30d158]" />
                 <span>Description</span>
               </button>
 
               <button
                 onClick={() => setLeftTab('REQUIREMENTS')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.97] ${
                   leftTab === 'REQUIREMENTS'
-                    ? 'bg-slate-800 text-slate-100 font-semibold border border-slate-700/60 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 font-medium'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/[0.1] shadow-xs'
+                    : 'text-[#86868b] hover:text-[#f5f5f7] hover:bg-white/[0.06] font-medium'
                 }`}
               >
-                <ListChecks className="w-4 h-4 text-sky-400" />
+                <ListChecks className="w-3.5 h-3.5 text-[#0a84ff]" />
                 <span>Requirements ({challenge.requirements.length})</span>
               </button>
 
               <button
                 onClick={() => setLeftTab('SCAFFOLD')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.97] ${
                   leftTab === 'SCAFFOLD'
-                    ? 'bg-slate-800 text-slate-100 font-semibold border border-slate-700/60 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 font-medium'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/[0.1] shadow-xs'
+                    : 'text-[#86868b] hover:text-[#f5f5f7] hover:bg-white/[0.06] font-medium'
                 }`}
               >
-                <FileCode2 className="w-4 h-4 text-amber-400" />
+                <FileCode2 className="w-3.5 h-3.5 text-[#ff9f0a]" />
                 <span>Scaffold</span>
               </button>
             </div>
           </div>
 
           {/* Left Card Body (Scrollable Problem Statement) */}
-          <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 select-text">
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 select-text scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
             {leftTab === 'DESCRIPTION' && (
               <div className="space-y-4">
                 {/* Title + Status Badges */}
                 <div>
                   <div className="flex items-center justify-between gap-3">
-                    <h1 className="text-xl sm:text-2xl font-bold text-slate-100 tracking-tight">
+                    <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-[-0.015em]">
                       {challenge.title}
                     </h1>
                     {isSolved && (
-                      <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-[#00b8a3] select-none shrink-0">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#30d158] bg-[#30d158]/15 border border-[#30d158]/30 px-2.5 py-0.5 rounded-full select-none shrink-0 shadow-xs">
                         <span>Solved</span>
-                        <CheckCircle2 className="w-4 h-4 text-[#00b8a3]" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#30d158]" />
                       </span>
                     )}
                   </div>
@@ -466,22 +466,22 @@ export const ChallengeDetailView: React.FC<Props> = ({
                   <div className="flex items-center gap-2 mt-3 flex-wrap">
                     <DifficultyBadge difficulty={challenge.difficulty} />
 
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#242424] text-zinc-300 text-xs font-medium">
-                      <Tag className="w-3 h-3 text-zinc-400" />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.06] text-[#d1d1d6] text-xs font-medium border border-white/[0.08]">
+                      <Tag className="w-3 h-3 text-[#86868b]" />
                       <span>{challenge.category}</span>
                     </span>
 
                     <button 
                       onClick={() => setShowHint(!showHint)}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#242424] hover:bg-[#303030] text-zinc-300 hover:text-white text-xs font-medium cursor-pointer transition"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.06] hover:bg-white/[0.10] active:scale-[0.97] text-[#d1d1d6] hover:text-white text-xs font-medium cursor-pointer transition-all border border-white/[0.08]"
                     >
-                      <Lightbulb className="w-3 h-3 text-amber-400" />
+                      <Lightbulb className="w-3 h-3 text-[#ff9f0a]" />
                       <span>Hint</span>
                     </button>
                   </div>
 
                   {showHint && (
-                    <div className="mt-3.5 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs sm:text-sm text-amber-200 leading-relaxed">
+                    <div className="mt-3.5 p-4 rounded-xl bg-[#ff9f0a]/10 border border-[#ff9f0a]/20 text-xs sm:text-sm text-[#ffd60a] leading-relaxed shadow-sm">
                       💡 Focus on handling concurrent edge cases and returning standard HTTP status codes as specified in contract assertions.
                     </div>
                   )}
@@ -494,14 +494,14 @@ export const ChallengeDetailView: React.FC<Props> = ({
 
             {leftTab === 'REQUIREMENTS' && (
               <div className="space-y-4">
-                <div className="pb-3 border-b border-slate-800/80 flex items-center justify-between">
+                <div className="pb-3 border-b border-white/[0.06] flex items-center justify-between">
                   <div>
-                    <h2 className="text-sm font-bold text-slate-100 tracking-tight">Contract Assertions</h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <h2 className="text-sm font-semibold text-white tracking-tight">Contract Assertions</h2>
+                    <p className="text-xs text-[#86868b] mt-0.5">
                       Verify HTTP status codes, headers, and payload boundary conditions.
                     </p>
                   </div>
-                  <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20">
+                  <span className="text-xs font-mono font-semibold text-[#30d158] bg-[#30d158]/15 px-2.5 py-0.5 rounded-full border border-[#30d158]/30">
                     {challenge.requirements.length} CHECKS
                   </span>
                 </div>
@@ -510,20 +510,20 @@ export const ChallengeDetailView: React.FC<Props> = ({
                   {challenge.requirements.map((req, idx) => (
                     <div
                       key={req.id}
-                      className="p-3.5 rounded-xl bg-[#141a27] border border-slate-800/80 hover:border-slate-700/80 transition-colors space-y-1.5"
+                      className="p-3.5 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:border-white/[0.12] transition-colors space-y-1.5 shadow-sm"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-100 flex items-center gap-2">
-                          <span className="w-4.5 h-4.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-[10px] font-mono font-bold">
+                        <span className="text-xs font-semibold text-white flex items-center gap-2">
+                          <span className="w-4.5 h-4.5 rounded-full bg-[#30d158]/15 border border-[#30d158]/30 text-[#30d158] flex items-center justify-center text-[10px] font-mono font-bold">
                             {idx + 1}
                           </span>
                           <span>{req.title}</span>
                         </span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700/60 text-slate-400 font-semibold">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.08] border border-white/[0.1] text-[#86868b] font-medium">
                           {req.badge || 'ASSERTION'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed pl-6.5">
+                      <p className="text-xs text-[#d1d1d6] leading-relaxed pl-6.5">
                         {req.detail}
                       </p>
                     </div>
@@ -534,13 +534,13 @@ export const ChallengeDetailView: React.FC<Props> = ({
 
             {leftTab === 'SCAFFOLD' && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-800/80 pb-2.5">
+                <div className="flex items-center justify-between text-xs text-[#86868b] font-mono border-b border-white/[0.06] pb-2.5">
                   <span className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#30d158]" />
                     <span>Language Template:</span>
-                    <strong className="text-emerald-400 uppercase">{selectedEditorLang}</strong>
+                    <strong className="text-[#30d158] uppercase">{selectedEditorLang}</strong>
                   </span>
-                  <span className="text-[11px] text-slate-500">Live Starter</span>
+                  <span className="text-[11px] text-[#86868b]">Live Starter</span>
                 </div>
                 <CodeBlock
                   code={challenge.starterCode?.[selectedEditorLang] || '// No starter code available'}
@@ -561,12 +561,12 @@ export const ChallengeDetailView: React.FC<Props> = ({
             setIsDraggingHorizontal(true);
           }}
           className={`w-2.5 h-full cursor-col-resize flex items-center justify-center shrink-0 group select-none z-20 ${
-            isDraggingHorizontal ? 'bg-emerald-500/30' : 'hover:bg-slate-800/50'
+            isDraggingHorizontal ? 'bg-[#30d158]/20' : 'hover:bg-white/[0.06]'
           }`}
           title="Drag to resize columns"
         >
-          <div className={`w-1 h-8 rounded-full transition-all duration-100 ${
-            isDraggingHorizontal ? 'bg-emerald-400 scale-y-125 shadow-[0_0_8px_rgba(52,211,153,0.6)]' : 'bg-slate-700 group-hover:bg-emerald-400'
+          <div className={`w-1 h-8 rounded-full transition-all duration-150 ${
+            isDraggingHorizontal ? 'bg-[#30d158] scale-y-125 shadow-[0_0_8px_rgba(48,209,88,0.5)]' : 'bg-white/20 group-hover:bg-[#30d158]'
           }`} />
         </div>
 
@@ -610,12 +610,12 @@ export const ChallengeDetailView: React.FC<Props> = ({
                 setIsDraggingVertical(true);
               }}
               className={`h-2.5 w-full cursor-row-resize flex items-center justify-center shrink-0 group select-none z-20 ${
-                isDraggingVertical ? 'bg-emerald-500/30' : 'hover:bg-slate-800/50'
+                isDraggingVertical ? 'bg-[#30d158]/20' : 'hover:bg-white/[0.06]'
               }`}
               title="Drag to resize editor and console"
             >
-              <div className={`h-1 w-8 rounded-full transition-all duration-100 ${
-                isDraggingVertical ? 'bg-emerald-400 scale-x-125 shadow-[0_0_8px_rgba(52,211,153,0.6)]' : 'bg-slate-700 group-hover:bg-emerald-400'
+              <div className={`h-1 w-8 rounded-full transition-all duration-150 ${
+                isDraggingVertical ? 'bg-[#30d158] scale-x-125 shadow-[0_0_8px_rgba(48,209,88,0.5)]' : 'bg-white/20 group-hover:bg-[#30d158]'
               }`} />
             </div>
           )}
