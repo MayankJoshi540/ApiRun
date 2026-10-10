@@ -14,7 +14,7 @@ export const HeroBackground: React.FC = () => {
 
       {/* 2. High-Resolution Luminous Globe Artwork */}
       <img
-        src="/background.png"
+        src="/backgrounds/background.png"
         alt="APIRun Hero Background"
         className="absolute inset-0 w-full h-full object-cover object-bottom pointer-events-none select-none opacity-90 brightness-110 saturate-[1.1]"
         style={{ 

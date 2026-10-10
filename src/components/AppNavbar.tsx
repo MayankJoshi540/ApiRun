@@ -173,7 +173,7 @@ export const AppNavbar: React.FC<Props> = ({
                 />
                 <span className="font-extrabold text-base sm:text-lg tracking-tight font-sans">
                   <span className="text-white">API</span>
-                  <span className="text-emerald-400">Run</span>
+                  <span className="text-white/80">Run</span>
                 </span>
               </Link>
             </div>
@@ -194,21 +194,21 @@ export const AppNavbar: React.FC<Props> = ({
                     href={link.href}
                     onMouseEnter={() => setHoveredTab(link.key)}
                     onClick={() => handleLinkClick(link.key)}
-                    className={`relative px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 z-10 active:scale-95 ${
+                    className={`relative px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-150 z-10 active:scale-95 ${
                       isActive 
-                        ? 'text-emerald-300' 
+                        ? 'text-white font-semibold' 
                         : isHovered 
                         ? 'text-white' 
-                        : 'text-slate-300 hover:text-white'
+                        : 'text-[#86868b] hover:text-white'
                     }`}
                   >
                     {(isActive || isHovered) && (
                       <span
-                        className={`absolute inset-0 rounded-full -z-10 transition-all duration-200 ${
-                          isHovered
-                            ? 'bg-white/[0.09] border border-white/[0.14] backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]'
-                            : isActive
-                            ? 'bg-emerald-500/15 border border-emerald-500/30 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(16,185,129,0.2)]'
+                        className={`absolute inset-0 rounded-full -z-10 transition-all duration-150 ${
+                          isActive
+                            ? 'bg-white/[0.12] border border-white/[0.16] backdrop-blur-md shadow-xs'
+                            : isHovered
+                            ? 'bg-white/[0.06] border border-white/[0.1] backdrop-blur-md'
                             : 'bg-transparent'
                         }`}
                         style={{
@@ -235,11 +235,11 @@ export const AppNavbar: React.FC<Props> = ({
                   <Link
                     href="/progress"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-8 h-8 rounded-full overflow-hidden border border-emerald-500/40 bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-bold text-xs active:scale-95"
+                    className="w-8 h-8 rounded-full overflow-hidden border border-white/[0.15] bg-white/[0.08] flex items-center justify-center text-white font-semibold text-xs active:scale-95"
                     aria-label="Profile"
                   >
                     {user.photoURL ? (
-                      <img src={user.photoURL} alt={displayName} className="w-full h-full object-cover" />
+                      <img src={user.photoURL} alt={displayName} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                     ) : (
                       <span>{initial}</span>
                     )}
@@ -307,13 +307,13 @@ export const AppNavbar: React.FC<Props> = ({
                       <div className="flex items-center space-x-3.5">
                         <div className={`p-2.5 rounded-xl border ${
                           isActive 
-                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' 
+                            ? 'bg-white/[0.12] border-white/20 text-white' 
                             : 'bg-white/[0.04] border-white/[0.08] text-slate-400'
                         }`}>
                           <IconComponent className="w-4 h-4" />
                         </div>
                         <div className="text-left">
-                          <div className={`text-sm font-bold tracking-tight ${isActive ? 'text-emerald-300' : 'text-white'}`}>
+                          <div className={`text-sm font-semibold tracking-tight ${isActive ? 'text-white' : 'text-[#86868b]'}`}>
                             {link.label}
                           </div>
                           <div className="text-[11px] text-slate-400 font-normal">
@@ -322,7 +322,7 @@ export const AppNavbar: React.FC<Props> = ({
                         </div>
                       </div>
 
-                      <ChevronRight className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-500'}`} />
+                      <ChevronRight className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                     </Link>
                   );
                 })}
@@ -339,15 +339,16 @@ export const AppNavbar: React.FC<Props> = ({
                           <img
                             src={user.photoURL}
                             alt={displayName}
+                            referrerPolicy="no-referrer"
                             className="w-9 h-9 rounded-xl object-cover border border-white/[0.1] shrink-0"
                           />
                         ) : (
-                          <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/35 flex items-center justify-center text-emerald-300 font-bold text-xs shrink-0">
+                          <div className="w-9 h-9 rounded-xl bg-white/[0.08] border border-white/[0.1] flex items-center justify-center text-white font-semibold text-xs shrink-0">
                             {initial}
                           </div>
                         )}
                         <div className="text-left truncate">
-                          <div className="text-xs font-bold text-white truncate">{displayName}</div>
+                          <div className="text-xs font-semibold text-white truncate">{displayName}</div>
                           <div className="text-[10px] text-slate-400 truncate">{user.email}</div>
                         </div>
                       </div>
@@ -355,7 +356,7 @@ export const AppNavbar: React.FC<Props> = ({
                       <Link
                         href="/progress"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold shrink-0 active:scale-95"
+                        className="px-3 py-1.5 rounded-full bg-white/[0.08] border border-white/[0.12] text-white text-xs font-medium shrink-0 active:scale-95"
                       >
                         Stats
                       </Link>

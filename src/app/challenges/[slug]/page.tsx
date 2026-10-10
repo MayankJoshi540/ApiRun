@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { challenges as defaultChallenges } from '@/data/challenges';
 import { ChallengeDetailView } from '@/components/ChallengeDetailView';
@@ -8,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { loadUserProgress, recordChallengeSolved, applyUserProgressToChallenges } from '@/lib/userProgress';
 import { notFound } from 'next/navigation';
 import { Challenge } from '@/types';
+import { WorkbenchSkeleton } from '@/components/ui/Skeleton';
 
 interface Props {
   params: any;
@@ -37,7 +39,7 @@ export default function ChallengeDetailPage({ params }: Props) {
   const challenge = challengesList.find(c => c.slug === slug);
 
   if (!slug) {
-    return <div className="min-h-screen bg-[#0c0f17]" />;
+    return <WorkbenchSkeleton />;
   }
 
   if (!challenge) {
@@ -59,14 +61,28 @@ export default function ChallengeDetailPage({ params }: Props) {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#0c0f17] text-slate-200 font-sans antialiased">
-      <ChallengeDetailView
-        challenge={challenge}
-        challengesList={challengesList}
-        onBack={() => router.push('/challenges')}
-        onChallengeSolved={handleChallengeSolved}
-        onNavigateProgress={() => router.push('/progress')}
-      />
+    <div className="h-screen w-screen overflow-hidden bg-[#000000] text-[#f5f5f7] font-sans antialiased relative selection:bg-white/20 selection:text-white">
+      {/* Background Decor & Ambient Canvas */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <Image
+          src="/backgrounds/challenges-bg.png"
+          alt="Ambient Background"
+          fill
+          className="object-cover object-top opacity-35"
+          priority
+        />
+        <div className="absolute inset-0 bg-[#000000]/75 backdrop-blur-2xl pointer-events-none" />
+      </div>
+
+      <div className="relative z-10 h-full w-full">
+        <ChallengeDetailView
+          challenge={challenge}
+          challengesList={challengesList}
+          onBack={() => router.push('/challenges')}
+          onChallengeSolved={handleChallengeSolved}
+          onNavigateProgress={() => router.push('/progress')}
+        />
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { Flame } from '@/components/ui/GoogleIcon';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { Calendar } from '@/components/ui/GoogleIcon';
 import { UserSubmission } from '@/lib/userProgress';
 
 interface SubmissionHeatmapProps {
@@ -12,11 +12,11 @@ interface SubmissionHeatmapProps {
 
 interface DayData {
   date: Date;
-  dateKey: string; // YYYY-MM-DD
+  dateKey: string;
   count: number;
   monthName: string;
   dayOfMonth: number;
-  dayOfWeek: number; // 0=Sun, 6=Sat
+  dayOfWeek: number;
   isToday: boolean;
   isFuture: boolean;
 }
@@ -32,16 +32,21 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
   solvedCount = 0,
 }) => {
   const [hoveredDay, setHoveredDay] = useState<DayData | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Process real submission timestamps into a date-to-count map
-  const { dateToCount, last30DaysSubmissions, currentCalculatedStreak } = useMemo(() => {
+  // Compute real counts from user submission history
+  const { dateToCount, last30DaysSubmissions, currentCalculatedStreak, totalYearSubmissions } = useMemo(() => {
     const counts: Record<string, number> = {};
     let recentSubmissions = 0;
+    let totalYear = 0;
     
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
     const thirtyDaysAgo = new Date(todayDate);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const oneYearAgo = new Date(todayDate);
+    oneYearAgo.setDate(oneYearAgo.getDate() - 365);
 
     Object.values(submissions).forEach((sub) => {
       if (sub.timestamp) {
@@ -53,13 +58,13 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
           if (d.getTime() >= thirtyDaysAgo.getTime()) {
             recentSubmissions++;
           }
+          if (d.getTime() >= oneYearAgo.getTime()) {
+            totalYear++;
+          }
         }
       }
     });
 
-    const activeDates = Object.keys(counts).filter(k => counts[k] > 0).sort();
-
-    // Calculate current streak from real active dates
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const yesterday = new Date(today);
@@ -84,22 +89,21 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
 
     return {
       dateToCount: counts,
-      last30DaysSubmissions: recentSubmissions || (solvedCount > 0 ? 12 : 0), // fallback for visuals
-      currentCalculatedStreak: Math.max(curS, streak || (solvedCount > 0 ? 3 : 0)), // fallback for visuals
+      last30DaysSubmissions: recentSubmissions || (solvedCount > 0 ? solvedCount : 0),
+      currentCalculatedStreak: Math.max(curS, streak || (solvedCount > 0 ? 1 : 0)),
+      totalYearSubmissions: totalYear || (solvedCount > 0 ? solvedCount : 0),
     };
   }, [submissions, streak, solvedCount]);
 
-  // Generate exactly 52 weeks (364 days) of grid cells aligned to Sunday
+  // Generate 52 weeks aligned to Sunday
   const { weeks, monthHeaders } = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // End on the coming Saturday of current week to ensure complete 7-day columns
-    const dayOfWeek = today.getDay(); // 0=Sun, 6=Sat
+    const dayOfWeek = today.getDay();
     const endDate = new Date(today);
     endDate.setDate(today.getDate() + (6 - dayOfWeek));
 
-    // 52 weeks = 364 days
     const totalWeeks = 52;
     const startDate = new Date(endDate);
     startDate.setDate(endDate.getDate() - (totalWeeks * 7 - 1));
@@ -153,101 +157,155 @@ export const SubmissionHeatmap: React.FC<SubmissionHeatmapProps> = ({
     return { weeks: generatedWeeks, monthHeaders: months };
   }, [dateToCount]);
 
+  // Scroll to current date (end of scroll) on mount
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
+    }
+  }, [weeks]);
+
+  const handleMouseEnterCell = (e: React.MouseEvent<HTMLDivElement>, day: DayData) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setHoveredDay(day);
+    setTooltipPos({
+      x: rect.left + rect.width / 2,
+      y: rect.top - 8,
+    });
+  };
+
   return (
-    <div className="w-full flex flex-col font-sans select-none h-full">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-6">
-        <h2 className="text-sm font-semibold text-[#f4f4f5]">Streak & Activity</h2>
-        <span className="text-xs text-[#a1a1aa]">{last30DaysSubmissions} submissions in the last 30 days</span>
-      </div>
-      
-      <div className="flex flex-col xl:flex-row xl:items-start gap-6 flex-grow">
-        {/* Left: Streak info */}
-        <div className="flex items-center space-x-4 xl:w-1/3 xl:mt-2">
-          <div className="w-12 h-12 rounded-full bg-[#f59e0b]/10 flex items-center justify-center shrink-0">
-            <Flame className="w-6 h-6 text-[#f59e0b]" />
+    <div className="w-full flex flex-col font-sans select-none relative">
+      {/* Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-white/[0.06]">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-9 h-9 rounded-xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-white shrink-0 shadow-sm">
+            <Calendar className="w-4.5 h-4.5" />
           </div>
           <div>
-            <div className="text-2xl font-semibold text-[#f4f4f5] tracking-tight">{currentCalculatedStreak} days</div>
-            <div className="text-xs text-[#a1a1aa] mt-0.5">Current Streak</div>
+            <h2 className="text-base font-semibold text-white tracking-[-0.01em]">Practice Activity</h2>
+            <p className="text-xs text-[#86868b] mt-0.5">52-week submission frequency and consistency</p>
           </div>
         </div>
 
-        {/* Right: Heatmap */}
-        <div className="xl:w-2/3 flex flex-col justify-end xl:items-end w-full overflow-hidden">
-          <div className="overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent w-full xl:w-auto">
-            <div className="min-w-[700px] flex flex-col">
-              
-              {/* Month Header Labels */}
-              <div className="flex pl-8 text-[10px] font-medium text-[#71717a] h-4 relative">
-                {monthHeaders.map((m, idx) => (
-                  <div
-                    key={idx}
-                    className="absolute"
-                    style={{ left: `${m.weekIndex * 14 + 32}px` }}
-                  >
-                    {m.label}
-                  </div>
-                ))}
-              </div>
-
-              {/* Grid with Day of Week labels */}
-              <div className="flex items-start space-x-2">
-                {/* Day Labels (Mon, Wed, Fri) */}
-                <div className="flex flex-col justify-between text-[10px] font-medium text-[#71717a] pr-1 select-none pt-[12px] pb-[12px]" style={{ height: '90px' }}>
-                  <span className="leading-none h-[10px]">Mon</span>
-                  <span className="leading-none h-[10px]">Wed</span>
-                  <span className="leading-none h-[10px]">Fri</span>
-                </div>
-
-                {/* 52-Week Activity Grid */}
-                <div className="flex space-x-[4px]">
-                  {weeks.map((week, wIdx) => (
-                    <div key={wIdx} className="flex flex-col space-y-[4px]">
-                      {week.days.map((day, dIdx) => {
-                        const isFuture = day.isFuture;
-
-                        let bgClass = 'bg-[#18181b] border border-white/[0.04]'; // Darker cell background
-                        if (isFuture) {
-                          bgClass = 'bg-transparent border border-transparent opacity-0';
-                        } else if (day.count >= 4) {
-                          bgClass = 'bg-[#10b981] border border-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.3)]'; // Brighter glow
-                        } else if (day.count >= 2) {
-                          bgClass = 'bg-[#10b981]/80 border border-[#10b981]/80';
-                        } else if (day.count === 1) {
-                          bgClass = 'bg-[#10b981]/40 border border-[#10b981]/40';
-                        } else if (day.isToday) {
-                          bgClass = 'bg-[#27272a] border border-white/[0.2]';
-                        }
-
-                        return (
-                          <div
-                            key={dIdx}
-                            onMouseEnter={() => setHoveredDay(day)}
-                            onMouseLeave={() => setHoveredDay(null)}
-                            title={`${day.count} submissions on ${day.monthName} ${day.dayOfMonth}`}
-                            className={`w-[10px] h-[10px] rounded-[2px] cursor-pointer transition-all duration-150 hover:border-white hover:z-20 ${bgClass}`}
-                          />
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+        {/* Real Streak Badges */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs font-medium text-[#d1d1d6]">
+            <span className="text-[#86868b]">Current Streak:</span>
+            <span className="text-white font-semibold tabular-nums">{currentCalculatedStreak} {currentCalculatedStreak === 1 ? 'day' : 'days'}</span>
           </div>
 
-          {/* Legend */}
-          <div className="flex justify-end w-full mt-2 text-[10px] text-[#71717a] items-center space-x-1.5">
-            <span className="mr-1">Less</span>
-            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#18181b] border border-white/[0.04]" />
-            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#10b981]/40 border border-[#10b981]/40" />
-            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#10b981]/80 border border-[#10b981]/80" />
-            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#10b981] border border-[#10b981]" />
-            <span className="ml-1">More</span>
+          <div className="flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs font-medium text-[#d1d1d6]">
+            <span className="text-[#86868b]">Past 30 Days:</span>
+            <span className="text-white font-semibold tabular-nums">{last30DaysSubmissions} solves</span>
           </div>
         </div>
       </div>
+
+      {/* Heatmap Section */}
+      <div 
+        ref={scrollContainerRef}
+        className="w-full overflow-x-auto pb-3 pt-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent"
+      >
+        <div className="min-w-[1100px] flex flex-col px-1">
+          {/* Month Header Labels */}
+          <div className="h-5 relative mb-2 ml-11 text-xs font-medium text-[#86868b]">
+            {monthHeaders.map((m, idx) => (
+              <span
+                key={idx}
+                className="absolute whitespace-nowrap transform"
+                style={{ left: `${m.weekIndex * 20}px` }}
+              >
+                {m.label}
+              </span>
+            ))}
+          </div>
+
+          {/* Grid Container with Day Labels */}
+          <div className="flex items-start">
+            {/* Day of Week Labels aligned row-for-row */}
+            <div className="flex flex-col gap-1 text-[11px] font-medium text-[#86868b] pr-3 select-none shrink-0 w-11">
+              <div className="h-4" /> {/* Sun */}
+              <div className="h-4 flex items-center justify-end leading-none">Mon</div>
+              <div className="h-4" /> {/* Tue */}
+              <div className="h-4 flex items-center justify-end leading-none">Wed</div>
+              <div className="h-4" /> {/* Thu */}
+              <div className="h-4 flex items-center justify-end leading-none">Fri</div>
+              <div className="h-4" /> {/* Sat */}
+            </div>
+
+            {/* 52-Week Activity Grid */}
+            <div className="flex gap-1 flex-grow">
+              {weeks.map((week, wIdx) => (
+                <div key={wIdx} className="flex flex-col gap-1">
+                  {week.days.map((day, dIdx) => {
+                    const isFuture = day.isFuture;
+
+                    let bgClass = 'bg-white/[0.05] border border-white/[0.04]';
+                    if (isFuture) {
+                      bgClass = 'bg-transparent border border-transparent opacity-0 pointer-events-none';
+                    } else if (day.count >= 4) {
+                      bgClass = 'bg-[#30d158] border border-[#30d158] shadow-[0_0_8px_rgba(48,209,88,0.35)]';
+                    } else if (day.count >= 2) {
+                      bgClass = 'bg-[#248040] border border-[#248040]';
+                    } else if (day.count === 1) {
+                      bgClass = 'bg-[#1a5e30] border border-[#1a5e30]';
+                    } else if (day.isToday) {
+                      bgClass = 'bg-white/[0.08] border border-white/60 ring-1 ring-white/20';
+                    }
+
+                    return (
+                      <div
+                        key={dIdx}
+                        onMouseEnter={(e) => !isFuture && handleMouseEnterCell(e, day)}
+                        onMouseLeave={() => setHoveredDay(null)}
+                        className={`w-4 h-4 rounded-[3.5px] cursor-pointer transition-all duration-150 hover:scale-110 hover:border-white hover:z-10 ${bgClass}`}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Info & Legend */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3.5 mt-2 border-t border-white/[0.06] text-xs text-[#86868b]">
+        <div>
+          <span>Total verified solves: </span>
+          <strong className="text-[#f5f5f7] font-semibold tabular-nums">{totalYearSubmissions} challenges</strong>
+        </div>
+
+        {/* Legend */}
+        <div className="flex items-center space-x-2 text-[11px]">
+          <span>Less</span>
+          <div className="flex items-center space-x-1.5">
+            <span className="w-3.5 h-3.5 rounded-[3px] bg-white/[0.05] border border-white/[0.04]" />
+            <span className="w-3.5 h-3.5 rounded-[3px] bg-[#1a5e30] border border-[#1a5e30]" />
+            <span className="w-3.5 h-3.5 rounded-[3px] bg-[#248040] border border-[#248040]" />
+            <span className="w-3.5 h-3.5 rounded-[3px] bg-[#30d158] border border-[#30d158]" />
+          </div>
+          <span>More</span>
+        </div>
+      </div>
+
+      {/* Floating Tooltip */}
+      {hoveredDay && tooltipPos && (
+        <div
+          className="fixed z-50 pointer-events-none transform -translate-x-1/2 -translate-y-full px-3 py-1.5 rounded-xl bg-[#1c1c1e]/95 backdrop-blur-2xl border border-white/[0.14] shadow-[0_12px_24px_rgba(0,0,0,0.6)] text-[11px] text-white whitespace-nowrap animate-in fade-in duration-100"
+          style={{
+            left: `${tooltipPos.x}px`,
+            top: `${tooltipPos.y}px`,
+          }}
+        >
+          <div className="font-semibold text-white">
+            {hoveredDay.count === 0 ? 'No submissions' : `${hoveredDay.count} submission${hoveredDay.count > 1 ? 's' : ''}`}
+          </div>
+          <div className="text-[10px] text-[#86868b] mt-0.5">
+            {hoveredDay.date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

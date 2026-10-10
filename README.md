@@ -1,63 +1,75 @@
 <div align="center">
 
-<img src="./public/logo.png" alt="APIRun Logo" width="96" height="96" style="border-radius: 20px;" />
+<img src="./public/logo.png" alt="APIRun Logo" width="100" height="100" style="border-radius: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
 
 # APIRun
 
-**A LeetCode-style platform for backend developers.**  
-*Build and test live endpoints in Node.js, Go, and Python against automated contract, concurrency, and validation test suites.*
+### **The Interactive Arena for Production-Grade Backend Engineering**
+*Because in production, systems don't fail on binary tree inversions — they fail on race conditions, connection starvation, and non-idempotent payment retries.*
 
 <br/>
 
-[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16_App_Router-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-VS_Code-1E1E1E?style=for-the-badge&logo=visual-studio-code&logoColor=007ACC)](https://microsoft.github.io/monaco-editor/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-Apple_Obsidian_Dark-0F172A?style=for-the-badge&logo=tailwind-css&logoColor=38B2AC)](https://tailwindcss.com/)
+[![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-VS_Code_Core-1E1E1E?style=for-the-badge&logo=visual-studio-code&logoColor=007ACC)](https://microsoft.github.io/monaco-editor/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10B981?style=for-the-badge)](LICENSE)
 
 <br/>
 
-[Explore Challenges](#-core-features) • [Platform Screenshots](#-platform-walkthrough) • [Why APIRun?](#-the-paradigm-shift-why-leetcode-isnt-enough-for-backend) • [Getting Started](#-getting-started)
+[Live Experience](#-the-paradigm-shift) • [Interactive Showcase](#-visual-tour) • [Core Pillars](#-what-makes-apirun-different) • [Curriculum Tracks](#-engineering-tracks) • [Quickstart](#-getting-started)
 
 </div>
 
 ---
 
-## ⚡ Overview
+## ⚡ The Paradigm Shift
 
 Traditional coding platforms focus primarily on abstract algorithmic puzzles (inverting binary trees, dynamic programming grids, graph traversals). While valuable for algorithmic fundamentals, they don't prepare developers for production backend systems.
 
-**APIRun** bridges this gap. It is an interactive engineering platform where you solve realistic backend challenges:
+Most competitive programming sites evaluate developers in synthetic bubbles: single-threaded standard I/O, synchronous deterministic calls, and contrived puzzle algorithms. 
 
-- 🛡️ **RFC-9110 HTTP & Schema Compliance**: Implement endpoints that validate strictly structured payloads, enforce headers, and return accurate HTTP semantics.
-- 💥 **Automated Concurrency Fuzzing**: Test your services against simultaneous race conditions, double-spend operations, and deadlocks with automated multi-client harnesses.
-- ⏳ **Rate Limiting & Idempotency**: Build token-bucket limiters, sliding-window algorithms, and safe idempotent payment mutations.
-- 🔐 **Stateless & Statefull Auth**: Implement robust JWT rotation, session invalidation, and RBAC permission checks.
-- ⚡ **Zero-Setup In-Browser Sandbox**: Code and test directly with the Monaco Editor (the engine powering VS Code) with sub-second feedback.
+**Backend reality is fundamentally different:**
+
+```
+Traditional Puzzle: Given an array, find the maximum subarray sum.
+Production Reality:   50 simultaneous webhook retries just hit your billing endpoint 
+                      with the same idempotency key while your cache expired. 
+                      Did you double-charge the customer?
+```
+
+**APIRun** is purpose-built to test and hone the engineering skills required to run software at scale. You build real HTTP services in **Node.js, Go, or Python**, and APIRun subjects them to live automated fuzzing suites, RFC compliance audits, burst concurrency stress tests, and edge-case probes.
 
 ---
 
-## 📸 Platform Walkthrough
+## 🖼️ Visual Tour
 
 <div align="center">
 
-### 1. Modern High-Performance Landing Experience
-*Interactive 3D language ticker, interactive challenge showcases, and real-world backend metrics.*
+### 1. High-Performance Landing Experience
+*Obsidian glass aesthetics, dynamic language tickers, and clear production-focused messaging.*
+
+<img src="./public/screenshots/landing.png" alt="APIRun Landing Page" width="100%" style="border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
+
+<br/><br/>
+
+### 2. Real-World Backend Challenges Catalog
+*Filter across HTTP Fundamentals, Distributed Systems, Transaction Locks, and Security Tiers.*
 
 <img src="./public/reference.png" alt="APIRun Landing Page" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
 <br/><br/>
 
-### 2. Live Interactive Code Arena & Challenge Runner
-*Full Monaco code editor with multi-file support, automated test execution, and live concurrency assertions.*
+### 3. The Workbench & Live Test Arena
+*Full Monaco IDE featuring live target proxying (`http://localhost:8000`), contract specs, and integrated testcase console.*
 
 <img src="./public/new-editor.png" alt="APIRun Challenge Arena" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
 <br/><br/>
 
-### 3. Developer Progress & Mastery Dashboard
-*Track completed challenges across concurrency, authentication, distributed systems, and real-time backend domains.*
+### 4. Precision Evaluation & Fuzzing Harness
+*De-slopped Apple-style feedback modal with spring physics, hidden edge-case audits, and microsecond latency telemetry.*
 
 <img src="./public/new-catalog.png" alt="APIRun Progress Tracker" width="100%" style="border-radius: 12px; border: 1px solid #27272a; margin-bottom: 24px;" />
 
@@ -65,104 +77,121 @@ Traditional coding platforms focus primarily on abstract algorithmic puzzles (in
 
 ---
 
-## 🥊 The Paradigm Shift: Why LeetCode Isn't Enough for Backend
+## 🛡️ What Makes APIRun Different?
 
-| Evaluation Vector | Traditional Algorithmic Platforms (LeetCode) | APIRun (Backend Engineering) |
+| Dimension | Typical Algorithmic Sites | APIRun |
 | :--- | :--- | :--- |
-| **Primary Focus** | Inverting binary trees, DP tables, graph DFS/BFS | HTTP contracts, RFC-9110 status codes, race conditions |
-| **Concurrency & Locks** | Single-threaded synchronous execution | 50+ concurrent requests hitting shared mutable states |
-| **Failures & Resilience** | Returns wrong boolean or timeout | Real 429 Too Many Requests, 409 Conflict, retry jitter |
-| **Data Integrity** | Arrays & Linked Lists | Idempotency keys, atomic distributed locks, token buckets |
-| **Real-World Relevance** | Algorithmic puzzle contests | Production API architecture & real backend scenarios |
+| **Execution Model** | Isolated `stdin` / `stdout` sandbox | Live HTTP server endpoints listening on active ports |
+| **Concurrency Testing** | ❌ None (Single-threaded) | ✅ **Automated burst fuzzer**: Dispatches parallel requests to expose non-atomic state mutations |
+| **Contract Verification** | Exact string or integer equality | ✅ **RFC-9110 HTTP Audits**: Header validation, status code semantics, and payload schema guards |
+| **Failure Modes** | Wrong answer on index `i` | ✅ Real 429 rate limit triggers, 409 conflict states, and cache expiration race conditions |
+| **Local Interop** | Cloud-only locked editor | ✅ **Dual Mode**: Code in-browser OR point the test runner to your local machine (`http://localhost:8000`) |
 
 ---
 
-## 🚀 Core Features
+## 🎯 Engineering Tracks
 
-- **⚡ Real-World Challenge Catalog**: Challenges crafted around production scenarios — Token Bucket Rate Limiters, Distributed Locks, Webhook Dispatchers, and JWT Refresh Flows.
-- **🛡️ Automated Assertion Harness**: Validates status codes, headers, response schemas, and latency benchmarks against strict specifications.
-- **🔥 Race Condition & Fuzzing Engine**: Automated runner tests your endpoints with burst traffic to expose non-atomic state mutations.
-- **💻 Monaco Editor (VS Code Engine)**: Code directly with full syntax highlighting, dark mode interface, and instant inline feedback.
-- **📊 Real-Time Telemetry & Progress**: Track your solved challenges, category mastery, and benchmark times.
-- **🎨 Modern Glassmorphic Dark UI**: Custom-designed with Plus Jakarta Sans typography and clean, high-contrast aesthetics.
+APIRun organizes hands-on problems into four core backend disciplines:
+
+### 1. 🌐 HTTP & REST Contracts
+*Master status code semantics, header negotiation, schema validations, and standard health probes.*
+- **Ping & Health Probes**: Implement RFC diagnostic endpoints (`/ping`, `/health`).
+- **Strict Request Validation**: Enforce JSON schema contracts and gracefully reject malformed payloads with informative `400 Bad Request` structures.
+- **Header Audits & Content Negotiation**: Manage `Accept`, `Content-Type`, and standard ETag conditional requests (`304 Not Modified`).
+
+### 2. ⚡ Concurrency & Transaction Safety
+*Defend your architecture against race conditions and concurrent mutation attacks.*
+- **Idempotent Mutation Keys**: Guarantee that duplicated network retries do not double-process mutations.
+- **Atomic Balance Transfers**: Solve the classic double-spend vulnerability with transactional locks and optimistic concurrency.
+- **Distributed Mutexes**: Coordinate shared resources safely across clustered instances.
+
+### 3. ⏱️ Rate Limiting & Traffic Shaping
+*Protect downstream databases and backends from cascading stampedes.*
+- **Token Bucket Limiters**: Allow brief traffic bursts while enforcing strict sustained capacity limits.
+- **Sliding Window Counters**: Eliminate edge boundary bursts common in naive fixed-window limiters.
+- **RFC Header Decorators**: Return standard `Retry-After`, `X-RateLimit-Remaining`, and `429 Too Many Requests` headers.
+
+### 4. 🔐 Security, Auth & Sessions
+*Production-grade authentication and perimeter security.*
+- **Stateless JWT Rotation**: Token refreshing, signature verification, and replay defense.
+- **Role-Based Access Control (RBAC)**: Fine-grained permission trees with middleware interception.
+- **Webhook Signature Verification**: Cryptographic HMAC signature verification on inbound webhooks.
 
 ---
 
-## 🛠️ Supported Languages & Frameworks
+## 💻 Code Anywhere: Dual Execution Modes
 
-APIRun supports writing backend solutions in any major runtime:
+### Mode A: In-Browser Monaco IDE
+Code right in your browser with the same core engine that powers **VS Code**. Switch seamlessly between **TypeScript / Node.js**, **Go**, and **Python**. Click **Run Tests** to see sub-second evaluation directly in the bottom dock.
 
-| Runtime / Ecosystem | Frameworks & Libraries |
-| :--- | :--- |
-| **Python** | FastAPI, Django Ninja, Flask, AsyncIO |
-| **Go** | Gin, Fiber, Chi, Standard Library `net/http` |
-| **TypeScript / Node.js** | Express, Fastify, NestJS, Hono, Bun |
-| **Rust** | Axum, Actix Web, Tokio |
-| **Java / Kotlin** | Spring Boot, Quarkus, Ktor |
-| **C# / .NET** | ASP.NET Core, Minimal APIs |
-| **Elixir** | Phoenix Framework, Plug |
+### Mode B: "Bring Your Own Server" (BYOS)
+Already have your preferred local workflow with Neovim, VS Code, or GoLand?
+1. Start your local server on your machine (e.g., `http://localhost:8000`).
+2. Type `http://localhost:8000` into the target URL pill inside APIRun.
+3. Click **Run Tests** or **Submit Solution** — APIRun's test harness will bombard your real running server with the full test and fuzzing suite!
 
 ---
 
-## 🏗️ Tech Stack
+## 🏗️ Architecture & Tech Stack
 
-- **Framework**: [Next.js 16 (Turbopack, App Router)](https://nextjs.org/)
-- **Frontend Core**: [React 19](https://react.dev/), [TypeScript 5.7](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS 3.4](https://tailwindcss.com/)
-- **Typography**: [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans)
-- **Animations & Physics**: [GSAP (GreenSock)](https://greensock.com/gsap/), ScrollTrigger
-- **Code Editor**: [@monaco-editor/react](https://github.com/suren-atoyan/monaco-react)
+- **Core Framework**: [Next.js 16](https://nextjs.org/) (Turbopack, App Router)
+- **UI & Components**: [React 19](https://react.dev/), [TypeScript 5.7](https://www.typescriptlang.org/)
+- **Design Philosophy**: Apple-inspired Obsidian Glassmorphism (subtle borders, layered blurs, tactile spring physics)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Editor**: [@monaco-editor/react](https://github.com/suren-atoyan/monaco-react)
+- **State & Persistence**: [Firebase Firestore](https://firebase.google.com/) for submission histories and live telemetry
 - **Authentication**: [Clerk](https://clerk.com/)
-- **Database & Persistence**: [Firebase Firestore](https://firebase.google.com/)
 
 ---
 
-## 📦 Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js**: `v18.17.0` or higher
-- **Package Manager**: `npm`, `pnpm`, or `yarn`
+- **Node.js**: `v18.18+` or `v20+`
+- **npm**, **pnpm**, or **yarn**
 
-### Installation
+### Quick Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/MayankJoshi540/ApiRun.git
-   cd ApiRun
-   ```
+```bash
+# 1. Clone the repository
+git clone https://github.com/MayankJoshi540/ApiRun.git
+cd ApiRun
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+# 2. Install dependencies
+npm install
 
-3. **Configure Environment Variables:**
-   Create a `.env.local` file in the project root:
-   ```env
-   # Clerk Authentication
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-   CLERK_SECRET_KEY=your_clerk_secret_key
+# 3. Create your local environment file
+cp .env.example .env.local
+```
 
-   # Firebase Configuration
-   NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-   NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-   ```
+### Environment Variables
+Configure your credentials in `.env.local`:
 
-4. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
+```env
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
 
-5. **Open in browser:**
-   Visit [http://localhost:3000](http://localhost:3000) to start building and testing endpoints.
+# Firebase Telemetry & Profiles
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+### Run Locally
+
+```bash
+npm run dev
+```
+
+Visit **[`http://localhost:3000`](http://localhost:3000)** in your browser and start building resilient backend systems.
 
 ---
 
-## 📂 Project Architecture
+## 📂 Project Structure
 
 ```
 APIRun/
@@ -173,38 +202,40 @@ APIRun/
 │   └── logo.png                  # APIRun platform logo
 ├── src/
 │   ├── app/                      # Next.js App Router
+│   │   ├── page.tsx              # High-conversion landing experience
 │   │   ├── challenges/           # Challenge catalog & live IDE runner
-│   │   ├── progress/             # Mastery score & metrics tracker
-│   │   ├── feedback/             # Community suggestions & feedback
-│   │   └── layout.tsx            # Global layout with Plus Jakarta Sans & AppNavbar
-│   ├── components/               # UI components
-│   │   ├── hero/                 # Hero section & CTA buttons
-│   │   ├── ui/                   # Custom UI icons, badges & reveal utilities
-│   │   ├── gsap/                 # GSAP animations & counter utilities
-│   │   ├── AppNavbar.tsx         # Glassmorphic navigation header
-│   │   ├── BackendTechMarquee.tsx# 3D dual-row language marquee
-│   │   ├── ChallengeShowcaseScroll.tsx # Interactive dashboard preview
-│   │   └── CodeEditorPanel.tsx   # Monaco editor & test execution console
-│   ├── data/                     # Challenge fixtures, test contracts & specs
-│   ├── lib/                      # Progress calculation, Firebase & client libs
-│   └── utils/                    # Automated test assertion runner
-└── package.json                  # Scripts & dependencies
+│   │   ├── progress/             # Developer mastery & activity heatmap
+│   │   └── feedback/             # Community feedback channel
+│   ├── components/               # UI Component System
+│   │   ├── ChallengeDetailView.tsx # Split-pane responsive workbench
+│   │   ├── CodeEditorPanel.tsx   # Monaco editor with Xcode/Apple theme
+│   │   ├── LeetCodeConsoleDock.tsx # Bottom test result & testcase dock
+│   │   ├── SubmissionModal.tsx   # De-slopped evaluation modal with spring physics
+│   │   ├── SubmissionHeatmap.tsx # Full 52-week high-density activity heatmap
+│   │   └── AppNavbar.tsx         # Floating obsidian navigation bar
+│   ├── data/                     # Challenge fixtures, test specs & starter code
+│   └── lib/                      # Firebase Firestore & telemetry utilities
+└── package.json
 ```
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! If you'd like to contribute new backend challenge specs, improve test harnesses, or enhance UI interactions:
+We welcome contributions from engineers across all backgrounds! Whether you want to author a new challenge spec (e.g. Redis stream processing, Kafka idempotency, OAuth2 PKCE), improve the test runner fuzzer, or enhance UI physics:
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/rate-limiter-challenge`)
-3. Commit your Changes (`git commit -m 'Add Redis-backed Token Bucket challenge'`)
-4. Push to the Branch (`git push origin feature/rate-limiter-challenge`)
-5. Open a Pull Request
+1. **Fork** the repository
+2. **Create** your feature branch (`git checkout -b feature/redis-lock-challenge`)
+3. **Commit** your changes (`git commit -m 'feat: add Redis distributed lock challenge spec'`)
+4. **Push** to your branch (`git push origin feature/redis-lock-challenge`)
+5. **Open** a Pull Request
 
 ---
 
 ## 📄 License
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
+
+<div align="center">
+<sub>Crafted with passion for backend engineers who build systems that don't crash under pressure.</sub>
+</div>

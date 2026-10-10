@@ -33,6 +33,8 @@ export const AuthControls: React.FC<AuthControlsProps> = ({ variant = 'navbar' }
     router.push('/');
   };
 
+  const [imgError, setImgError] = useState(false);
+
   if (loading) {
     return (
       <div className="w-16 h-7 rounded-full bg-white/[0.04] animate-pulse" />
@@ -49,10 +51,12 @@ export const AuthControls: React.FC<AuthControlsProps> = ({ variant = 'navbar' }
           onClick={() => setDropdownOpen(!dropdownOpen)}
           className="flex items-center space-x-2 py-1 px-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all text-left group"
         >
-          {user.photoURL ? (
+          {user.photoURL && !imgError ? (
             <img
               src={user.photoURL}
               alt={displayName}
+              referrerPolicy="no-referrer"
+              onError={() => setImgError(true)}
               className="w-6 h-6 rounded-lg object-cover border border-white/[0.1]"
             />
           ) : (
