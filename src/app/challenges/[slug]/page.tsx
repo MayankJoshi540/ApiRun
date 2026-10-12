@@ -10,6 +10,7 @@ import { loadUserProgress, recordChallengeSolved, applyUserProgressToChallenges 
 import { notFound } from 'next/navigation';
 import { Challenge } from '@/types';
 import { WorkbenchSkeleton } from '@/components/ui/Skeleton';
+import { MobileWorkbenchBanner } from '@/components/MobileWorkbenchBanner';
 
 interface Props {
   params: any;
@@ -73,6 +74,9 @@ export default function ChallengeDetailPage({ params }: Props) {
         />
         <div className="absolute inset-0 bg-[#000000]/75 backdrop-blur-2xl pointer-events-none" />
       </div>
+
+      {/* Mobile Device Advisory Banner */}
+      <MobileWorkbenchBanner />
 
       <div className="relative z-10 h-full w-full">
         <ChallengeDetailView
