@@ -173,6 +173,7 @@ export const StaggerContainer: React.FC<StaggerContainerProps> = ({
         return (
           <div
             key={index}
+            className="h-full"
             style={{
               opacity: isVisible ? 1 : 0,
               transform: isVisible ? 'translate3d(0, 0, 0) scale3d(1, 1, 1)' : hiddenTransform,

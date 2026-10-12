@@ -285,7 +285,7 @@ export const AppNavbar: React.FC<Props> = ({
             >
               {/* Navigation Items */}
               <div className="space-y-1.5">
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 pb-1">
+                <div className="text-[10px] font-bold text-slate-300 uppercase tracking-wider px-2 pb-1">
                   Navigation
                 </div>
 
@@ -298,31 +298,31 @@ export const AppNavbar: React.FC<Props> = ({
                       key={link.href}
                       href={link.href}
                       onClick={() => handleLinkClick(link.key)}
-                      className={`flex items-center justify-between p-3 rounded-2xl transition-all duration-150 active:scale-[0.98] ${
+                      className={`group flex items-center justify-between p-3.5 rounded-2xl transition-all duration-150 active:scale-[0.98] ${
                         isActive
-                          ? 'bg-emerald-500/15 border border-emerald-500/35 text-white'
-                          : 'bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] text-slate-300'
+                          ? 'bg-emerald-500/15 border border-emerald-500/35 text-white shadow-[0_0_20px_rgba(16,185,129,0.12)]'
+                          : 'bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.15]'
                       }`}
                     >
                       <div className="flex items-center space-x-3.5">
-                        <div className={`p-2.5 rounded-xl border ${
+                        <div className={`p-2.5 rounded-xl border transition-colors ${
                           isActive 
-                            ? 'bg-white/[0.12] border-white/20 text-white' 
-                            : 'bg-white/[0.04] border-white/[0.08] text-slate-400'
+                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' 
+                            : 'bg-white/[0.06] border-white/[0.12] text-slate-200 group-hover:text-emerald-300 group-hover:border-emerald-500/30 group-hover:bg-emerald-500/10'
                         }`}>
                           <IconComponent className="w-4 h-4" />
                         </div>
                         <div className="text-left">
-                          <div className={`text-sm font-semibold tracking-tight ${isActive ? 'text-white' : 'text-[#86868b]'}`}>
+                          <div className={`text-sm font-semibold tracking-tight transition-colors ${isActive ? 'text-emerald-300' : 'text-white group-hover:text-emerald-300'}`}>
                             {link.label}
                           </div>
-                          <div className="text-[11px] text-slate-400 font-normal">
+                          <div className="text-xs text-slate-300 group-hover:text-slate-200 font-normal transition-colors">
                             {link.desc}
                           </div>
                         </div>
                       </div>
 
-                      <ChevronRight className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                      <ChevronRight className={`w-4 h-4 transition-all ${isActive ? 'text-emerald-400' : 'text-slate-400 group-hover:text-white group-hover:translate-x-0.5'}`} />
                     </Link>
                   );
                 })}
@@ -333,7 +333,7 @@ export const AppNavbar: React.FC<Props> = ({
                 {user ? (
                   <div className="space-y-2.5">
                     {/* User Profile Card */}
-                    <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
                       <div className="flex items-center space-x-3 truncate">
                         {user.photoURL ? (
                           <img
@@ -349,14 +349,14 @@ export const AppNavbar: React.FC<Props> = ({
                         )}
                         <div className="text-left truncate">
                           <div className="text-xs font-semibold text-white truncate">{displayName}</div>
-                          <div className="text-[10px] text-slate-400 truncate">{user.email}</div>
+                          <div className="text-[11px] text-slate-300 truncate">{user.email}</div>
                         </div>
                       </div>
 
                       <Link
                         href="/progress"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="px-3 py-1.5 rounded-full bg-white/[0.08] border border-white/[0.12] text-white text-xs font-medium shrink-0 active:scale-95"
+                        className="px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.15] text-white text-xs font-medium shrink-0 active:scale-95 transition-colors"
                       >
                         Stats
                       </Link>

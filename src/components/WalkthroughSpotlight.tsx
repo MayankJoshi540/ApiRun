@@ -17,6 +17,7 @@ interface WalkthroughSpotlightProps {
   steps: TourStep[];
   onComplete?: () => void;
   autoStartDelayMs?: number;
+  triggerKey?: number;
 }
 
 const DragGripIcon = ({ className = 'w-3.5 h-3.5' }: { className?: string }) => (
@@ -35,6 +36,7 @@ export const WalkthroughSpotlight: React.FC<WalkthroughSpotlightProps> = ({
   steps,
   onComplete,
   autoStartDelayMs = 600,
+  triggerKey,
 }) => {
   const { user } = useAuth();
   const [isDesktop, setIsDesktop] = useState(false);
@@ -49,7 +51,7 @@ export const WalkthroughSpotlight: React.FC<WalkthroughSpotlightProps> = ({
 
   const cardRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef<{ startX: number; startY: number; initialLeft: number; initialTop: number } | null>(null);
-  const storageKey = user?.uid ? `apirun_walkthrough_${tourKey}_${user.uid}` : null;
+  const storageKey = user?.uid ? `apirun_walkthrough_${tourKey}_${user.uid}` : `apirun_walkthrough_${tourKey}_guest`;
 
   // Viewport detector: ONLY enable walkthrough on desktop/laptop web browsers (>= 1024px)
   useEffect(() => {
@@ -66,9 +68,9 @@ export const WalkthroughSpotlight: React.FC<WalkthroughSpotlightProps> = ({
     return () => window.removeEventListener('resize', handleCheckDesktop);
   }, []);
 
-  // Check if tour should run (Only for logged-in users on desktop web browser on first visit)
+  // Check if tour should run on first visit
   useEffect(() => {
-    if (!user || !storageKey || steps.length === 0 || !isDesktop) {
+    if (!storageKey || steps.length === 0 || !isDesktop) {
       setIsActive(false);
       return;
     }
@@ -82,6 +84,14 @@ export const WalkthroughSpotlight: React.FC<WalkthroughSpotlightProps> = ({
       return () => clearTimeout(timer);
     }
   }, [user, storageKey, autoStartDelayMs, steps.length, isDesktop]);
+
+  // Support manual trigger (e.g., clicking "Tour Guide" button)
+  useEffect(() => {
+    if (triggerKey !== undefined && triggerKey > 0 && isDesktop) {
+      setIsActive(true);
+      setCurrentStepIndex(0);
+    }
+  }, [triggerKey, isDesktop]);
 
   const currentStep = steps[currentStepIndex];
 

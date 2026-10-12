@@ -43,6 +43,7 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({
 
   return (
     <article
+      id={index === 0 ? 'tour-feedback-card-sample' : undefined}
       onClick={() => onSelect(item)}
       className="group relative rounded-2xl p-5 sm:p-6 transition-all duration-200 cursor-pointer select-none active:scale-[0.99] border bg-[#0c1015] hover:bg-[#10151d] border-white/[0.08] hover:border-emerald-500/30 shadow-[0_2px_12px_rgba(0,0,0,0.4)]"
     >
@@ -51,14 +52,15 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({
         {/* Tactile Vertical Upvote Button */}
         <div className="shrink-0 pt-0.5">
           <button
+            id={index === 0 ? 'tour-feedback-upvote-btn' : undefined}
             type="button"
             onClick={(e) => onVote(item.id, e)}
             className={`flex flex-col items-center justify-center min-w-[50px] sm:min-w-[54px] py-2.5 px-2 rounded-xl border transition-all duration-150 active:scale-90 cursor-pointer ${
               hasVoted
-                ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40 font-bold'
+                ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40 font-bold shadow-[0_0_12px_rgba(16,185,129,0.18)]'
                 : 'bg-white/[0.03] hover:bg-emerald-500/10 border-white/[0.08] hover:border-emerald-500/30 text-zinc-400 hover:text-emerald-400'
             }`}
-            title={hasVoted ? 'Remove upvote' : 'Upvote this feedback'}
+            title={hasVoted ? 'Remove upvote' : 'Upvote to highlight this feedback on the roadmap'}
             aria-label={`${item.upvotesCount} upvotes`}
           >
             <ChevronUp className={`w-4 h-4 transition-transform duration-150 ${hasVoted ? 'scale-110 font-bold text-emerald-400' : 'group-hover:-translate-y-0.5'}`} />
