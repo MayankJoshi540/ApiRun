@@ -169,7 +169,7 @@ export const CodeEditorPanel: React.FC<Props> = ({
   };
 
   return (
-    <div className={`h-full w-full rounded-2xl bg-[#1c1c1e]/85 backdrop-blur-2xl border border-white/[0.08] border-t-white/[0.14] flex flex-col overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.35)] ${
+    <div id="tour-workbench-editor" className={`h-full w-full rounded-2xl bg-[#1c1c1e]/85 backdrop-blur-2xl border border-white/[0.08] border-t-white/[0.14] flex flex-col overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.35)] ${
       isFullscreen ? 'fixed inset-3 z-50 rounded-2xl' : ''
     }`}>
       {/* ── Top Header: </> Code Tab + Language Switcher + Tools ── */}
@@ -298,7 +298,7 @@ export const CodeEditorPanel: React.FC<Props> = ({
         </div>
 
         {/* Right: Run Tests & Submit Solution Buttons */}
-        <div className="flex items-center gap-2">
+        <div id="tour-workbench-runner" className="flex items-center gap-2">
           {/* Run Tests Button */}
           <button
             onClick={onRunTests}

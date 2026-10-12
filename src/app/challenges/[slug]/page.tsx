@@ -11,6 +11,40 @@ import { notFound } from 'next/navigation';
 import { Challenge } from '@/types';
 import { WorkbenchSkeleton } from '@/components/ui/Skeleton';
 import { MobileWorkbenchBanner } from '@/components/MobileWorkbenchBanner';
+import { WalkthroughSpotlight, TourStep } from '@/components/WalkthroughSpotlight';
+
+const WORKBENCH_TOUR_STEPS: TourStep[] = [
+  {
+    targetId: 'tour-workbench-target-url',
+    title: 'Target API Server (Localhost Port)',
+    description: 'Direct live test assertions to your running backend (defaults to http://localhost:8000). You can edit this directly to test custom local ports, Docker containers, or staging URLs.',
+    preferredPlacement: 'bottom',
+  },
+  {
+    targetId: 'tour-workbench-specs',
+    title: 'API Specification & Invariants',
+    description: 'Review the required endpoints, HTTP response schemas, status codes, and concurrency requirements before writing code.',
+    preferredPlacement: 'right',
+  },
+  {
+    targetId: 'tour-workbench-editor',
+    title: 'Multi-Language IDE Workbench',
+    description: 'Implement your solution directly in Node.js, Go, or Python. Your code is preserved automatically as you type.',
+    preferredPlacement: 'left',
+  },
+  {
+    targetId: 'tour-workbench-runner',
+    title: 'Run Tests & Submit Solutions',
+    description: 'Fire concurrency suites and edge-case payloads to verify your server, or submit your solution for official evaluation.',
+    preferredPlacement: 'left',
+  },
+  {
+    targetId: 'tour-workbench-console',
+    title: 'Live Terminal & Assertions Dock',
+    description: 'Inspect live execution results, HTTP response payloads, test durations, and terminal logs in real-time.',
+    preferredPlacement: 'left',
+  },
+];
 
 interface Props {
   params: any;
@@ -77,6 +111,9 @@ export default function ChallengeDetailPage({ params }: Props) {
 
       {/* Mobile Device Advisory Banner */}
       <MobileWorkbenchBanner />
+
+      {/* First-Visit Walkthrough for Authenticated Developers */}
+      <WalkthroughSpotlight tourKey="workbench" steps={WORKBENCH_TOUR_STEPS} />
 
       <div className="relative z-10 h-full w-full">
         <ChallengeDetailView

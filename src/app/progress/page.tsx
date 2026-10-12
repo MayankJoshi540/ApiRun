@@ -10,6 +10,31 @@ import { Footer } from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { loadUserProgress, applyUserProgressToChallenges } from '@/lib/userProgress';
 import { Challenge, UserStats } from '@/types';
+import { WalkthroughSpotlight, TourStep } from '@/components/WalkthroughSpotlight';
+
+const PROGRESS_TOUR_STEPS: TourStep[] = [
+  {
+    targetId: 'tour-progress-overview',
+    title: 'Developer Profile & Competencies',
+    description: 'Track your architectural competencies across REST APIs, Concurrency, Middleware, and Infrastructure.',
+    category: 'PROFILE & DOMAINS',
+    preferredPlacement: 'bottom',
+  },
+  {
+    targetId: 'tour-progress-heatmap',
+    title: 'Daily Practice Heatmap',
+    description: 'Build an active engineering streak as you write, debug, and submit test-passing API challenge implementations.',
+    category: 'PRACTICE ACTIVITY',
+    preferredPlacement: 'bottom',
+  },
+  {
+    targetId: 'tour-progress-roadmap',
+    title: 'Backend Curriculum Tracks',
+    description: 'Follow curated learning tracks categorized by difficulty tiers to master production system engineering.',
+    category: 'CURRICULUM ROADMAP',
+    preferredPlacement: 'top',
+  },
+];
 
 export default function ProgressPage() {
   const router = useRouter();
@@ -63,6 +88,9 @@ export default function ProgressPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/30 via-[#000000]/65 to-[#000000] pointer-events-none" />
       </div>
       
+      {/* First-Visit Walkthrough for Authenticated Developers */}
+      <WalkthroughSpotlight tourKey="progress" steps={PROGRESS_TOUR_STEPS} />
+
       <BackendRankNavbar
         activeTab="progress"
         onSelectTab={handleNavigate}

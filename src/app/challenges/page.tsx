@@ -11,6 +11,31 @@ import { Footer } from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { loadUserProgress, applyUserProgressToChallenges } from '@/lib/userProgress';
 import { Challenge, UserStats } from '@/types';
+import { WalkthroughSpotlight, TourStep } from '@/components/WalkthroughSpotlight';
+
+const CHALLENGES_TOUR_STEPS: TourStep[] = [
+  {
+    targetId: 'tour-challenges-stats',
+    title: 'Curriculum & Live Mastery',
+    description: 'Track how many real-world API labs you have solved, monitor your completion percentage, and watch your developer stats update live.',
+    category: 'CURRICULUM METRICS',
+    preferredPlacement: 'bottom',
+  },
+  {
+    targetId: 'tour-challenges-filters',
+    title: 'Precision Routes & Track Filters',
+    description: 'Filter by architectural patterns (HTTP Fundamentals, Webhooks, Idempotency, Redis locks) or search by specific routes like POST /orders.',
+    category: 'API SEARCH & FILTERS',
+    preferredPlacement: 'bottom',
+  },
+  {
+    targetId: 'tour-challenges-first-card',
+    title: 'Interactive Challenge Labs',
+    description: 'Click any challenge card to launch the dual-pane code editor, review API assertions, and execute real concurrency test suites.',
+    category: 'DEVELOPER WORKBENCH',
+    preferredPlacement: 'right',
+  },
+];
 
 export default function ChallengesPage() {
   const router = useRouter();
@@ -78,6 +103,10 @@ export default function ChallengesPage() {
         />
         <div className="absolute inset-0 bg-[#000000]/40 pointer-events-none" />
       </div>
+
+      {/* First-Visit Walkthrough for Authenticated Developers */}
+      <WalkthroughSpotlight tourKey="challenges" steps={CHALLENGES_TOUR_STEPS} />
+
       <BackendRankNavbar
         activeTab="challenges"
         onSelectTab={handleNavigate}

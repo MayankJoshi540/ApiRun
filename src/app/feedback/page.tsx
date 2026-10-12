@@ -459,8 +459,8 @@ export default function FeedbackPage() {
         <div 
           className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(16, 185, 129, 0.16), rgba(5, 150, 105, 0.04) 50%, transparent 80%)',
-            filter: 'blur(40px)',
+            background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255, 255, 255, 0.05), transparent 75%)',
+            filter: 'blur(50px)',
           }}
         />
 
@@ -480,7 +480,7 @@ export default function FeedbackPage() {
         <div 
           className="absolute bottom-20 left-1/2 -translate-x-1/2 w-[85%] max-w-4xl h-[160px] pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at center, rgba(52, 211, 153, 0.12) 0%, rgba(16, 185, 129, 0.04) 40%, transparent 75%)',
+            background: 'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.04) 0%, transparent 70%)',
             filter: 'blur(50px)',
           }}
         />
@@ -608,12 +608,12 @@ export default function FeedbackPage() {
                     onClick={() => setActiveTypeTab('all')}
                     className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center justify-center space-x-1.5 ${
                       activeTypeTab === 'all'
-                        ? 'bg-emerald-600 text-white'
+                        ? 'bg-white/[0.12] text-white'
                         : 'text-zinc-400 hover:text-white'
                     }`}
                   >
                     <span>All</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.15] font-mono">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.1] font-mono text-zinc-300">
                       {counts.all}
                     </span>
                   </button>
@@ -622,12 +622,12 @@ export default function FeedbackPage() {
                     onClick={() => setActiveTypeTab('suggestions')}
                     className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center justify-center space-x-1.5 ${
                       activeTypeTab === 'suggestions'
-                        ? 'bg-emerald-600 text-white'
+                        ? 'bg-white/[0.12] text-white'
                         : 'text-zinc-400 hover:text-white'
                     }`}
                   >
                     <span>Suggestions</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.15] font-mono">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.1] font-mono text-zinc-300">
                       {counts.suggestions}
                     </span>
                   </button>
@@ -636,12 +636,12 @@ export default function FeedbackPage() {
                     onClick={() => setActiveTypeTab('bugs')}
                     className={`flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center justify-center space-x-1.5 ${
                       activeTypeTab === 'bugs'
-                        ? 'bg-emerald-600 text-white'
+                        ? 'bg-white/[0.12] text-white'
                         : 'text-zinc-400 hover:text-white'
                     }`}
                   >
                     <span>Bugs</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.15] font-mono">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/[0.1] font-mono text-zinc-300">
                       {counts.bugs}
                     </span>
                   </button>
@@ -653,7 +653,7 @@ export default function FeedbackPage() {
                     onClick={() => setActiveSort('hot')}
                     className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
                       activeSort === 'hot'
-                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        ? 'bg-white/[0.12] text-white border-white/20'
                         : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
                     }`}
                   >
@@ -665,7 +665,7 @@ export default function FeedbackPage() {
                     onClick={() => setActiveSort('top')}
                     className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
                       activeSort === 'top'
-                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        ? 'bg-white/[0.12] text-white border-white/20'
                         : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
                     }`}
                   >
@@ -677,7 +677,7 @@ export default function FeedbackPage() {
                     onClick={() => setActiveSort('new')}
                     className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
                       activeSort === 'new'
-                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        ? 'bg-white/[0.12] text-white border-white/20'
                         : 'bg-[#05070a] hover:bg-zinc-900 text-zinc-400 border-white/[0.06]'
                     }`}
                   >
@@ -1014,7 +1014,7 @@ export default function FeedbackPage() {
                   onClick={() => handleVote(selectedFeedback.id)}
                   className={`flex flex-col items-center justify-center min-w-[54px] sm:min-w-[58px] py-2.5 px-2 rounded-xl border transition-all duration-150 active:scale-95 cursor-pointer shrink-0 ${
                     selectedFeedback.upvotedBy.includes(currentUserId)
-                      ? 'bg-emerald-500 text-black border-emerald-400 font-extrabold shadow-[0_2px_12px_rgba(16,185,129,0.35)]'
+                      ? 'bg-white text-zinc-950 border-white font-bold shadow-xs'
                       : 'bg-white/[0.04] hover:bg-white/[0.09] border-white/[0.1] hover:border-white/[0.2] text-zinc-300 hover:text-white'
                   }`}
                   title="Upvote"
@@ -1120,7 +1120,7 @@ export default function FeedbackPage() {
                         type="button"
                         onClick={handleAddComment}
                         disabled={isSubmittingComment || !commentText.trim()}
-                        className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold transition-all disabled:opacity-40 flex items-center space-x-1.5 active:scale-95 cursor-pointer shadow-[0_2px_8px_rgba(16,185,129,0.25)]"
+                        className="px-4 py-2 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold transition-all disabled:opacity-40 flex items-center space-x-1.5 active:scale-95 cursor-pointer shadow-xs"
                       >
                         {isSubmittingComment ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1141,14 +1141,14 @@ export default function FeedbackPage() {
                         key={c.id}
                         className={`p-4 rounded-xl border transition-colors space-y-2 ${
                           c.userRole === 'admin'
-                            ? 'bg-emerald-950/20 border-emerald-500/30'
+                            ? 'bg-white/[0.06] border-white/[0.14]'
                             : 'bg-white/[0.03] border-white/[0.07]'
                         }`}
                       >
                         <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center space-x-2">
                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${
-                              c.userRole === 'admin' ? 'bg-emerald-500 text-black' : 'bg-zinc-800 text-zinc-300'
+                              c.userRole === 'admin' ? 'bg-white text-zinc-950' : 'bg-zinc-800 text-zinc-300'
                             }`}>
                               {c.userRole === 'admin' ? 'M' : 'A'}
                             </div>
@@ -1156,7 +1156,7 @@ export default function FeedbackPage() {
                               {c.userRole === 'admin' ? 'Maintainer' : (c.userName || 'Anonymous Engineer')}
                             </span>
                             {c.userRole === 'admin' && (
-                              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold border border-emerald-500/30">
+                              <span className="px-2 py-0.5 rounded-full bg-white/[0.1] text-zinc-200 text-[10px] font-mono font-bold border border-white/[0.15]">
                                 Verified
                               </span>
                             )}

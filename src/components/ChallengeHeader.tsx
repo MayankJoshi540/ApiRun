@@ -160,6 +160,7 @@ export const ChallengeHeader: React.FC<Props> = ({
       {/* ── Center: Target API Server URL Box ── */}
       <div className="flex items-center gap-2">
         <div 
+          id="tour-workbench-target-url"
           onClick={() => inputRef.current?.focus()}
           className="h-10 px-3.5 sm:px-4 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] focus-within:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.14] focus-within:border-[#30d158]/70 focus-within:ring-2 focus-within:ring-[#30d158]/20 flex items-center gap-2.5 transition-all cursor-text shadow-sm"
           title="Target API Server URL (Click to edit directly)"

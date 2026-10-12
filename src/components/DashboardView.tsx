@@ -83,7 +83,7 @@ export const DashboardView: React.FC<Props> = ({
     <div className="flex-1 space-y-4 sm:space-y-6 font-sans">
       
       {/* 1. Header Banner - Apple Pro Plate */}
-      <div className="rounded-2xl bg-[#1c1c1e]/60 border border-white/[0.08] border-t-white/[0.14] shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-4 sm:p-6 space-y-3.5 sm:space-y-5">
+      <div id="tour-challenges-stats" className="rounded-2xl bg-[#1c1c1e]/60 border border-white/[0.08] border-t-white/[0.14] shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-4 sm:p-6 space-y-3.5 sm:space-y-5">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5 sm:gap-5">
           {/* Title and Intro */}
           <div className="space-y-1 sm:space-y-1.5 max-w-2xl">
@@ -141,7 +141,7 @@ export const DashboardView: React.FC<Props> = ({
       </div>
 
       {/* 2. Search & Filter Bar */}
-      <div className="space-y-2.5 sm:space-y-3">
+      <div id="tour-challenges-filters" className="space-y-2.5 sm:space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3">
           {/* Spotlight Search Input */}
           <div className="relative flex-1 w-full">
@@ -294,8 +294,8 @@ export const DashboardView: React.FC<Props> = ({
       {/* 3. Challenges Cards List */}
       <div className="space-y-3">
         {filteredChallenges.length > 0 ? (
-          filteredChallenges.map((challenge) => (
-            <div key={challenge.id}>
+          filteredChallenges.map((challenge, idx) => (
+            <div key={challenge.id} id={idx === 0 ? "tour-challenges-first-card" : undefined}>
               <ChallengeCard
                 challenge={challenge}
                 onSelect={onSelectChallenge}
