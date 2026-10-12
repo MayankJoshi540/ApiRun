@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Challenge, UserStats } from '../types';
 import { ChallengeCard } from './ChallengeCard';
 import { Search, X } from '@/components/ui/GoogleIcon';
@@ -27,6 +27,16 @@ export const DashboardView: React.FC<Props> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'SOLVED' | 'UNSOLVED'>('ALL');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const categories = useMemo(() => {
     return ['ALL', ...Array.from(new Set(challenges.map(c => c.category)))];
@@ -70,14 +80,14 @@ export const DashboardView: React.FC<Props> = ({
   const hasActiveFilters = selectedDifficulty !== 'ALL' || selectedConcept !== 'ALL' || selectedCategory !== 'ALL' || statusFilter !== 'ALL' || searchQuery.trim() !== '';
 
   return (
-    <div className="flex-1 space-y-6 font-sans">
+    <div className="flex-1 space-y-4 sm:space-y-6 font-sans">
       
       {/* 1. Header Banner - Apple Pro Plate */}
-      <div className="rounded-2xl bg-[#1c1c1e]/60 border border-white/[0.08] border-t-white/[0.14] shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-6 sm:p-7 space-y-5">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+      <div className="rounded-2xl bg-[#1c1c1e]/60 border border-white/[0.08] border-t-white/[0.14] shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.06)] p-4 sm:p-6 space-y-3.5 sm:space-y-5">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5 sm:gap-5">
           {/* Title and Intro */}
-          <div className="space-y-1.5 max-w-2xl">
-            <h1 className="text-2xl sm:text-3xl font-semibold tracking-[-0.03em] text-white">
+          <div className="space-y-1 sm:space-y-1.5 max-w-2xl">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-[-0.03em] text-white">
               Backend Challenges
             </h1>
             <p className="text-xs sm:text-[13px] text-[#86868b] leading-relaxed">
@@ -85,67 +95,82 @@ export const DashboardView: React.FC<Props> = ({
             </p>
           </div>
 
-          {/* Quick Stats Strip */}
-          <div className="flex items-center space-x-2.5 shrink-0 text-xs font-mono">
-            <div className="px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08]">
-              <span className="text-[#86868b]">CURRICULUM: </span>
-              <span className="text-white font-semibold tabular-nums">{challenges.length} APIs</span>
+          {/* Quick Stats: Mobile 3-column grid, Desktop horizontal pill strip */}
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:space-x-2.5 sm:gap-0 shrink-0 text-xs font-mono">
+            <div className="flex flex-col sm:flex-row sm:items-center items-center justify-center sm:justify-start px-2 sm:px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-center sm:text-left">
+              <span className="text-[10px] sm:text-xs text-[#86868b] uppercase tracking-wider sm:tracking-normal sm:mr-1 font-sans sm:font-mono">
+                Curriculum<span className="hidden sm:inline">:</span>
+              </span>
+              <span className="text-sm sm:text-xs text-white font-semibold tabular-nums mt-0.5 sm:mt-0">
+                {challenges.length} <span className="text-[10px] sm:text-xs text-[#86868b] font-normal">APIs</span>
+              </span>
             </div>
-            <div className="px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08]">
-              <span className="text-[#86868b]">SOLVED: </span>
-              <span className="text-[#30d158] font-semibold tabular-nums">{solvedCount}</span>
+
+            <div className="flex flex-col sm:flex-row sm:items-center items-center justify-center sm:justify-start px-2 sm:px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-center sm:text-left">
+              <span className="text-[10px] sm:text-xs text-[#86868b] uppercase tracking-wider sm:tracking-normal sm:mr-1 font-sans sm:font-mono">
+                Solved<span className="hidden sm:inline">:</span>
+              </span>
+              <span className="text-sm sm:text-xs text-[#30d158] font-semibold tabular-nums mt-0.5 sm:mt-0">
+                {solvedCount}
+              </span>
             </div>
-            <div className="px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08]">
-              <span className="text-[#86868b]">MASTERY: </span>
-              <span className="text-white font-semibold tabular-nums">{completionPercentage}%</span>
+
+            <div className="flex flex-col sm:flex-row sm:items-center items-center justify-center sm:justify-start px-2 sm:px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-center sm:text-left">
+              <span className="text-[10px] sm:text-xs text-[#86868b] uppercase tracking-wider sm:tracking-normal sm:mr-1 font-sans sm:font-mono">
+                Mastery<span className="hidden sm:inline">:</span>
+              </span>
+              <span className="text-sm sm:text-xs text-white font-semibold tabular-nums mt-0.5 sm:mt-0">
+                {completionPercentage}%
+              </span>
             </div>
           </div>
         </div>
 
         {/* Global Progress Bar */}
-        <div className="pt-4 border-t border-white/[0.06] flex items-center space-x-3">
+        <div className="pt-3 sm:pt-4 border-t border-white/[0.06] flex items-center space-x-3">
           <div className="flex-1 h-1.5 rounded-full bg-[#2c2c2e] overflow-hidden">
             <div 
               className="h-full bg-[#30d158] rounded-full transition-all duration-500 ease-out"
               style={{ width: `${Math.max(completionPercentage, 2)}%` }}
             />
           </div>
-          <span className="text-xs font-medium text-[#86868b] tabular-nums shrink-0">
+          <span className="text-[11px] sm:text-xs font-medium text-[#86868b] tabular-nums shrink-0">
             {solvedCount} of {challenges.length} completed
           </span>
         </div>
       </div>
 
       {/* 2. Search & Filter Bar */}
-      <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="space-y-2.5 sm:space-y-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3">
           {/* Spotlight Search Input */}
           <div className="relative flex-1 w-full">
-            <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-[#86868b]" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b] pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search challenges, routes (e.g. POST /users), Redis locks..."
-              className="w-full pl-10 pr-9 py-2.5 bg-[#1c1c1e]/70 border border-white/[0.1] rounded-xl text-sm text-white placeholder-[#636366] focus:outline-none focus:ring-2 focus:ring-[#30d158]/40 focus:border-[#30d158] font-sans transition-all"
+              placeholder={isMobile ? "Search routes, tags..." : "Search challenges, routes (e.g. POST /users)..."}
+              className="w-full pl-10 pr-9 py-2 sm:py-2.5 min-h-[40px] sm:min-h-[42px] bg-[#1c1c1e]/70 border border-white/[0.1] rounded-xl text-xs sm:text-sm text-white placeholder-[#636366] focus:outline-none focus:ring-2 focus:ring-[#30d158]/40 focus:border-[#30d158] font-sans transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-3 text-[#86868b] hover:text-white transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#86868b] hover:text-white transition-colors p-1"
+                aria-label="Clear search query"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             )}
           </div>
 
-          {/* Apple Segmented Status Toggle */}
-          <div className="flex items-center rounded-full bg-[#1c1c1e] border border-white/[0.08] p-1 text-xs w-full sm:w-auto">
+          {/* Compact Apple Segmented Status Toggle */}
+          <div className="flex items-center rounded-xl sm:rounded-full bg-[#1c1c1e] border border-white/[0.08] p-0.5 sm:p-1 text-xs w-full sm:w-auto shrink-0 min-h-[38px] sm:min-h-0">
             {(['ALL', 'SOLVED', 'UNSOLVED'] as const).map((status) => (
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`px-4 py-1.5 rounded-full font-medium transition-all duration-100 active:scale-[0.97] flex-1 sm:flex-none cursor-pointer ${
+                className={`px-3 sm:px-4 py-1.5 rounded-lg sm:rounded-full font-medium transition-all duration-100 active:scale-[0.97] flex-1 sm:flex-none cursor-pointer min-h-[34px] sm:min-h-0 flex items-center justify-center text-xs ${
                   statusFilter === status 
                     ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-xs' 
                     : 'text-[#86868b] hover:text-white'
@@ -157,92 +182,110 @@ export const DashboardView: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Category & Difficulty Quick Chips */}
-        <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
-          {/* Track Filter */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs text-[#86868b] mr-1 hidden sm:inline">Track:</span>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1 rounded-full text-xs transition-all duration-100 active:scale-[0.96] border cursor-pointer ${
-                  selectedCategory === cat
-                    ? 'bg-white/[0.12] border-white/20 text-white font-semibold'
-                    : 'bg-white/[0.03] border-white/[0.06] text-[#86868b] hover:text-white hover:border-white/10 font-medium'
-                }`}
-              >
-                {cat === 'ALL' ? 'All' : cat}
-              </button>
-            ))}
+        {/* Track & Tier Quick Filters */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-0.5">
+          {/* Category/Track Chips: Smooth Horizontal Scroll */}
+          <div className="relative min-w-0 flex-1 overflow-hidden">
+            <div className="flex items-center overflow-x-auto no-scrollbar py-0.5 gap-1.5 scroll-smooth [mask-image:linear-gradient(to_right,black_88%,transparent)] sm:[mask-image:none]">
+              <span className="text-[11px] text-[#86868b] mr-1 hidden sm:inline shrink-0 font-medium">
+                Track:
+              </span>
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs transition-all duration-100 active:scale-[0.96] border cursor-pointer min-h-[38px] sm:min-h-[30px] flex items-center whitespace-nowrap ${
+                    selectedCategory === cat
+                      ? 'bg-white/[0.14] border-white/25 text-white font-semibold shadow-xs'
+                      : 'bg-white/[0.03] border-white/[0.06] text-[#86868b] hover:text-white hover:border-white/10 font-medium'
+                  }`}
+                >
+                  {cat === 'ALL' ? 'All Tracks' : cat}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Difficulty Filter */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-[#86868b] mr-1 hidden sm:inline">Tier:</span>
-            {(['ALL', 'BEGINNER', 'INTERMEDIATE', 'ADVANCED'] as const).map((diff) => (
-              <button
-                key={diff}
-                onClick={() => onSelectDifficulty(diff)}
-                className={`px-3 py-1 rounded-full text-xs transition-all duration-100 active:scale-[0.96] border cursor-pointer ${
-                  selectedDifficulty === diff
-                    ? 'bg-white/[0.12] border-white/20 text-white font-semibold'
-                    : 'bg-white/[0.03] border-white/[0.06] text-[#86868b] hover:text-white hover:border-white/10 font-medium'
-                }`}
-              >
-                {diff === 'ALL' ? 'All' : diff.charAt(0) + diff.slice(1).toLowerCase()}
-              </button>
-            ))}
+          {/* Difficulty (Tier) Chips: Compact Horizontal Row */}
+          <div className="relative shrink-0 overflow-hidden">
+            <div className="flex items-center overflow-x-auto no-scrollbar py-0.5 gap-1.5 scroll-smooth">
+              <span className="text-[11px] text-[#86868b] mr-1 hidden sm:inline shrink-0 font-medium">
+                Tier:
+              </span>
+              {(['ALL', 'BEGINNER', 'INTERMEDIATE', 'ADVANCED'] as const).map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => onSelectDifficulty(diff)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs transition-all duration-100 active:scale-[0.96] border cursor-pointer min-h-[38px] sm:min-h-[30px] flex items-center whitespace-nowrap ${
+                    selectedDifficulty === diff
+                      ? 'bg-white/[0.14] border-white/25 text-white font-semibold shadow-xs'
+                      : 'bg-white/[0.03] border-white/[0.06] text-[#86868b] hover:text-white hover:border-white/10 font-medium'
+                  }`}
+                >
+                  {diff === 'ALL' ? 'All Tiers' : diff.charAt(0) + diff.slice(1).toLowerCase()}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Active Filters Summary */}
         {hasActiveFilters && (
-          <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[#86868b] text-[11px]">Active:</span>
+          <div className="flex items-center justify-between gap-2 p-2 sm:p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs">
+            <div className="flex items-center overflow-x-auto no-scrollbar gap-1.5 py-0.5 min-w-0">
+              <span className="text-[#86868b] text-[11px] shrink-0 font-medium">Active:</span>
               
               {selectedCategory !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/[0.08] border border-white/[0.1] text-white text-[11px]">
+                <span className="shrink-0 inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/[0.08] border border-white/[0.1] text-white text-[11px]">
                   <span>track: {selectedCategory}</span>
-                  <button onClick={() => setSelectedCategory('ALL')} className="hover:text-white"><X className="w-3 h-3 ml-1" /></button>
+                  <button onClick={() => setSelectedCategory('ALL')} className="hover:text-white ml-0.5 p-0.5" aria-label="Remove category filter">
+                    <X className="w-3 h-3" />
+                  </button>
                 </span>
               )}
 
               {selectedDifficulty !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/[0.08] border border-white/[0.1] text-white text-[11px]">
+                <span className="shrink-0 inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/[0.08] border border-white/[0.1] text-white text-[11px]">
                   <span>tier: {selectedDifficulty}</span>
-                  <button onClick={() => onSelectDifficulty('ALL')} className="hover:text-white"><X className="w-3 h-3 ml-1" /></button>
+                  <button onClick={() => onSelectDifficulty('ALL')} className="hover:text-white ml-0.5 p-0.5" aria-label="Remove difficulty filter">
+                    <X className="w-3 h-3" />
+                  </button>
                 </span>
               )}
 
               {selectedConcept !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-[#30d158]/15 border border-[#30d158]/30 text-[#30d158] text-[11px]">
+                <span className="shrink-0 inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-[#30d158]/15 border border-[#30d158]/30 text-[#30d158] text-[11px]">
                   <span>concept: {selectedConcept}</span>
-                  <button onClick={() => onSelectConcept('ALL')} className="hover:text-white"><X className="w-3 h-3 ml-1" /></button>
+                  <button onClick={() => onSelectConcept('ALL')} className="hover:text-white ml-0.5 p-0.5" aria-label="Remove concept filter">
+                    <X className="w-3 h-3" />
+                  </button>
                 </span>
               )}
 
               {statusFilter !== 'ALL' && (
-                <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/[0.08] border border-white/[0.1] text-white text-[11px]">
+                <span className="shrink-0 inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/[0.08] border border-white/[0.1] text-white text-[11px]">
                   <span>status: {statusFilter.toLowerCase()}</span>
-                  <button onClick={() => setStatusFilter('ALL')} className="hover:text-white"><X className="w-3 h-3 ml-1" /></button>
+                  <button onClick={() => setStatusFilter('ALL')} className="hover:text-white ml-0.5 p-0.5" aria-label="Remove status filter">
+                    <X className="w-3 h-3" />
+                  </button>
                 </span>
               )}
 
               {searchQuery && (
-                <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/[0.08] border border-white/[0.1] text-white text-[11px]">
-                  <span>query: "{searchQuery}"</span>
-                  <button onClick={() => setSearchQuery('')} className="hover:text-white"><X className="w-3 h-3 ml-1" /></button>
+                <span className="shrink-0 inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/[0.08] border border-white/[0.1] text-white text-[11px]">
+                  <span className="max-w-[140px] truncate">query: "{searchQuery}"</span>
+                  <button onClick={() => setSearchQuery('')} className="hover:text-white ml-0.5 p-0.5" aria-label="Clear search query filter">
+                    <X className="w-3 h-3" />
+                  </button>
                 </span>
               )}
             </div>
 
             <button
               onClick={handleResetFilters}
-              className="text-[11px] text-[#30d158] hover:text-[#34c759] font-medium active:scale-95 cursor-pointer"
+              className="text-[11px] text-[#30d158] hover:text-[#34c759] font-medium active:scale-95 cursor-pointer shrink-0 ml-1 py-1 px-1.5"
             >
-              Reset Filters
+              Reset
             </button>
           </div>
         )}
