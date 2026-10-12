@@ -379,26 +379,28 @@ export const LandingPageView: React.FC<Props> = ({
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" staggerDelay={80}>
             {engineeringTracks.map((track, i) => (
-              <GsapTilt key={i} maxTilt={6} scale={1.02}>
+              <GsapTilt key={i} maxTilt={6} scale={1.02} className="h-full">
                 <div
-                  className="h-full p-6 rounded-2xl bg-[#0b0f17] border border-white/[0.08] hover:border-emerald-500/40 transition-all duration-300 space-y-4 backdrop-blur-xl group hover:shadow-[0_15px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(16,185,129,0.08)] cursor-pointer"
+                  className="h-full p-6 rounded-2xl bg-[#0b0f17] border border-white/[0.08] hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between gap-4 backdrop-blur-xl group hover:shadow-[0_15px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(16,185,129,0.08)] cursor-pointer"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg">
-                      TRACK {track.number}
-                    </span>
-                    <span className="text-[11px] text-slate-400 font-medium">
-                      {track.badge}
-                    </span>
-                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg">
+                        TRACK {track.number}
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-medium">
+                        {track.badge}
+                      </span>
+                    </div>
 
-                  <div className="space-y-2">
-                    <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors tracking-tight">
-                      {track.title}
-                    </h3>
-                    <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                      {track.description}
-                    </p>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors tracking-tight">
+                        {track.title}
+                      </h3>
+                      <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                        {track.description}
+                      </p>
+                    </div>
                   </div>
 
                   <div className="pt-3 flex flex-wrap gap-1.5 border-t border-white/[0.06]">
@@ -443,23 +445,25 @@ export const LandingPageView: React.FC<Props> = ({
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6" staggerDelay={100}>
             {previewChallenges.map((challenge) => (
-              <GsapTilt key={challenge.id} maxTilt={5} scale={1.02}>
+              <GsapTilt key={challenge.id} maxTilt={5} scale={1.02} className="h-full">
                 <div
                   onClick={() => onSelectChallenge(challenge)}
-                  className="h-full p-6 rounded-2xl bg-white/[0.04] border border-white/[0.1] hover:border-emerald-400/50 transition-all cursor-pointer space-y-4 backdrop-blur-xl group hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+                  className="h-full p-6 rounded-2xl bg-white/[0.04] border border-white/[0.1] hover:border-emerald-400/50 transition-all cursor-pointer flex flex-col justify-between gap-4 backdrop-blur-xl group hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-sans text-xs text-[#94a3b8] uppercase tracking-wider font-semibold">{challenge.category}</span>
-                    <DifficultyBadge difficulty={challenge.difficulty} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center space-x-2">
-                      <span>{challenge.title}</span>
-                      <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </h3>
-                    <p className="text-xs text-[#94a3b8] leading-relaxed line-clamp-2">
-                      {challenge.summary}
-                    </p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-sans text-xs text-[#94a3b8] uppercase tracking-wider font-semibold">{challenge.category}</span>
+                      <DifficultyBadge difficulty={challenge.difficulty} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center space-x-2">
+                        <span>{challenge.title}</span>
+                        <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </h3>
+                      <p className="text-xs text-[#94a3b8] leading-relaxed line-clamp-2">
+                        {challenge.summary}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {challenge.concepts.map((c) => (
