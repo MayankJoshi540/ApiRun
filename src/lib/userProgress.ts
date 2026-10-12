@@ -40,8 +40,8 @@ export const getInitialProgress = (userId = 'guest'): UserProgressRecord => ({
   lastActiveDate: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   profile: {
-    bio: 'Practicing production-grade backend engineering with Express, Go, and Python. Focused on resilient APIs, clean validation, and sub-20ms SLAs.',
-    location: 'San Francisco, CA',
+    bio: '',
+    location: '',
     github: '',
     title: 'Backend Engineer',
   },
