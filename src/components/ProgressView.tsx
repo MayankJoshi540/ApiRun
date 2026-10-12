@@ -34,8 +34,8 @@ export const ProgressView: React.FC<Props> = ({
   const [avatarError, setAvatarError] = useState(false);
 
   // Profile data
-  const [profileBio, setProfileBio] = useState('Backend engineer focused on resilient APIs, clean contract validation, and high-throughput systems.');
-  const [profileLocation, setProfileLocation] = useState('India');
+  const [profileBio, setProfileBio] = useState('');
+  const [profileLocation, setProfileLocation] = useState('');
   const [profileGithub, setProfileGithub] = useState('');
   const [profileTitle, setProfileTitle] = useState('Backend Engineer');
   const [customDisplayName, setCustomDisplayName] = useState('');
@@ -65,8 +65,8 @@ export const ProgressView: React.FC<Props> = ({
       const progress = await loadUserProgress(user?.uid);
       setUserProgress(progress);
       if (progress?.profile) {
-        if (progress.profile.bio) setProfileBio(progress.profile.bio);
-        if (progress.profile.location) setProfileLocation(progress.profile.location);
+        setProfileBio(progress.profile.bio || '');
+        setProfileLocation(progress.profile.location || '');
         if (progress.profile.github) setProfileGithub(progress.profile.github);
         if (progress.profile.title) setProfileTitle(progress.profile.title);
         if (progress.profile.displayName) setCustomDisplayName(progress.profile.displayName);
@@ -126,7 +126,7 @@ export const ProgressView: React.FC<Props> = ({
         displayName: editForm.displayName.trim()
       });
       setProfileBio(editForm.bio.trim());
-      setProfileLocation(editForm.location.trim() || 'India');
+      setProfileLocation(editForm.location.trim());
       setProfileGithub(editForm.github.trim());
       setProfileTitle(editForm.title.trim() || 'Backend Engineer');
       if (editForm.displayName.trim()) setCustomDisplayName(editForm.displayName.trim());
@@ -297,9 +297,15 @@ export const ProgressView: React.FC<Props> = ({
                   </button>
                 </div>
 
-                <p className="text-xs text-[#a1a1aa] leading-relaxed pt-1.5 max-w-xl">
-                  {profileBio}
-                </p>
+                {profileBio ? (
+                  <p className="text-xs text-[#a1a1aa] leading-relaxed pt-1.5 max-w-xl">
+                    {profileBio}
+                  </p>
+                ) : (
+                  <p className="text-xs text-[#636366] italic leading-relaxed pt-1.5 max-w-xl">
+                    No bio added yet. Click &quot;Edit&quot; to customize your profile.
+                  </p>
+                )}
 
                 {/* Tags */}
                 <div className="flex flex-wrap items-center gap-2 pt-3">
@@ -307,10 +313,12 @@ export const ProgressView: React.FC<Props> = ({
                     <Shield className="w-3.5 h-3.5 text-white/70" />
                     <span>{profileTitle}</span>
                   </span>
-                  <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs font-medium text-[#86868b]">
-                    <MapPin className="w-3.5 h-3.5 text-[#636366]" />
-                    <span>{profileLocation}</span>
-                  </span>
+                  {profileLocation && (
+                    <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs font-medium text-[#86868b]">
+                      <MapPin className="w-3.5 h-3.5 text-[#636366]" />
+                      <span>{profileLocation}</span>
+                    </span>
+                  )}
                   {profileGithub && (
                     <a 
                       href={`https://github.com/${profileGithub.replace(/^@/, '')}`}
@@ -737,9 +745,9 @@ export const ProgressView: React.FC<Props> = ({
                   <textarea 
                     rows={3} 
                     maxLength={320} 
-                    required 
                     value={editForm.bio} 
                     onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))} 
+                    placeholder="Write a brief developer bio..."
                     className="w-full px-3.5 py-2.5 bg-[#2c2c2e]/70 border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#636366] focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition-all resize-none leading-relaxed" 
                   />
                 </div>
@@ -751,6 +759,7 @@ export const ProgressView: React.FC<Props> = ({
                     <input 
                       type="text" 
                       value={editForm.location} 
+                      placeholder="e.g. San Francisco, CA or Remote"
                       onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))} 
                       className="w-full px-3.5 py-2.5 bg-[#2c2c2e]/70 border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#636366] focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition-all" 
                     />
