@@ -26,6 +26,8 @@ export default function HomePage() {
       router.push('/');
     } else if (route === 'feedback') {
       router.push('/feedback');
+    } else if (route === 'challenges') {
+      router.push('/challenges');
     } else {
       if (!user) {
         router.push(`/sign-in?redirect=${encodeURIComponent(`/${route}`)}`);
@@ -36,10 +38,6 @@ export default function HomePage() {
   };
 
   const handleExploreChallenges = () => {
-    if (!user) {
-      router.push('/sign-in?redirect=/challenges');
-      return;
-    }
     router.push('/challenges');
   };
 
