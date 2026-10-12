@@ -160,6 +160,15 @@ export const LandingPageView: React.FC<Props> = ({
     }
   ];
 
+  const handleBrowseTracks = () => {
+    const tracksSection = document.getElementById('tracks');
+    if (tracksSection) {
+      tracksSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      onExploreChallenges();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#050708] text-[#f8fafc] font-sans selection:bg-emerald-500/30 selection:text-white relative overflow-x-hidden">
       {/* 1. Global Page Technical Background Atmosphere (Clean, Minimal Dark with Subtle Bottom Emerald Glow) */}
@@ -196,8 +205,8 @@ export const LandingPageView: React.FC<Props> = ({
 
       {/* 2. Hero Section */}
       <Hero
-        onLaunchArena={() => onSelectChallenge(challenges[0] || challenges[1])}
-        onBrowseTracks={onExploreChallenges}
+        onLaunchArena={onExploreChallenges}
+        onBrowseTracks={handleBrowseTracks}
       />
 
       {/* 3D Pinned Screenshot Wall Experience */}
@@ -346,7 +355,7 @@ export const LandingPageView: React.FC<Props> = ({
         {/* ========================================================= */}
         {/* 6 PRODUCTION ENGINEERING TRACKS */}
         {/* ========================================================= */}
-        <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans relative">
+        <section id="tracks" className="py-20 px-4 sm:px-6 max-w-6xl mx-auto space-y-12 font-sans relative">
           {/* Center ambient purple glow for variety */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-purple-500/5 blur-[140px] pointer-events-none rounded-[100%] -z-10 mix-blend-screen opacity-20" />
           

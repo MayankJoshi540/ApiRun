@@ -44,6 +44,15 @@
     background-color: rgba(16, 185, 129, 0.3) !important;
     color: #ffffff !important;
   }
+
+  /* Smooth horizontal scrolling without scrollbar indicators */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /* Emil Kowalski Animation Foundation */
