@@ -217,13 +217,17 @@ export const ChallengeDetailView: React.FC<Props> = ({
     setIsSubmissionModalOpen(true);
     setIsSubmitting(true);
 
-    const output = await runChallengeTests({
-      challenge,
-      code: editorCodes[selectedEditorLang],
-      language: selectedEditorLang,
-      serverUrl,
-      isLocalServerMode: false
-    });
+    // Artificial evaluation delay for realistic backend grading feel
+    const [output] = await Promise.all([
+      runChallengeTests({
+        challenge,
+        code: editorCodes[selectedEditorLang],
+        language: selectedEditorLang,
+        serverUrl,
+        isLocalServerMode: false
+      }),
+      new Promise(resolve => setTimeout(resolve, 1500))
+    ]);
 
     setTestResults(output.results);
     setLogs(output.logs);
@@ -626,7 +630,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
             id="tour-workbench-console"
             style={{ 
               height: isConsoleCollapsed 
-                ? '40px' 
+                ? '44px' 
                 : `calc(${100 - editorHeightPercent}% - 10px)` 
             }}
             className={`w-full flex flex-col overflow-hidden mt-auto ${

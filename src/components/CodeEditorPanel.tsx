@@ -287,29 +287,29 @@ export const CodeEditorPanel: React.FC<Props> = ({
       </div>
 
       {/* ── Bottom Status Bar with Run & Submit Buttons ── */}
-      <div className="h-12 px-3.5 bg-[#161618]/70 border-t border-white/[0.06] flex items-center justify-between shrink-0 select-none text-[11px] text-[#86868b]">
+      <div className="h-12 px-4 bg-[#161618]/70 border-t border-white/[0.06] flex items-center justify-between shrink-0 select-none text-xs text-[#86868b]">
         {/* Left: Cursor position & Shortcut hint */}
         <div className="flex items-center gap-3">
           <span>Ln {cursorPos.line}, Col {cursorPos.col}</span>
           <span className="hidden sm:inline text-white/10">|</span>
           <span className="hidden sm:inline text-[#86868b]">
-            Press <kbd className="px-1.5 py-0.5 rounded-md bg-white/[0.06] text-[#d1d1d6] font-mono text-[10px] border border-white/[0.1]">Ctrl + Enter</kbd> to Run
+            Press <kbd className="px-1.5 py-0.5 rounded-md bg-white/[0.06] text-[#d1d1d6] font-mono text-[11px] border border-white/[0.1]">Ctrl + Enter</kbd> to Run
           </span>
         </div>
 
         {/* Right: Run Tests & Submit Solution Buttons */}
-        <div id="tour-workbench-runner" className="flex items-center gap-2">
+        <div id="tour-workbench-runner" className="flex items-center gap-2.5">
           {/* Run Tests Button */}
           <button
             onClick={onRunTests}
             disabled={isRunning || isSubmitting}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] active:scale-[0.97] text-white border border-white/[0.1] text-xs font-medium transition-all cursor-pointer disabled:opacity-40 shadow-xs"
+            className="flex items-center justify-center gap-2 min-w-[124px] px-4 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] active:scale-[0.97] text-white border border-white/[0.1] text-sm font-medium transition-all cursor-pointer disabled:opacity-40 shadow-xs"
             title="Run tests against implementation"
           >
             {isRunning ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#30d158]" />
+              <Loader2 className="w-4 h-4 animate-spin text-[#30d158]" />
             ) : (
-              <Play className="w-3.5 h-3.5 text-[#30d158] fill-current" />
+              <Play className="w-4 h-4 text-[#30d158] fill-current" />
             )}
             <span>{isRunning ? 'Running...' : 'Run Tests'}</span>
           </button>
@@ -319,13 +319,13 @@ export const CodeEditorPanel: React.FC<Props> = ({
             <button
               onClick={onSubmitSolution}
               disabled={isRunning || isSubmitting}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[#30d158] hover:bg-[#34c759] active:scale-[0.97] text-black text-xs font-semibold transition-all cursor-pointer disabled:opacity-40 shadow-[0_2px_12px_rgba(48,209,88,0.25)]"
+              className="flex items-center justify-center gap-2 min-w-[124px] px-4 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-[0.97] text-black text-sm font-semibold transition-all cursor-pointer border border-emerald-600/30 shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
               title="Submit solution for full grading"
             >
               {isSubmitting ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-black" />
+                <Loader2 className="w-4 h-4 animate-spin text-black" />
               ) : (
-                <Send className="w-3.5 h-3.5 text-black" />
+                <Send className="w-4 h-4 text-black" />
               )}
               <span>{isSubmitting ? 'Evaluating...' : 'Submit'}</span>
             </button>

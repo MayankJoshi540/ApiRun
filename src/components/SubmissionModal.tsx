@@ -27,6 +27,7 @@ export const SubmissionModal: React.FC<Props> = ({
 }) => {
   const router = useRouter();
   const { user } = useAuth();
+
   if (!isOpen) return null;
 
   const allPassed = summary.passed === summary.total && summary.total > 0;
@@ -34,122 +35,55 @@ export const SubmissionModal: React.FC<Props> = ({
   const hiddenPassed = hiddenTests.filter(r => r.status === 'PASSED').length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
-      {/* Scoped Keyframe Animations */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes modalSuccessPop {
-          0% { transform: scale(0.94); opacity: 0; }
-          60% { transform: scale(1.018); opacity: 1; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes modalShake {
-          0%, 100% { transform: translateX(0); }
-          15% { transform: translateX(-8px); }
-          30% { transform: translateX(7px); }
-          45% { transform: translateX(-5px); }
-          60% { transform: translateX(4px); }
-          75% { transform: translateX(-2px); }
-          90% { transform: translateX(1px); }
-        }
-
-        @keyframes iconCheckSpring {
-          0% { transform: scale(0.4) rotate(-15deg); opacity: 0; }
-          65% { transform: scale(1.22) rotate(4deg); opacity: 1; }
-          100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-
-        @keyframes iconRejectSpring {
-          0% { transform: scale(0.5); opacity: 0; }
-          60% { transform: scale(1.2); opacity: 1; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes statCardFade {
-          0% { opacity: 0; transform: translateY(8px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-
-        .anim-modal-success {
-          animation: modalSuccessPop 380ms cubic-bezier(0.23, 1, 0.32, 1) both;
-        }
-
-        .anim-modal-shake {
-          animation: modalShake 460ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-        }
-
-        .anim-icon-check {
-          animation: iconCheckSpring 450ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        }
-
-        .anim-icon-reject {
-          animation: iconRejectSpring 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        }
-
-        .anim-stat-card {
-          animation: statCardFade 320ms cubic-bezier(0.23, 1, 0.32, 1) both;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .anim-modal-success,
-          .anim-modal-shake,
-          .anim-icon-check,
-          .anim-icon-reject,
-          .anim-stat-card {
-            animation: none !important;
-            transform: none !important;
-          }
-        }
-      `}} />
-
+    <div 
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-md animate-emil-fade"
+      onClick={!isSubmitting ? onClose : undefined}
+    >
       <div 
-        className={`w-full max-w-[600px] bg-[#1c1c1e]/95 backdrop-blur-3xl border border-white/[0.12] border-t-white/[0.22] rounded-3xl shadow-[0_24px_64px_rgba(0,0,0,0.7)] overflow-hidden font-sans select-none text-[#f5f5f7] relative ${
-          !isSubmitting ? (allPassed ? 'anim-modal-success' : 'anim-modal-shake') : 'animate-in zoom-in-95 duration-200'
-        }`}
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-[620px] max-h-[calc(100dvh-32px)] flex flex-col bg-[#0E1317] border border-white/[0.1] rounded-[22px] shadow-2xl overflow-hidden font-sans select-none text-[#f5f5f7] animate-emil-modal"
       >
-        {/* Ambient Top Glow Layer */}
+        {/* Floating Close Button (Hidden while submitting) */}
         {!isSubmitting && (
-          <div 
-            className={`absolute top-0 inset-x-0 h-28 pointer-events-none rounded-t-3xl transition-opacity duration-300 ${
-              allPassed 
-                ? 'bg-gradient-to-b from-[#30d158]/12 via-[#30d158]/3 to-transparent' 
-                : 'bg-gradient-to-b from-[#ff453a]/12 via-[#ff453a]/3 to-transparent'
-            }`} 
-          />
+          <button
+            onClick={onClose}
+            className="absolute top-4.5 right-4.5 z-20 w-8 h-8 rounded-full bg-white/[0.05] hover:bg-white/[0.1] active:scale-95 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/[0.08]"
+            title="Close dialog (Esc)"
+            aria-label="Close dialog"
+          >
+            <X className="w-4.5 h-4.5" />
+          </button>
         )}
 
-        {/* Floating Top-Right Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.12] active:scale-90 text-[#86868b] hover:text-white flex items-center justify-center transition-all cursor-pointer"
-          title="Close modal"
-        >
-          <X className="w-4 h-4" />
-        </button>
-
-        {/* Content Body */}
-        <div className="p-6 sm:p-7 space-y-5 relative z-10">
+        {/* Content Body (Scrollable if viewport is small) */}
+        <div className="p-6 sm:p-7 space-y-4 sm:space-y-5 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
           {isSubmitting ? (
-            <div className="py-12 flex flex-col items-center justify-center space-y-4">
-              <div className="relative w-12 h-12 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full bg-[#30d158]/15 animate-ping" />
-                <Loader2 className="w-8 h-8 animate-spin text-[#30d158]" />
+            <div className="py-12 flex flex-col items-center justify-center space-y-4 text-center animate-emil-fade">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-emerald-400">
+                <Loader2 className="w-6 h-6 animate-spin" />
               </div>
-              <div className="text-center space-y-1">
-                <div className="text-sm font-semibold text-white tracking-tight">Evaluating Backend Solution...</div>
-                <div className="text-xs text-[#86868b] max-w-xs leading-relaxed">
-                  Executing contract assertions, hidden edge cases, and measuring response latency.
-                </div>
+              <div className="space-y-1.5 max-w-sm">
+                <h3 className="text-xl font-semibold text-white tracking-tight">Evaluating Backend Solution...</h3>
+                <p className="text-[14px] text-zinc-400 leading-relaxed font-normal">
+                  Executing contract assertions, concurrency checks, and measuring runtime latency.
+                </p>
+              </div>
+              <div className="relative w-48 h-1 bg-white/[0.08] rounded-full overflow-hidden pt-0.5">
+                <div className="animate-apirun-bar" />
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Outcome Status Banner */}
-              <div className="p-4 sm:p-4.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] flex items-start gap-4 shadow-sm relative overflow-hidden">
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border shadow-sm ${
+              {/* Outcome Status Banner (Staggered Cascade 1) */}
+              <div className={`p-4.5 sm:p-5 rounded-2xl border flex items-start gap-3.5 transition-all animate-cascade-1 ${
+                allPassed 
+                  ? 'bg-[#0B1E17]/90 border-emerald-500/25' 
+                  : 'bg-[#1E1114]/90 border-rose-500/25'
+              }`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
                   allPassed 
-                    ? 'bg-[#30d158]/15 border-[#30d158]/30 text-[#30d158] anim-icon-check shadow-[0_0_16px_rgba(48,209,88,0.25)]' 
-                    : 'bg-[#ff453a]/15 border-[#ff453a]/30 text-[#ff453a] anim-icon-reject shadow-[0_0_16px_rgba(255,69,58,0.25)]'
+                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' 
+                    : 'bg-rose-500/15 border-rose-500/30 text-rose-400'
                 }`}>
                   {allPassed ? (
                     <CheckCircle2 className="w-5 h-5" />
@@ -159,66 +93,63 @@ export const SubmissionModal: React.FC<Props> = ({
                 </div>
 
                 <div className="space-y-1 flex-1 min-w-0 pr-6">
-                  <h3 className="text-base font-semibold text-white tracking-tight">
+                  <h3 className="text-[22px] sm:text-[24px] font-semibold text-white tracking-tight leading-snug">
                     {allPassed ? 'Challenge Completed' : 'Tests Incomplete'}
                   </h3>
-                  <p className="text-[13px] text-[#a1a1a6] leading-relaxed">
+                  <p className="text-[14px] sm:text-[14.5px] text-zinc-300 leading-relaxed font-normal">
                     {allPassed 
                       ? (!user 
-                          ? 'All test assertions and edge cases passed. Sign in to record your completion and maintain your streak.'
+                          ? 'All test assertions and edge cases passed. Sign in to save your completion score and streak.'
                           : 'Your backend passed all public contracts and hidden edge cases. Progress has been saved.')
                       : `${summary.failed} test case${summary.failed === 1 ? '' : 's'} failed assertions. Review the expected vs. actual status diffs in the terminal dock.`}
                   </p>
                 </div>
               </div>
 
-              {/* 3 Metric Cards with Perfect Baseline Alignment & Fluid Widths */}
-              <div className="grid grid-cols-3 gap-3 sm:gap-3.5">
+              {/* 3 Metric Cards (Staggered Cascade 2) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 animate-cascade-2">
                 {/* Metric 1: Score */}
-                <div 
-                  className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex flex-col justify-between anim-stat-card shadow-xs"
-                  style={{ animationDelay: '60ms' }}
-                >
-                  <div className="text-xs text-[#86868b] font-medium tracking-tight">Score</div>
-                  <div className={`text-2xl sm:text-[26px] font-semibold tabular-nums tracking-tight mt-1.5 ${
-                    allPassed ? 'text-[#30d158]' : 'text-[#ff453a]'
+                <div className="p-3.5 sm:p-4 rounded-xl bg-white/[0.03] border border-white/[0.07] flex flex-col justify-between space-y-1 min-h-[104px]">
+                  <div className="text-[12px] sm:text-[12.5px] font-mono text-zinc-400 uppercase tracking-wider font-medium">
+                    Score
+                  </div>
+                  <div className={`text-[32px] sm:text-[34px] font-bold font-mono tabular-nums tracking-tight ${
+                    allPassed ? 'text-emerald-400' : 'text-rose-400'
                   }`}>
                     {summary.scorePercent}%
                   </div>
-                  <div className="text-[11px] text-[#86868b] tabular-nums mt-1 truncate">
+                  <div className="text-[12px] sm:text-[12.5px] text-zinc-400 font-medium truncate">
                     {summary.passed} of {summary.total} passed
                   </div>
                 </div>
 
-                {/* Metric 2: Edge Cases (Aligned baseline) */}
-                <div 
-                  className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex flex-col justify-between anim-stat-card shadow-xs"
-                  style={{ animationDelay: '120ms' }}
-                >
-                  <div className="text-xs text-[#86868b] font-medium tracking-tight">Edge Cases</div>
-                  <div className="flex items-baseline gap-1 mt-1.5">
-                    <span className="text-2xl sm:text-[26px] font-semibold text-white tabular-nums tracking-tight">
+                {/* Metric 2: Edge Cases */}
+                <div className="p-3.5 sm:p-4 rounded-xl bg-white/[0.03] border border-white/[0.07] flex flex-col justify-between space-y-1 min-h-[104px]">
+                  <div className="text-[12px] sm:text-[12.5px] font-mono text-zinc-400 uppercase tracking-wider font-medium">
+                    Edge Cases
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-[32px] sm:text-[34px] font-bold font-mono text-white tabular-nums tracking-tight">
                       {hiddenPassed}
                     </span>
-                    <span className="text-xs font-medium text-[#86868b]">
+                    <span className="text-[13px] font-mono text-zinc-400 font-medium">
                       / {hiddenTests.length}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#86868b] mt-1 truncate">
+                  <div className="text-[12px] sm:text-[12.5px] text-zinc-400 font-medium truncate">
                     Hidden checks
                   </div>
                 </div>
 
-                {/* Metric 3: Latency (Fitted label) */}
-                <div 
-                  className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex flex-col justify-between anim-stat-card shadow-xs"
-                  style={{ animationDelay: '180ms' }}
-                >
-                  <div className="text-xs text-[#86868b] font-medium tracking-tight">Avg Latency</div>
-                  <div className="text-2xl sm:text-[26px] font-semibold text-white tabular-nums tracking-tight mt-1.5">
+                {/* Metric 3: Latency */}
+                <div className="p-3.5 sm:p-4 rounded-xl bg-white/[0.03] border border-white/[0.07] flex flex-col justify-between space-y-1 min-h-[104px]">
+                  <div className="text-[12px] sm:text-[12.5px] font-mono text-zinc-400 uppercase tracking-wider font-medium">
+                    Avg Latency
+                  </div>
+                  <div className="text-[32px] sm:text-[34px] font-bold font-mono text-white tabular-nums tracking-tight">
                     {summary.durationMs}ms
                   </div>
-                  <div className="text-[11px] text-[#86868b] mt-1 truncate">
+                  <div className="text-[12px] sm:text-[12.5px] text-zinc-400 font-medium truncate">
                     Total runtime
                   </div>
                 </div>
@@ -227,46 +158,52 @@ export const SubmissionModal: React.FC<Props> = ({
           )}
         </div>
 
-        {/* Footer Actions */}
-        <div className="px-6 sm:px-7 py-4 bg-white/[0.02] border-t border-white/[0.06] flex items-center justify-end space-x-3 relative z-10">
-          <button
-            onClick={onClose}
-            className="h-10 px-4.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.10] active:scale-[0.97] border border-white/[0.08] text-xs font-semibold text-[#d1d1d6] hover:text-white transition-all cursor-pointer shadow-xs"
-          >
-            Close
-          </button>
+        {/* Footer Actions (Staggered Cascade 3) */}
+        {!isSubmitting && (
+          <div className="px-6 py-4 bg-[#090D10] border-t border-white/[0.07] flex items-center justify-end gap-3 shrink-0 animate-cascade-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="min-h-[44px] h-[44px] px-5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] active:scale-[0.98] border border-white/[0.1] text-[14px] font-medium text-zinc-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
+            >
+              Close
+            </button>
 
-          {allPassed ? (
-            !user ? (
-              <button
-                onClick={() => {
-                  onClose();
-                  router.push('/sign-in?redirect=/challenges');
-                }}
-                className="h-10 px-5 rounded-xl bg-[#30d158] hover:bg-[#34c759] active:scale-[0.97] text-black font-semibold text-xs transition-all shadow-[0_2px_14px_rgba(48,209,88,0.3)] flex items-center gap-2 cursor-pointer"
-              >
-                <Lock className="w-3.5 h-3.5 text-black" />
-                <span>Sign In to Save Progress</span>
-                <ArrowRight className="w-4 h-4 text-black stroke-[2.5]" />
-              </button>
+            {allPassed ? (
+              !user ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    router.push('/sign-in?redirect=/challenges');
+                  }}
+                  className="min-h-[44px] h-[44px] px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.98] text-black font-semibold text-[14px] transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap"
+                >
+                  <Lock className="w-4 h-4 text-black" />
+                  <span>Sign In to Save Progress</span>
+                  <ArrowRight className="w-4 h-4 text-black stroke-[2.5]" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onFeedbackProgress}
+                  className="min-h-[44px] h-[44px] px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.98] text-black font-semibold text-[14px] transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap"
+                >
+                  <span>View Progress</span>
+                  <ArrowRight className="w-4 h-4 text-black stroke-[2.5]" />
+                </button>
+              )
             ) : (
               <button
-                onClick={onFeedbackProgress}
-                className="h-10 px-5 rounded-xl bg-[#30d158] hover:bg-[#34c759] active:scale-[0.97] text-black font-semibold text-xs transition-all shadow-[0_2px_14px_rgba(48,209,88,0.3)] flex items-center gap-2 cursor-pointer"
+                type="button"
+                onClick={onClose}
+                className="min-h-[44px] h-[44px] px-6 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 active:scale-[0.98] border border-rose-500/30 text-rose-300 hover:text-white text-[14px] font-medium transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap"
               >
-                <span>View Progress</span>
-                <ArrowRight className="w-4 h-4 text-black stroke-[2.5]" />
+                <span>Inspect Test Diff</span>
               </button>
-            )
-          ) : (
-            <button
-              onClick={onClose}
-              className="h-10 px-4.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] active:scale-[0.97] border border-white/[0.1] text-xs font-semibold text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
-            >
-              <span>Inspect Diff</span>
-            </button>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
