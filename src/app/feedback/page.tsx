@@ -30,6 +30,7 @@ import {
   Trash2,
   Layers
 } from '@/components/ui/Icons';
+import { WalkthroughSpotlight, TourStep } from '@/components/WalkthroughSpotlight';
 
 export interface FeedbackComment {
   id: string;
@@ -62,6 +63,37 @@ export interface FeedbackItem {
 }
 
 const ADMIN_EMAILS = ['joshimayank646@gmail.com'];
+
+const FEEDBACK_TOUR_STEPS: TourStep[] = [
+  {
+    targetId: 'tour-feedback-upvote-banner',
+    title: 'Upvote to Highlight Community Feedback',
+    description: 'Give everyone an upvote to highlight the best feedback! High-voted feature RFCs and bug reports rise directly to the top of the engineering priority list.',
+    category: 'COMMUNITY IMPACT',
+    preferredPlacement: 'bottom',
+  },
+  {
+    targetId: 'tour-feedback-filters',
+    title: 'Filter & Search RFCs',
+    description: 'Quickly narrow down submissions by Features, Bugs, or sort by Hot, Top, and New to explore what backend developers are discussing.',
+    category: 'ROADMAP EXPLORATION',
+    preferredPlacement: 'bottom',
+  },
+  {
+    targetId: 'tour-feedback-card-sample',
+    title: 'Upvote & Discuss Proposals',
+    description: 'Click the upvote button on any card to vote it up and highlight it on the roadmap, or click the card body to read comments and join the discussion.',
+    category: 'VOTE & COLLABORATE',
+    preferredPlacement: 'right',
+  },
+  {
+    targetId: 'tour-feedback-form',
+    title: 'Submit Your Feature or Bug Report',
+    description: 'Propose new API challenges, recommend execution harness improvements, or report bugs. Submissions are posted anonymously to the community.',
+    category: 'SUBMIT PROPOSAL',
+    preferredPlacement: 'left',
+  },
+];
 
 export default function FeedbackPage() {
   const router = useRouter();
@@ -524,6 +556,12 @@ export default function FeedbackPage() {
         totalCount={12}
       />
 
+      {/* Interactive Developer Walkthrough Spotlight */}
+      <WalkthroughSpotlight
+        tourKey="feedback"
+        steps={FEEDBACK_TOUR_STEPS}
+      />
+
       {/* Main Feedback Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-20 flex-grow w-full relative z-10">
         
@@ -557,7 +595,7 @@ export default function FeedbackPage() {
         )}
 
         {/* Hero Section */}
-        <div className="text-center mb-10 sm:mb-12 space-y-4">
+        <div className="text-center mb-8 sm:mb-10 space-y-4">
           
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
             Suggest a{' '}
@@ -613,6 +651,24 @@ export default function FeedbackPage() {
 
         </div>
 
+        {/* Community Upvoting Callout Banner */}
+        <div 
+          id="tour-feedback-upvote-banner"
+          className="mb-8 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-amber-500/10 to-[#090d14]/90 border border-emerald-500/30 backdrop-blur-md shadow-[0_4px_30px_rgba(16,185,129,0.08)] flex items-start sm:items-center space-x-3.5"
+        >
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+            <Flame className="w-5 h-5 text-amber-400" />
+          </div>
+          <div>
+            <h2 className="text-sm sm:text-base font-bold text-white tracking-tight">
+              Give Everyone an Upvote to Highlight Feedback!
+            </h2>
+            <p className="text-xs sm:text-[13px] text-zinc-300 mt-1 leading-relaxed">
+              Feedback with more upvotes rises directly to the top and gets highlighted for engineering prioritization. Take a moment to upvote ideas and bugs below!
+            </p>
+          </div>
+        </div>
+
         {/* 2-Column Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
           
@@ -620,7 +676,7 @@ export default function FeedbackPage() {
           <div className="lg:col-span-2 space-y-5">
             
             {/* Filter Bar & Controls */}
-            <div className="p-3 sm:p-4 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08] space-y-3">
+            <div id="tour-feedback-filters" className="p-3 sm:p-4 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08] space-y-3">
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 
@@ -897,7 +953,7 @@ export default function FeedbackPage() {
 
           {/* ================= RIGHT COLUMN: STICKY SUBMISSION FORM (1 COL) ================= */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08] p-5 sm:p-6 space-y-4">
+            <div id="tour-feedback-form" className="sticky top-24 rounded-xl bg-[#090d14]/85 backdrop-blur-md border border-white/[0.08] p-5 sm:p-6 space-y-4">
               
               <div className="border-b border-white/[0.06] pb-3">
                 <div className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider font-semibold">
@@ -906,8 +962,8 @@ export default function FeedbackPage() {
                 <h2 className="text-base font-bold text-white font-display mt-0.5">
                   Suggest a feature or Report a bug
                 </h2>
-                <p className="text-xs text-zinc-400 mt-1">
-                  Submissions are posted anonymously to the public roadmap.
+                <p className="text-xs text-zinc-300 mt-1 leading-relaxed">
+                  Submissions are posted anonymously. Make sure to upvote others in the feed so top requests get highlighted!
                 </p>
               </div>
 
