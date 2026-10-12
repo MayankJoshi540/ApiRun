@@ -398,6 +398,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
       >
         {/* ── LEFT PANEL: Problem Specification Card ── */}
         <div 
+          id="tour-workbench-specs"
           style={{ width: `${leftWidthPercent}%` }} 
           className={`h-full flex flex-col bg-[#1c1c1e]/80 backdrop-blur-2xl rounded-2xl border border-white/[0.08] border-t-white/[0.14] shadow-[0_12px_40px_rgba(0,0,0,0.45)] overflow-hidden shrink-0 ${
             (isDraggingHorizontal || isDraggingVertical) ? 'transition-none pointer-events-none select-none' : 'transition-all duration-150 ease-out'
@@ -622,6 +623,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
 
           {/* ── Bottom Right: Testcase & Test Result Dock ── */}
           <div 
+            id="tour-workbench-console"
             style={{ 
               height: isConsoleCollapsed 
                 ? '40px' 
