@@ -261,7 +261,7 @@ export const ProgressView: React.FC<Props> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
         
         {/* Left: Developer Profile Plate (Span 7) */}
-        <div className="lg:col-span-7 rounded-2xl bg-[#1c1c1e]/75 backdrop-blur-2xl border border-white/[0.08] border-t-white/[0.14] p-6 sm:p-7 flex flex-col justify-between shadow-[0_8px_32px_rgba(0,0,0,0.35)] relative">
+        <div id="tour-progress-overview" className="lg:col-span-7 rounded-2xl bg-[#1c1c1e]/75 backdrop-blur-2xl border border-white/[0.08] border-t-white/[0.14] p-6 sm:p-7 flex flex-col justify-between shadow-[0_8px_32px_rgba(0,0,0,0.35)] relative">
           <div>
             <div className="flex flex-col sm:flex-row items-start gap-5">
               {/* Avatar */}
@@ -445,7 +445,7 @@ export const ProgressView: React.FC<Props> = ({
       {/* ========================================================================= */}
       {/* 3. PRACTICE ACTIVITY HEATMAP                                              */}
       {/* ========================================================================= */}
-      <div className="rounded-2xl bg-[#1c1c1e]/75 backdrop-blur-2xl border border-white/[0.08] border-t-white/[0.14] p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+      <div id="tour-progress-heatmap" className="rounded-2xl bg-[#1c1c1e]/75 backdrop-blur-2xl border border-white/[0.08] border-t-white/[0.14] p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
         <SubmissionHeatmap
           submissions={userProgress?.submissions || {}}
           streak={streakCount}
@@ -456,7 +456,7 @@ export const ProgressView: React.FC<Props> = ({
       {/* ========================================================================= */}
       {/* 4. CURRICULUM ROADMAP (REAL CONTENT TRACKS)                               */}
       {/* ========================================================================= */}
-      <div className="rounded-2xl bg-[#1c1c1e]/75 backdrop-blur-2xl border border-white/[0.08] border-t-white/[0.14] p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+      <div id="tour-progress-roadmap" className="rounded-2xl bg-[#1c1c1e]/75 backdrop-blur-2xl border border-white/[0.08] border-t-white/[0.14] p-5 sm:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-4 border-b border-white/[0.06]">
           <div>
             <h3 className="text-sm font-semibold text-white tracking-[-0.01em]">Backend Engineering Curriculum</h3>
