@@ -92,7 +92,7 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({
                 ) : (
                   <Zap className="w-3.5 h-3.5 text-emerald-400" />
                 )}
-                <span>{item.type === 'bug' ? 'Bug Report' : 'Feature RFC'}</span>
+                <span>{item.type === 'bug' ? 'Bug Report' : 'Feature'}</span>
               </span>
 
               {/* Status Badge */}
