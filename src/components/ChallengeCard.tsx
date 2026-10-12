@@ -60,7 +60,7 @@ export const ChallengeCard: React.FC<Props> = ({
         transformStyle: 'preserve-3d',
         willChange: 'transform'
       }}
-      className={`group relative rounded-2xl bg-[#1c1c1e]/60 border p-5 sm:p-6 mb-3 cursor-pointer select-none overflow-hidden active:scale-[0.985] transition-all shadow-[0_4px_16px_rgba(0,0,0,0.3)] ${
+      className={`group relative rounded-2xl bg-[#1c1c1e]/60 border p-4 sm:p-6 mb-3 cursor-pointer select-none overflow-hidden active:scale-[0.985] transition-all shadow-[0_4px_16px_rgba(0,0,0,0.3)] ${
         isSolved 
           ? 'border-white/[0.12] hover:border-white/[0.22] border-t-white/[0.18]' 
           : isInProgress 
@@ -175,7 +175,7 @@ export const ChallengeCard: React.FC<Props> = ({
           {/* Action CTA Button with Apple Pill Styling */}
           <button
             onClick={(e) => { e.stopPropagation(); onSelect(challenge); }}
-            className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-full text-xs font-semibold tracking-[-0.01em] transition-all duration-100 active:scale-[0.96] min-w-[135px] cursor-pointer ${
+            className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-full text-xs font-semibold tracking-[-0.01em] transition-all duration-100 active:scale-[0.96] min-w-[135px] min-h-[38px] cursor-pointer ${
               isLocked
                 ? 'bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/[0.1]'
                 : isSolved
