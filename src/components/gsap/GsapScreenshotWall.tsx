@@ -158,17 +158,19 @@ export const GsapScreenshotWall: React.FC = () => {
       <div className="absolute inset-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-emerald-500/5 blur-[120px] pointer-events-none rounded-full opacity-30" />
       
       {/* Title that fades out as you scroll */}
-      <div ref={titleRef} className="absolute top-8 sm:top-12 left-0 w-full text-center z-30 pointer-events-none">
+      <div ref={titleRef} className="absolute top-4 sm:top-6 md:top-7 left-0 w-full text-center z-30 pointer-events-none flex flex-col items-center px-4">
         <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
           Experience the Platform
         </h2>
-        <p className="text-slate-400 font-mono text-xs mt-2 uppercase tracking-wider">Scroll to explore</p>
+        <p className="text-slate-400 font-mono text-[11px] sm:text-xs mt-1 uppercase tracking-wider">
+          Scroll to explore
+        </p>
       </div>
 
       {/* 3D Perspective Wrapper */}
       <div 
         ref={wrapperRef}
-        className="relative w-full max-w-[1600px] h-[55vh] mt-12 flex items-center justify-center"
+        className="relative w-full max-w-[1600px] h-[52vh] mt-16 sm:mt-20 flex items-center justify-center"
         style={{ perspective: '1200px' }}
       >
         {screenshots.map((item, index) => (

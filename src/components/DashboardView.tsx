@@ -183,21 +183,21 @@ export const DashboardView: React.FC<Props> = ({
         </div>
 
         {/* Track & Tier Quick Filters */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-0.5">
-          {/* Category/Track Chips: Smooth Horizontal Scroll */}
-          <div className="relative min-w-0 flex-1 overflow-hidden">
-            <div className="flex items-center overflow-x-auto no-scrollbar py-0.5 gap-1.5 scroll-smooth [mask-image:linear-gradient(to_right,black_88%,transparent)] sm:[mask-image:none]">
-              <span className="text-[11px] text-[#86868b] mr-1 hidden sm:inline shrink-0 font-medium">
-                Track:
-              </span>
+        <div className="space-y-2 pt-1 border-t border-white/[0.04]">
+          {/* Category/Track Filter Row */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 scroll-smooth">
+            <span className="text-[11px] font-mono text-slate-400 shrink-0 font-medium pl-0.5">
+              Track:
+            </span>
+            <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs transition-all duration-100 active:scale-[0.96] border cursor-pointer min-h-[38px] sm:min-h-[30px] flex items-center whitespace-nowrap ${
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs transition-all duration-100 active:scale-[0.96] border cursor-pointer min-h-[30px] flex items-center whitespace-nowrap ${
                     selectedCategory === cat
                       ? 'bg-white/[0.14] border-white/25 text-white font-semibold shadow-xs'
-                      : 'bg-white/[0.03] border-white/[0.06] text-[#86868b] hover:text-white hover:border-white/10 font-medium'
+                      : 'bg-white/[0.03] border-white/[0.06] text-slate-300 hover:text-white hover:border-white/12 font-medium'
                   }`}
                 >
                   {cat === 'ALL' ? 'All Tracks' : cat}
@@ -206,20 +206,20 @@ export const DashboardView: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Difficulty (Tier) Chips: Compact Horizontal Row */}
-          <div className="relative shrink-0 overflow-hidden">
-            <div className="flex items-center overflow-x-auto no-scrollbar py-0.5 gap-1.5 scroll-smooth">
-              <span className="text-[11px] text-[#86868b] mr-1 hidden sm:inline shrink-0 font-medium">
-                Tier:
-              </span>
+          {/* Difficulty (Tier) Filter Row */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 scroll-smooth">
+            <span className="text-[11px] font-mono text-slate-400 shrink-0 font-medium pl-0.5">
+              Tier:
+            </span>
+            <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
               {(['ALL', 'BEGINNER', 'INTERMEDIATE', 'ADVANCED'] as const).map((diff) => (
                 <button
                   key={diff}
                   onClick={() => onSelectDifficulty(diff)}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs transition-all duration-100 active:scale-[0.96] border cursor-pointer min-h-[38px] sm:min-h-[30px] flex items-center whitespace-nowrap ${
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs transition-all duration-100 active:scale-[0.96] border cursor-pointer min-h-[30px] flex items-center whitespace-nowrap ${
                     selectedDifficulty === diff
                       ? 'bg-white/[0.14] border-white/25 text-white font-semibold shadow-xs'
-                      : 'bg-white/[0.03] border-white/[0.06] text-[#86868b] hover:text-white hover:border-white/10 font-medium'
+                      : 'bg-white/[0.03] border-white/[0.06] text-slate-300 hover:text-white hover:border-white/12 font-medium'
                   }`}
                 >
                   {diff === 'ALL' ? 'All Tiers' : diff.charAt(0) + diff.slice(1).toLowerCase()}
