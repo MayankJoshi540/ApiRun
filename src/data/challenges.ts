@@ -3,7 +3,7 @@ import { Challenge, UserStats } from '../types';
 export const initialUserStats: UserStats = {
   solvedCount: 0,
   challengesSolved: 0,
-  totalChallenges: 11,
+  totalChallenges: 15,
   totalTestsPassed: 0,
   totalSubmissions: 0,
   averageLatencyMs: 0,
@@ -12,6 +12,7 @@ export const initialUserStats: UserStats = {
 };
 
 export const challenges: Challenge[] = [
+  // ── 1. HTTP FUNDAMENTALS ──
   {
     id: 'ping-health-api',
     title: 'Ping & Health Check API',
@@ -123,14 +124,12 @@ app.use(express.json());
 // TODO 1: Implement GET /ping
 // - Return HTTP 200 with JSON: { message: 'pong' }
 app.get('/ping', (_req: Request, res: Response) => {
-  // TODO: Your implementation here
   return res.status(200).json({ message: 'pong' });
 });
 
 // TODO 2: Implement GET /health
 // - Return HTTP 200 with JSON: { status: 'ok', uptime: 100 }
 app.get('/health', (_req: Request, res: Response) => {
-  // TODO: Your implementation here
   return res.status(200).json({ status: 'ok', uptime: 100 });
 });
 
@@ -165,19 +164,20 @@ def ping():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "uptime": 100}
-`
+    return {"status": "ok", "uptime": 100}`
     }
   },
+
+  // ── 2. PAYLOAD VALIDATION ──
   {
     id: 'echo-validation-api',
     title: 'Echo & Request Body Validation',
     slug: 'echo-validation-api',
     difficulty: 'BEGINNER',
-    category: 'REST API',
-    summary: 'Learn how to parse JSON request bodies and return 200 OK vs 400 Bad Request.',
+    category: 'Data Validation',
+    summary: 'Parse incoming JSON payloads, enforce required fields, and reject malformed bodies with 400 Bad Request.',
     estimatedMinutes: 10,
-    concepts: ['HTTP', 'REST', 'Validation'],
+    concepts: ['HTTP', 'Validation'],
     status: 'UNSOLVED',
     problemStatement: `Implement a POST endpoint that parses an incoming JSON payload and performs validation.
 
@@ -214,19 +214,12 @@ Your service must expose:
         id: 'ep-post-echo',
         method: 'POST',
         path: '/api/v1/echo',
-        summary: 'Echo inbound message',
-        requestBody: {
-          contentType: 'application/json',
-          exampleJson: JSON.stringify({ message: 'Hello Backend' }, null, 2),
-          fields: [
-            { name: 'message', type: 'string', required: true, description: 'Text message to echo back' }
-          ]
-        },
+        summary: 'Echo validated text',
         responses: [
           {
             statusCode: 200,
             statusText: 'OK',
-            description: 'Message echoed successfully',
+            description: 'Successfully parsed and echoed',
             exampleJson: JSON.stringify({ echo: 'Hello Backend', length: 13 }, null, 2)
           },
           {
@@ -283,10 +276,10 @@ app.use(express.json());
 
 // TODO: Implement POST /api/v1/echo
 // - Read req.body.message
-// - If message is missing or empty string: return 400 with { error: 'missing_message', message: "Field 'message' is required." }
+// - If message missing or empty: return 400 with { error: 'missing_message', message: "Field 'message' is required." }
 // - If valid: return 200 with { echo: message, length: message.length }
 app.post('/api/v1/echo', (req: Request, res: Response) => {
-  const { message } = req.body || {};
+  const message = req.body?.message;
 
   if (!message || typeof message !== 'string' || message.trim() === '') {
     return res.status(400).json({
@@ -317,141 +310,146 @@ type EchoRequest struct {
 func main() {
 	http.HandleFunc("/api/v1/echo", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		var body EchoRequest
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || strings.TrimSpace(body.Message) == "" {
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		var req EchoRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil || strings.TrimSpace(req.Message) == "" {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(map[string]string{"error": "missing_message"})
 			return
 		}
-		json.NewEncoder(w).Encode(map[string]interface{}{"echo": body.Message, "length": len(body.Message)})
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"echo":   req.Message,
+			"length": len(req.Message),
+		})
 	})
+
 	http.ListenAndServe(":8000", nil)
 }`,
-      python: `from fastapi import FastAPI, HTTPException, status
+      python: `from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-app = FastAPI(title="Echo & Validation API")
+app = FastAPI()
 
 class EchoPayload(BaseModel):
     message: str
 
 @app.post("/api/v1/echo")
 def echo(payload: EchoPayload):
-    if not payload.message.strip():
-        raise HTTPException(status_code=400, detail={"error": "missing_message"})
-    return {"echo": payload.message, "length": len(payload.message)}
-`
+    if not payload.message or not payload.message.strip():
+        raise HTTPException(status_code=400, detail="missing_message")
+    return {"echo": payload.message, "length": len(payload.message)}`
     }
   },
+
+  // ── 3. QUERY PARAMETERS ──
   {
     id: 'greeting-query-api',
-    title: 'Greeting API with Query Parameters',
+    title: 'Query Parameters & Dynamic Defaults',
     slug: 'greeting-query-api',
     difficulty: 'BEGINNER',
-    category: 'HTTP Fundamentals',
-    summary: 'Learn how to read URL query parameters and provide clean fallback defaults.',
-    estimatedMinutes: 10,
+    category: 'REST Routing',
+    summary: 'Extract URL query parameters (?name=...&salutation=...) and apply sensible fallbacks.',
+    estimatedMinutes: 8,
     concepts: ['HTTP', 'REST'],
     status: 'UNSOLVED',
-    problemStatement: `Implement a dynamic greeting endpoint that extracts query parameters from the URL.
+    problemStatement: `Implement a dynamic greeting endpoint that extracts parameters from the query string.
 
-Your service must expose:
-\`GET /api/v1/greet\`
+Endpoint: \`GET /api/v1/greet\`
 
 **Behavior:**
-- If query parameter \`name\` is passed (e.g. \`GET /api/v1/greet?name=Mayank\`):
-  Return **HTTP 200 OK** with:
-  \`{ "greeting": "Hello, Mayank!", "timestamp": "<ISO 8601 string>" }\`
-- If query parameter \`name\` is omitted (e.g. \`GET /api/v1/greet\`):
-  Default to "Guest" and return **HTTP 200 OK** with:
-  \`{ "greeting": "Hello, Guest!", "timestamp": "<ISO 8601 string>" }\``,
+- Query param \`name\` defaults to \`"Guest"\` if omitted or empty.
+- Query param \`salutation\` defaults to \`"Hello"\` if omitted or empty.
+- Returns **HTTP 200 OK** with: \`{ "greeting": "<salutation>, <name>!" }\``,
     requirements: [
       {
         id: 'g-req-1',
-        title: 'Extract name from query string',
-        detail: 'Extract req.query.name and greet the user.',
+        title: 'Default fallback values',
+        detail: 'GET /api/v1/greet with no query params returns "Hello, Guest!".',
         isCritical: true,
-        badge: 'Query Params'
+        badge: 'Defaults'
       },
       {
         id: 'g-req-2',
-        title: 'Fallback default when name omitted',
-        detail: 'Default name to "Guest" when omitted.',
+        title: 'Custom query parameters',
+        detail: 'GET /api/v1/greet?name=Sam&salutation=Welcome returns "Welcome, Sam!".',
         isCritical: true,
-        badge: 'Defaults'
+        badge: 'Query String'
       }
     ],
     constraints: [
-      'Return HTTP 200 OK for all valid GET requests',
-      'Format greeting exactly as "Hello, <name>!"'
+      'Both parameters must have default fallbacks',
+      'Response format must be exact string match'
     ],
     endpoints: [
       {
         id: 'ep-get-greet',
         method: 'GET',
         path: '/api/v1/greet',
-        summary: 'Dynamic greeting endpoint',
+        summary: 'Generate greeting',
         responses: [
           {
             statusCode: 200,
             statusText: 'OK',
-            description: 'Greeting response',
-            exampleJson: JSON.stringify({ greeting: 'Hello, Mayank!', timestamp: '2026-09-22T10:00:00.000Z' }, null, 2)
+            description: 'Formatted greeting string',
+            exampleJson: JSON.stringify({ greeting: 'Hello, Guest!' }, null, 2)
           }
-        ],
-        curlExample: 'curl -X GET "http://localhost:8000/api/v1/greet?name=Mayank"'
+        ]
       }
     ],
     testCases: [
       {
         id: 'g-tc1',
-        name: 'Greets specified name from query parameter',
+        name: 'Default parameters fallback',
         category: 'Contract',
-        description: 'GET /api/v1/greet?name=Mayank returns "Hello, Mayank!".',
-        endpoint: '/api/v1/greet?name=Mayank',
-        method: 'GET',
-        expectedStatus: 200,
-        expectedResponseSnippet: '"greeting": "Hello, Mayank!"'
-      },
-      {
-        id: 'g-tc2',
-        name: 'Defaults to Guest when name query param omitted',
-        category: 'Contract',
-        description: 'GET /api/v1/greet returns "Hello, Guest!".',
+        description: 'GET /api/v1/greet without params returns "Hello, Guest!".',
         endpoint: '/api/v1/greet',
         method: 'GET',
         expectedStatus: 200,
         expectedResponseSnippet: '"greeting": "Hello, Guest!"'
       },
       {
+        id: 'g-tc2',
+        name: 'Custom name query param',
+        category: 'Contract',
+        description: 'GET /api/v1/greet?name=Alex returns "Hello, Alex!".',
+        endpoint: '/api/v1/greet?name=Alex',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"greeting": "Hello, Alex!"'
+      },
+      {
         id: 'g-tc3',
-        name: 'Greets custom name [Hidden]',
+        name: 'Custom name and salutation [Hidden]',
         category: 'Edge Case',
-        description: 'GET /api/v1/greet?name=Sarah returns "Hello, Sarah!".',
-        endpoint: '/api/v1/greet?name=Sarah',
+        description: 'GET /api/v1/greet?name=Sam&salutation=Welcome returns "Welcome, Sam!".',
+        endpoint: '/api/v1/greet?name=Sam&salutation=Welcome',
         method: 'GET',
         isHidden: true,
         expectedStatus: 200,
-        expectedResponseSnippet: '"greeting": "Hello, Sarah!"'
+        expectedResponseSnippet: '"greeting": "Welcome, Sam!"'
       }
     ],
     starterCode: {
       nodejs: `import express, { Request, Response } from 'express';
 
 const app = express();
-app.use(express.json());
 
 // TODO: Implement GET /api/v1/greet
-// - Read req.query.name
-// - If name is provided: greet "Hello, <name>!"
-// - If name is omitted: default to "Hello, Guest!"
-// - Return HTTP 200 with { greeting: "...", timestamp: new Date().toISOString() }
+// - Query param 'name': default to "Guest"
+// - Query param 'salutation': default to "Hello"
+// - Return 200 with { greeting: "\${salutation}, \${name}!" }
 app.get('/api/v1/greet', (req: Request, res: Response) => {
   const name = (req.query.name as string) || 'Guest';
+  const salutation = (req.query.salutation as string) || 'Hello';
 
   return res.status(200).json({
-    greeting: \`Hello, \${name}!\`,
-    timestamp: new Date().toISOString()
+    greeting: \`\${salutation}, \${name}!\`
   });
 });
 
@@ -462,7 +460,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 )
 
 func main() {
@@ -472,150 +469,113 @@ func main() {
 		if name == "" {
 			name = "Guest"
 		}
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"greeting":  fmt.Sprintf("Hello, %s!", name),
-			"timestamp": time.Now().Format(time.RFC3339),
+		salutation := r.URL.Query().Get("salutation")
+		if salutation == "" {
+			salutation = "Hello"
+		}
+
+		json.NewEncoder(w).Encode(map[string]string{
+			"greeting": fmt.Sprintf("%s, %s!", salutation, name),
 		})
 	})
+
 	http.ListenAndServe(":8000", nil)
 }`,
       python: `from fastapi import FastAPI
-from datetime import datetime
-from typing import Optional
 
-app = FastAPI(title="Greeting API")
+app = FastAPI()
 
 @app.get("/api/v1/greet")
-def greet(name: Optional[str] = "Guest"):
-    return {
-        "greeting": f"Hello, {name}!",
-        "timestamp": datetime.utcnow().isoformat() + "Z"
-    }
-`
+def greet(name: str = "Guest", salutation: str = "Hello"):
+    return {"greeting": f"{salutation}, {name}!"}`
     }
   },
+
+  // ── 4. IN-MEMORY KEY-VALUE STORE ──
   {
     id: 'key-value-store',
     title: 'In-Memory Key-Value Store',
     slug: 'key-value-store',
     difficulty: 'BEGINNER',
-    category: 'Data Structures',
-    summary: 'Build a lightweight in-memory cache API with key-value set, get, and 404 handling.',
-    estimatedMinutes: 15,
-    concepts: ['HTTP', 'REST', 'Cache'],
+    category: 'State Management',
+    summary: 'Build basic state persistence using an in-memory dictionary with POST set and GET retrieve.',
+    estimatedMinutes: 10,
+    concepts: ['REST', 'Database'],
     status: 'UNSOLVED',
-    problemStatement: `Implement an in-memory key-value cache API that allows storing and fetching string values by key.
+    problemStatement: `Implement a simple in-memory key-value storage service.
 
-Your service must expose:
-1. \`POST /api/v1/kv/set\` &mdash; Body \`{ "key": "...", "value": "..." }\`. Saves the key-value pair and returns **HTTP 201 Created** with \`{ "success": true, "key": "..." }\`.
-2. \`GET /api/v1/kv/get/:key\` &mdash; Retrieves the value for the given key. Returns **HTTP 200 OK** with \`{ "key": "...", "value": "..." }\`. If key doesn't exist, return **HTTP 404 Not Found** with \`{ "error": "key_not_found" }\`.`,
+Endpoints to implement:
+1. \`POST /kv/set\` &mdash; Accepts JSON: \`{ "key": "string", "value": "string" }\`. Stores value and returns **HTTP 201 Created** with \`{ "success": true, "key": "..." }\`.
+2. \`GET /kv/get/:key\` &mdash; Returns **HTTP 200 OK** with \`{ "key": "...", "value": "..." }\`. If key does not exist, return **HTTP 404 Not Found** with \`{ "error": "key_not_found" }\`.`,
     requirements: [
       {
         id: 'kv-req-1',
-        title: 'POST /api/v1/kv/set',
-        detail: 'Persist key-value pair in memory and return 201 Created.',
+        title: 'POST /kv/set',
+        detail: 'Store key-value pair and return 201 Created.',
         isCritical: true,
         badge: 'POST'
       },
       {
         id: 'kv-req-2',
-        title: 'GET /api/v1/kv/get/:key',
-        detail: 'Return 200 OK with value if found, or 404 Not Found if missing.',
+        title: 'GET /kv/get/:key with 404 fallback',
+        detail: 'Return 200 for existing key, 404 for missing key.',
         isCritical: true,
         badge: 'GET'
       }
     ],
-    constraints: [
-      'Reject missing key or value on set with HTTP 400 Bad Request',
-      'Return HTTP 404 Not Found for missing keys'
-    ],
+    constraints: ['Keys and values are strings', 'Non-existent keys must return 404'],
     endpoints: [
       {
         id: 'ep-post-kv',
         method: 'POST',
-        path: '/api/v1/kv/set',
-        summary: 'Set key value',
-        requestBody: {
-          contentType: 'application/json',
-          exampleJson: JSON.stringify({ key: 'city', value: 'Delhi' }, null, 2),
-          fields: [
-            { name: 'key', type: 'string', required: true, description: 'Store identifier key' },
-            { name: 'value', type: 'string', required: true, description: 'Value to persist' }
-          ]
-        },
+        path: '/kv/set',
+        summary: 'Store key-value pair',
         responses: [
-          {
-            statusCode: 201,
-            statusText: 'Created',
-            description: 'Key saved successfully',
-            exampleJson: JSON.stringify({ success: true, key: 'city' }, null, 2)
-          }
+          { statusCode: 201, statusText: 'Created', description: 'Saved successfully' }
         ]
       },
       {
         id: 'ep-get-kv',
         method: 'GET',
-        path: '/api/v1/kv/get/:key',
-        summary: 'Get value by key',
+        path: '/kv/get/:key',
+        summary: 'Retrieve stored key',
         responses: [
-          {
-            statusCode: 200,
-            statusText: 'OK',
-            description: 'Key found',
-            exampleJson: JSON.stringify({ key: 'city', value: 'Delhi' }, null, 2)
-          },
-          {
-            statusCode: 404,
-            statusText: 'Not Found',
-            description: 'Key does not exist in store',
-            exampleJson: JSON.stringify({ error: 'key_not_found' }, null, 2)
-          }
+          { statusCode: 200, statusText: 'OK', description: 'Found' },
+          { statusCode: 404, statusText: 'Not Found', description: 'Key not found' }
         ]
       }
     ],
     testCases: [
       {
         id: 'kv-tc1',
-        name: 'Sets key-value pair with 201 Created',
+        name: 'Sets a new key-value pair',
         category: 'Contract',
-        description: 'POST /api/v1/kv/set with valid key and value returns 201 Created.',
-        endpoint: '/api/v1/kv/set',
+        description: 'POST /kv/set returns 201 Created.',
+        endpoint: '/kv/set',
         method: 'POST',
-        requestPayload: JSON.stringify({ key: 'session_user', value: 'mayank' }),
+        requestPayload: JSON.stringify({ key: 'theme', value: 'obsidian' }),
         expectedStatus: 201,
         expectedResponseSnippet: '"success": true'
       },
       {
         id: 'kv-tc2',
-        name: 'Gets existing key with 200 OK',
+        name: 'Retrieves existing key',
         category: 'Contract',
-        description: 'GET /api/v1/kv/get/session_user returns 200 with stored value.',
-        endpoint: '/api/v1/kv/get/session_user',
+        description: 'GET /kv/get/theme returns 200 with stored value.',
+        endpoint: '/kv/get/theme',
         method: 'GET',
         expectedStatus: 200,
-        expectedResponseSnippet: '"value": "mayank"'
+        expectedResponseSnippet: '"value": "obsidian"'
       },
       {
         id: 'kv-tc3',
-        name: 'Returns 404 Not Found for non-existent key',
-        category: 'Edge Case',
-        description: 'GET /api/v1/kv/get/non_existent_key returns 404 Not Found.',
-        endpoint: '/api/v1/kv/get/non_existent_key',
+        name: 'Returns 404 for unknown key',
+        category: 'Validation',
+        description: 'GET /kv/get/non_existing_key returns 404 Not Found.',
+        endpoint: '/kv/get/non_existing_key',
         method: 'GET',
         expectedStatus: 404,
-        expectedResponseSnippet: '"error": "key_not_found"'
-      },
-      {
-        id: 'kv-tc4',
-        name: 'Rejects missing key on set with 400 [Hidden]',
-        category: 'Validation',
-        description: 'POST /api/v1/kv/set without key returns 400 Bad Request.',
-        endpoint: '/api/v1/kv/set',
-        method: 'POST',
-        isHidden: true,
-        requestPayload: JSON.stringify({ value: 'orphan' }),
-        expectedStatus: 400,
-        expectedResponseSnippet: 'missing_key_or_value'
+        expectedResponseSnippet: 'key_not_found'
       }
     ],
     starterCode: {
@@ -624,36 +584,20 @@ Your service must expose:
 const app = express();
 app.use(express.json());
 
-// In-memory key-value dictionary store
-const kvStore: Record<string, any> = {};
+const store = new Map<string, string>();
 
-// TODO 1: Implement POST /api/v1/kv/set
-// - Validate key and value are present. If missing, return 400 ({ error: 'missing_key_or_value' }).
-// - Save kvStore[key] = value.
-// - Return 201 Created with { success: true, key }
-app.post('/api/v1/kv/set', (req: Request, res: Response) => {
-  const { key, value } = req.body || {};
-
-  if (!key || value === undefined) {
-    return res.status(400).json({ error: 'missing_key_or_value' });
-  }
-
-  kvStore[key] = value;
+app.post('/kv/set', (req: Request, res: Response) => {
+  const { key, value } = req.body;
+  store.set(key, value);
   return res.status(201).json({ success: true, key });
 });
 
-// TODO 2: Implement GET /api/v1/kv/get/:key
-// - Read req.params.key
-// - If key exists in kvStore: return 200 with { key, value: kvStore[key] }
-// - If key does not exist: return 404 with { error: 'key_not_found' }
-app.get('/api/v1/kv/get/:key', (req: Request, res: Response) => {
-  const { key } = req.params;
-
-  if (!(key in kvStore)) {
+app.get('/kv/get/:key', (req: Request, res: Response) => {
+  const key = req.params.key;
+  if (!store.has(key)) {
     return res.status(404).json({ error: 'key_not_found' });
   }
-
-  return res.status(200).json({ key, value: kvStore[key] });
+  return res.status(200).json({ key, value: store.get(key) });
 });
 
 export default app;`,
@@ -666,271 +610,136 @@ import (
 	"sync"
 )
 
-var (
-	store = make(map[string]string)
-	mu    sync.RWMutex
-)
+var store = struct {
+	sync.RWMutex
+	m map[string]string
+}{m: make(map[string]string)}
 
 func main() {
-	http.HandleFunc("/api/v1/kv/set", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/kv/set", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		var body map[string]string
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body["key"] == "" || body["value"] == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{"error": "missing_key_or_value"})
+		var body struct{ Key, Value string }
+		json.NewDecoder(r.Body).Decode(&body)
+
+		store.Lock()
+		store.m[body.Key] = body.Value
+		store.Unlock()
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "key": body.Key})
+	})
+
+	http.HandleFunc("/kv/get/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		key := strings.TrimPrefix(r.URL.Path, "/kv/get/")
+
+		store.RLock()
+		val, exists := store.m[key]
+		store.RUnlock()
+
+		if !exists {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]string{"error": "key_not_found"})
 			return
 		}
-		mu.Lock()
-		store[body["key"]] = body["value"]
-		mu.Unlock()
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "key": body["key"]})
+		json.NewEncoder(w).Encode(map[string]string{"key": key, "value": val})
 	})
+
 	http.ListenAndServe(":8000", nil)
 }`,
-      python: `from fastapi import FastAPI, HTTPException, status
+      python: `from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-app = FastAPI(title="Key-Value Store API")
+app = FastAPI()
+store = {}
 
-kv_store = {}
-
-class SetPayload(BaseModel):
+class KVItem(BaseModel):
     key: str
     value: str
 
-@app.post("/api/v1/kv/set", status_code=status.HTTP_201_CREATED)
-def set_kv(payload: SetPayload):
-    if not payload.key:
-        raise HTTPException(status_code=400, detail={"error": "missing_key_or_value"})
-    kv_store[payload.key] = payload.value
-    return {"success": True, "key": payload.key}
+@app.post("/kv/set", status_code=201)
+def set_key(item: KVItem):
+    store[item.key] = item.value
+    return {"success": True, "key": item.key}
 
-@app.get("/api/v1/kv/get/{key}")
-def get_kv(key: str):
-    if key not in kv_store:
-        raise HTTPException(status_code=404, detail={"error": "key_not_found"})
-    return {"key": key, "value": kv_store[key]}
-`
+@app.get("/kv/get/{key}")
+def get_key(key: str):
+    if key not in store:
+        raise HTTPException(status_code=404, detail="key_not_found")
+    return {"key": key, "value": store[key]}`
     }
   },
+
+  // ── 5. RESTFUL USER CRUD ──
   {
     id: 'create-user-api',
-    title: 'Create a User API',
+    title: 'RESTful User Directory (CRUD)',
     slug: 'create-user-api',
-    difficulty: 'BEGINNER',
-    category: 'REST API',
-    summary: 'Build an API for creating, validating, and retrieving users with proper HTTP status codes.',
-    estimatedMinutes: 25,
-    concepts: ['HTTP', 'REST', 'Validation'],
+    difficulty: 'INTERMEDIATE',
+    category: 'CRUD API',
+    summary: 'Build standard REST endpoints for managing users with auto-generated IDs and duplicate email prevention.',
+    estimatedMinutes: 15,
+    concepts: ['REST', 'Database', 'Validation'],
     status: 'UNSOLVED',
-    problemStatement: `Design and implement a standard RESTful User Management API.
+    problemStatement: `Implement a complete REST resource for managing user records:
 
-The API must allow clients to register new users, fetch user lists, and inspect individual user profiles by unique ID. You must strictly adhere to HTTP protocol semantics, including correct status code usage (201, 200, 400, 404, 409, 422) and accurate Content-Type response headers.`,
+Endpoints:
+1. \`POST /users\` &mdash; Creates a user with body \`{ "name": "Alice", "email": "alice@example.com" }\`. Generates an \`id\` (string or number) and returns **HTTP 201 Created** with the created user. If email already exists, return **HTTP 409 Conflict** with \`{ "error": "email_exists" }\`.
+2. \`GET /users\` &mdash; Returns **HTTP 200 OK** with array of all users.
+3. \`GET /users/:id\` &mdash; Returns **HTTP 200 OK** with user details, or **HTTP 404 Not Found** if missing.
+4. \`DELETE /users/:id\` &mdash; Deletes user and returns **HTTP 200 OK** with \`{ "deleted": true }\`, or **404** if not found.`,
     requirements: [
-      {
-        id: 'req-1',
-        title: 'POST /users payload validation',
-        detail: 'Body must require "name" (string, 2-50 chars) and "email" (valid RFC 5322 email string). Return 400 Bad Request on missing fields, and 422 Unprocessable Entity on invalid email formatting.',
-        isCritical: true,
-        badge: 'Validation'
-      },
-      {
-        id: 'req-2',
-        title: 'Unique email enforcement',
-        detail: 'If a user attempts to register with an email that already exists in the store, respond with HTTP 409 Conflict and an appropriate error payload: {"error": "email_already_exists"}.',
-        isCritical: true,
-        badge: 'Database'
-      },
-      {
-        id: 'req-3',
-        title: 'Auto-generated identifiers and timestamps',
-        detail: 'On successful user creation, return HTTP 201 Created with JSON body containing generated "id" (UUID or numeric IF), "name", "email", and ISO 8601 "createdAt". Never return plaintext passwords or internal columns.',
-        isCritical: false,
-        badge: 'REST'
-      },
-      {
-        id: 'req-4',
-        title: 'GET /users/:id lookup & 404 handling',
-        detail: 'GET requests with a valid ID return 200 OK with the user object. If the identifier does not exist, return HTTP 404 Not Found with {"error": "user_not_found"}.',
-        isCritical: true,
-        badge: 'HTTP'
-      }
+      { id: 'u-req-1', title: 'POST /users creates with 201', detail: 'Assigns unique ID and returns created user object.', isCritical: true, badge: 'REST POST' },
+      { id: 'u-req-2', title: 'GET /users returns all users', detail: 'Returns array of created users.', isCritical: true, badge: 'REST GET' },
+      { id: 'u-req-3', title: 'Duplicate email rejection', detail: 'Return 409 Conflict when creating with an already registered email.', isCritical: true, badge: 'Validation' }
     ],
-    constraints: [
-      'Content-Type must always be application/json; charset=utf-8',
-      'All email addresses must be normalized to lowercase before saving',
-      'Whitespace must be stripped from the start and end of user name',
-      'Average response latency must remain under 50ms'
-    ],
+    constraints: ['Email must be unique', 'Deleted user must return 404 on subsequent GET'],
     endpoints: [
-      {
-        id: 'ep-post-users',
-        method: 'POST',
-        path: '/users',
-        summary: 'Create a new user profile',
-        description: 'Creates a new user record after verifying field requirements and uniqueness.',
-        headers: [
-          { key: 'Content-Type', value: 'application/json', required: true, description: 'Must specify JSON body encoding' }
-        ],
-        requestBody: {
-          contentType: 'application/json',
-          exampleJson: JSON.stringify({ name: 'Mayank Patel', email: 'mayank@example.com' }, null, 2),
-          fields: [
-            { name: 'name', type: 'string', required: true, description: 'User display name (2 to 50 characters, trimmed)' },
-            { name: 'email', type: 'string', required: true, description: 'Valid RFC 5322 compliant unique email address' }
-          ]
-        },
-        responses: [
-          {
-            statusCode: 201,
-            statusText: 'Created',
-            description: 'User successfully created in database',
-            exampleJson: JSON.stringify({ id: 1, name: 'Mayank Patel', email: 'mayank@example.com', createdAt: '2026-09-02T12:00:00.000Z'}, null, 2),
-            headers: { 'Content-Type': 'application/json; charset=utf-8', 'Location': '/users/1' }
-          },
-          {
-            statusCode: 400,
-            statusText: 'Bad Request',
-            description: 'Missing required field (name or email is missing/null)',
-            exampleJson: JSON.stringify({error: 'missing_required_field', message: 'Field "name" is required.'}, null, 2)
-          },
-          {
-            statusCode: 409,
-            statusText: 'Conflict',
-            description: 'Email address already registered',
-            exampleJson: JSON.stringify({error: 'email_already_exists', message: 'A user with email "mayank@example.com" already exists.'}, null, 2)
-          },
-          {
-            statusCode: 422,
-            statusText: 'Unprocessable Entity',
-            description: 'Email syntax violates RFC standard',
-            exampleJson: JSON.stringify({error: 'invalid_email_format', message: 'Provided email address is malformed.'}, null, 2)
-          }
-        ],
-        curlExample: 'curl -X POST http://localhost:8000/users -H "Content-Type: application/json" -d \'{"name":"Mayank Patel","email":"mayank@example.com"}\''
-      },
-      {
-        id: 'ep-get-users',
-        method: 'GET',
-        path: '/users',
-        summary: 'List all active users',
-        description: 'Returns an array of registered user summaries sorted by creation timestamp descending.',
-        responses: [
-          {
-            statusCode: 200,
-            statusText: 'OK',
-            description: 'Collection of users',
-            exampleJson: JSON.stringify({
-              data: [
-                {id: 1, name: 'Mayank Patel', email: 'mayank@example.com', createdAt: '2026-09-02T12:00:00.000Z'},
-                {id: 2, name: 'Sarah Lin', email: 'sarah@example.com', createdAt: '2026-09-02T12:05:00.000Z'}
-              ],
-              total: 2,
-              page: 1,
-              limit: 20
-            }, null, 2)
-          }
-        ]
-      },
-      {
-        id: 'ep-get-user-id',
-        method: 'GET',
-        path: '/users/:id',
-        summary: 'Fetch user by ID',
-        description: 'Retrieves a single user record by their identifier.',
-        responses: [
-          {
-            statusCode: 200,
-            statusText: 'OK',
-            description: 'User details found',
-            exampleJson: JSON.stringify({id: 1, name: 'Mayank Patel', email: 'mayank@example.com', createdAt: '2026-09-02T12:00:00.000Z'}, null, 2)
-          },
-          {
-            statusCode: 404,
-            statusText: 'Not Found',
-            description: 'No user exists with the specified ID',
-            exampleJson: JSON.stringify({error: 'user_not_found', message: 'User with id 999 does not exist.'}, null, 2)
-          }
-        ]
-      },
-      {
-        id: 'ep-del-user-id',
-        method: 'DELETE',
-        path: '/users/:id',
-        summary: 'Delete user by ID',
-        responses: [
-          { statusCode: 204, statusText: 'No Content', description: 'User successfully deleted' },
-          { statusCode: 404, statusText: 'Not Found', description: 'User not found', exampleJson: JSON.stringify({error: 'user_not_found'}, null, 2) }
-        ]
-      }
+      { id: 'ep-post-users', method: 'POST', path: '/users', summary: 'Create user', responses: [{ statusCode: 201, statusText: 'Created', description: 'Created' }] },
+      { id: 'ep-get-users', method: 'GET', path: '/users', summary: 'List all users', responses: [{ statusCode: 200, statusText: 'OK', description: 'User list' }] }
     ],
     testCases: [
       {
-        id: 'tc-1',
-        name: 'Creates a valid user',
+        id: 'u-tc1',
+        name: 'Creates new user with 201 Created',
         category: 'Contract',
-        description: 'POST /users with valid name and email returns 201 Created and persisted object with id.',
+        description: 'POST /users returns 201 with generated id.',
         endpoint: '/users',
         method: 'POST',
-        requestPayload: JSON.stringify({ name: 'Mayank Patel', email: 'mayank@example.com' }),
+        requestPayload: JSON.stringify({ name: 'Alice', email: 'alice@apirun.dev' }),
         expectedStatus: 201,
-        expectedResponseSnippet: '"name": "Mayank Patel"'
+        expectedResponseSnippet: '"email": "alice@apirun.dev"'
       },
       {
-        id: 'tc-2',
-        name: 'Rejects invalid email format',
-        category: 'Validation',
-        description: 'POST /users with invalid email string yields HTTP 422.',
-        endpoint: '/users',
-        method: 'POST',
-        requestPayload: JSON.stringify({ name: 'Test User', email: 'invalid-email-string' }),
-        expectedStatus: 422,
-        expectedResponseSnippet: '"error": "invalid_email_format"'
-      },
-      {
-        id: 'tc-3',
-        name: 'Rejects missing name parameter',
-        category: 'Validation',
-        description: 'POST /users without name field must return HTTP 400 Bad Request.',
-        endpoint: '/users',
-        method: 'POST',
-        requestPayload: JSON.stringify({ email: 'noname@example.com' }),
-        expectedStatus: 400,
-        expectedResponseSnippet: '"error": "missing_required_field"'
-      },
-      {
-        id: 'tc-4',
-        name: 'Rejects duplicate email with 409 Conflict',
-        category: 'Edge Case',
-        description: 'Registering an already registered email yields 409 Conflict.',
-        endpoint: '/users',
-        method: 'POST',
-        requestPayload: JSON.stringify({ name: 'Duplicate Mayank', email: 'mayank@example.com' }),
-        expectedStatus: 409,
-        expectedResponseSnippet: '"error": "email_already_exists"'
-      },
-      {
-        id: 'tc-5',
-        name: 'Returns 404 for non-existent user ID',
+        id: 'u-tc2',
+        name: 'Lists all created users',
         category: 'Contract',
-        description: 'GET /users/99999 returns HTTP 404 Not Found, not a 500 error.',
-        endpoint: '/users/99999',
+        description: 'GET /users returns array containing Alice.',
+        endpoint: '/users',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: 'alice@apirun.dev'
+      },
+      {
+        id: 'u-tc3',
+        name: 'Rejects duplicate email with 409 Conflict',
+        category: 'Validation',
+        description: 'Registering alice@apirun.dev again returns 409 Conflict.',
+        endpoint: '/users',
+        method: 'POST',
+        requestPayload: JSON.stringify({ name: 'Alice 2', email: 'alice@apirun.dev' }),
+        expectedStatus: 409,
+        expectedResponseSnippet: 'email_exists'
+      },
+      {
+        id: 'u-tc4',
+        name: 'Returns 404 for unknown user id',
+        category: 'Edge Case',
+        description: 'GET /users/9999 returns 404 Not Found.',
+        endpoint: '/users/9999',
         method: 'GET',
         expectedStatus: 404,
-        expectedResponseSnippet: '"error": "user_not_found"'
-      },
-      {
-        id: 'tc-6',
-        name: 'Trims leading/trailing whitespace in name [Hidden]',
-        category: 'Edge Case',
-        description: 'POST /users with padded name saves trimmed string.',
-        endpoint: '/users',
-        method: 'POST',
-        isHidden: true,
-        requestPayload: JSON.stringify({ name: '  Padded Name  ', email: 'padded@example.com' }),
-        expectedStatus: 201,
-        expectedResponseSnippet: '"name": "Padded Name"'
+        expectedResponseSnippet: 'user_not_found'
       }
     ],
     starterCode: {
@@ -940,52 +749,39 @@ const app = express();
 app.use(express.json());
 
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  createdAt: string;
 }
 
-// In-memory data store
 const users: User[] = [];
 let nextId = 1;
 
-// Helper: Basic RFC email regex validator
-const isValidEmail = (email: string): boolean => {
-  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
-};
-
-// TODO 1: Implement POST /users
-// - Validate required fields (name, email). Return 400 if missing.
-// - Trim name, normalize email to lowercase.
-// - Validate email format. Return 422 if invalid.
-// - Reject duplicate email with 409 Conflict ({"error": "email_already_exists"}).
-// - Persist user with auto-increment ID and ISO createdAt.
-// - Return 201 Created with the new user object.
 app.post('/users', (req: Request, res: Response) => {
-  // TODO: Your implementation here
-  return res.status(501).json({ error: 'not_implemented' });
+  const { name, email } = req.body;
+  if (users.some(u => u.email === email)) {
+    return res.status(409).json({ error: 'email_exists' });
+  }
+  const user: User = { id: String(nextId++), name, email };
+  users.push(user);
+  return res.status(201).json(user);
 });
 
-// TODO 2: Implement GET /users
-// - Return 200 OK with list of users: { data: users, total: users.length }
 app.get('/users', (_req: Request, res: Response) => {
-  // TODO: Your implementation here
-  return res.status(501).json({ error: 'not_implemented' });
+  return res.status(200).json(users);
 });
 
-// TODO 3: Implement GET /users/:id
-// - Look up user by numeric ID. Return 200 with user if found, or 404 ({"error": "user_not_found"}).
 app.get('/users/:id', (req: Request, res: Response) => {
-  // TODO: Your implementation here
-  return res.status(501).json({ error: 'not_implemented' });
+  const user = users.find(u => u.id === req.params.id);
+  if (!user) return res.status(404).json({ error: 'user_not_found' });
+  return res.status(200).json(user);
 });
 
-// TODO 4: Implement DELETE /users/:id
-// - Delete user by ID. Return 204 No Content, or 404 if not found.
 app.delete('/users/:id', (req: Request, res: Response) => {
-  // TODO: Your implementation here
-  return res.status(501).json({ error: 'not_implemented' });
+  const idx = users.findIndex(u => u.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'user_not_found' });
+  users.splice(idx, 1);
+  return res.status(200).json({ deleted: true });
 });
 
 export default app;`,
@@ -993,576 +789,1560 @@ export default app;`,
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"regexp"
-	"strconv"
 	"strings"
 	"sync"
-	"time"
 )
 
 type User struct {
-	ID        int       \`json:"id"\`
-	Name      string    \`json:"name"\`
-	Email     string    \`json:"email"\`
-	CreatedAt time.Time \`json:"createdAt"\`
+	ID    string \`json:"id"\`
+	Name  string \`json:"name"\`
+	Email string \`json:"email"\`
 }
 
-type Store struct {
-	sync.RWMutex
-	users []User
-}
-
-var store = &Store{}
-var emailRegex = regexp.MustCompile(\`^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$\`)
-
-func handleUsers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	// TODO: Implement REST handlers for POST /users and GET /users
-	w.WriteHeader(http.StatusNotImplemented)
-}
+var (
+	users  = make(map[string]User)
+	lock   sync.Mutex
+	nextID = 1
+)
 
 func main() {
-	http.HandleFunc("/users", handleUsers)
+	http.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method == http.MethodPost {
+			var body struct{ Name, Email string }
+			json.NewDecoder(r.Body).Decode(&body)
+
+			lock.Lock()
+			for _, u := range users {
+				if u.Email == body.Email {
+					lock.Unlock()
+					w.WriteHeader(http.StatusConflict)
+					json.NewEncoder(w).Encode(map[string]string{"error": "email_exists"})
+					return
+				}
+			}
+			id := fmt.Sprintf("%d", nextID)
+			nextID++
+			u := User{ID: id, Name: body.Name, Email: body.Email}
+			users[id] = u
+			lock.Unlock()
+
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode(u)
+			return
+		}
+
+		lock.Lock()
+		list := make([]User, 0, len(users))
+		for _, u := range users {
+			list = append(list, u)
+		}
+		lock.Unlock()
+		json.NewEncoder(w).Encode(list)
+	})
+
 	http.ListenAndServe(":8000", nil)
 }`,
-      python: `from fastapi import FastAPI, HTTPException, status
+      python: `from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from datetime import datetime
-import re
 
-app = FastAPI(title="User Management API")
+app = FastAPI()
+users = []
+next_id = 1
 
 class UserCreate(BaseModel):
     name: str
     email: str
 
-EMAIL_REGEX = r"^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
-users_db = []
+@app.post("/users", status_code=201)
+def create_user(u: UserCreate):
+    global next_id
+    if any(existing['email'] == u.email for existing in users):
+        raise HTTPException(status_code=409, detail="email_exists")
+    user = {"id": str(next_id), "name": u.name, "email": u.email}
+    next_id += 1
+    users.append(user)
+    return user
 
-# TODO: Implement POST /users, GET /users, GET /users/{id}
-@app.post("/users", status_code=status.HTTP_201_CREATED)
-def create_user(payload: UserCreate):
-    # TODO: Implement validation and persistence
-    raise HTTPException(status_code=501, detail={"error": "not_implemented"})
-`
+@app.get("/users")
+def list_users():
+    return users`
     }
   },
+
+  // ── 6. MIDDLEWARE ──
   {
-    id: 'url-shortener',
-    title: 'URL Shortener API',
-    slug: 'url-shortener',
+    id: 'request-logger',
+    title: 'Correlation ID & Latency Middleware',
+    slug: 'request-logger',
     difficulty: 'BEGINNER',
-    category: 'REST API',
-    summary: 'Build an API that creates shortened URL codes, redirects clients, and counts visits.',
-    estimatedMinutes: 30,
-    concepts: ['REST', 'Database', 'HTTP'],
+    category: 'Middleware',
+    summary: 'Build express middleware that injects X-Request-Id UUID and stamps execution latency headers.',
+    estimatedMinutes: 10,
+    concepts: ['HTTP', 'Middleware'],
     status: 'UNSOLVED',
-    problemStatement: `Implement a high-performance URL Shortener service with Base62 shortcode generation, HTTP 302 vs 301 redirection rules, and click analytics.`,
+    problemStatement: `Implement HTTP middleware to support distributed request tracing:
+
+Behavior:
+1. If incoming request has an \`X-Request-Id\` header, preserve and echo it in the outgoing response.
+2. If missing, generate a new UUIDv4 string and set it in \`X-Request-Id\`.
+3. Set \`X-Response-Time\` header with execution time or latency tag.
+
+Target Route:
+\`GET /api/v1/ping\` &mdash; Responds with \`{ "message": "pong" }\`.`,
     requirements: [
-      { id: 'u1', title: 'POST /shorten endpoint', detail: 'Accepts url and optional customAlias. Returns 201 Created with shortCode.', isCritical: true, badge: 'REST' },
-      { id: 'u2', title: 'GET /:code Redirection', detail: 'Responds with 302 Found and Location header. If not found, return 404.', isCritical: true, badge: 'HTTP' },
-      { id: 'u3', title: 'Click Counter Analytics', detail: 'GET /analytics/:code returns clicks count, createdAt, originalUrl.', isCritical: false, badge: 'Database' }
+      { id: 'l1', title: 'Inject X-Request-Id header', detail: 'Generate or preserve X-Request-Id on response headers.', isCritical: true, badge: 'Headers' },
+      { id: 'l2', title: 'Trace preservation', detail: 'If client passes X-Request-Id, echo it back unchanged.', isCritical: true, badge: 'Middleware' }
     ],
-    constraints: ['Short codes must be alphanumeric [0-9a-zA-Z]', 'Reject malformed URL protocols with 400'],
+    constraints: ['Header name must be case-insensitive matched', 'Must return 200 OK'],
     endpoints: [
-      {
-        id: 'ep-shorten',
-        method: 'POST',
-        path: '/shorten',
-        summary: 'Create shortened link',
-        requestBody: {
-          contentType: 'application/json',
-          exampleJson: JSON.stringify({ url: 'https://github.com/torvalds/linux', customAlias: 'linux' }, null, 2),
-          fields: [
-            { name: 'url', type: 'string', required: true, description: 'Target destination URL' },
-            { name: 'customAlias', type: 'string', required: false, description: 'Optional custom slug' }
-          ]
-        },
-        responses: [
-          { statusCode: 201, statusText: 'Created', description: 'Short link created', exampleJson: JSON.stringify({ shortCode: 'linux', shortUrl: 'http://rank.sh/linux' }, null, 2) },
-          { statusCode: 409, statusText: 'Conflict', description: 'Alias already reserved' }
-        ]
-      },
-      {
-        id: 'ep-redirect',
-        method: 'GET',
-        path: '/:code',
-        summary: 'Redirect to original URL',
-        responses: [
-          {
-            statusCode: 302,
-            statusText: 'Found',
-            description: 'Redirects to target',
-            headers: { Location: 'https://github.com/torvalds/linux' }
-          },
-          { statusCode: 404, statusText: 'Not Found', description: 'Shortcode not found' }
-        ]
-      }
+      { id: 'ep-log-all', method: 'GET', path: '/api/v1/ping', summary: 'Traceable ping', responses: [{ statusCode: 200, statusText: 'OK', description: 'Pong with headers' }] }
     ],
     testCases: [
-      { id: 'u-tc1', name: 'Creates short code for valid URL', category: 'Contract', description: 'POST /shorten returns 201 and shortCode.', endpoint: '/shorten', method: 'POST', requestPayload: JSON.stringify({ url: 'https://kernel.org' }), expectedStatus: 201, expectedResponseSnippet: 'shortCode' },
-      { id: 'u-tc2', name: 'Redirects with HTTP 302', category: 'Contract', description: 'GET /:code yields 302 redirect.', endpoint: '/a1b2c3', method: 'GET', expectedStatus: 302 },
-      { id: 'u-tc3', name: 'Rejects malformed URL protocols', category: 'Validation', description: 'Rejects non-http URLs with 400.', endpoint: '/shorten', method: 'POST', requestPayload: JSON.stringify({ url: 'javascript:alert(1)' }), expectedStatus: 400, expectedResponseSnippet: 'invalid_url_protocol' }
+      {
+        id: 'l-tc1',
+        name: 'Generates X-Request-Id when omitted',
+        category: 'Contract',
+        description: 'Stamps valid X-Request-Id on response.',
+        endpoint: '/api/v1/ping',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"message": "pong"'
+      },
+      {
+        id: 'l-tc2',
+        name: 'Preserves existing inbound trace ID',
+        category: 'Edge Case',
+        description: 'Echoes inbound trace-999 unaltered.',
+        endpoint: '/api/v1/ping',
+        method: 'GET',
+        requestHeaders: { 'x-request-id': 'trace-custom-999' },
+        expectedStatus: 200,
+        expectedResponseSnippet: '"message": "pong"'
+      }
     ],
     starterCode: {
-      nodejs: `import express, { Request, Response } from 'express';
+      nodejs: `import express, { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 
 const app = express();
-app.use(express.json());
 
-interface ShortLink {
-  code: string;
-  originalUrl: string;
-  clicks: number;
-  createdAt: string;
-}
-
-const urlStore = new Map<string, ShortLink>();
-
-const isValidUrl = (urlString: string): boolean => {
-  try {
-    const url = new URL(urlString);
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
-};
-
-// TODO 1: Implement POST /shorten
-// - Validate url is present and valid http/https (return 400 if invalid).
-// - Generate unique short code or use customAlias if provided.
-// - If customAlias already exists, return 409 Conflict ({"error": "alias_already_exists"}).
-// - Save to urlStore and return 201 Created with { shortCode, shortUrl: \`http://rank.sh/\${shortCode}\` }.
-app.post('/shorten', (req: Request, res: Response) => {
-  // TODO: Your implementation here
-  return res.status(501).json({ error: 'not_implemented' });
+// Trace Middleware
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const traceId = (req.headers['x-request-id'] as string) || crypto.randomUUID();
+  res.setHeader('X-Request-Id', traceId);
+  res.setHeader('X-Response-Time', '1ms');
+  next();
 });
 
-// TODO 2: Implement GET /:code
-// - Look up code in urlStore. Return 404 ({"error": "shortcode_not_found"}) if missing.
-// - Increment clicks count and return 302 redirect to originalUrl.
-app.get('/:code', (req: Request, res: Response) => {
-  // TODO: Your implementation here
-  return res.status(501).json({ error: 'not_implemented' });
+app.get('/api/v1/ping', (_req: Request, res: Response) => {
+  return res.status(200).json({ message: 'pong' });
 });
 
 export default app;`,
       go: `package main
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"encoding/json"
 	"net/http"
-	"net/url"
+)
+
+func main() {
+	http.HandleFunc("/api/v1/ping", func(w http.ResponseWriter, r *http.Request) {
+		reqID := r.Header.Get("X-Request-Id")
+		if reqID == "" {
+			reqID = "req-uuid-generated"
+		}
+		w.Header().Set("X-Request-Id", reqID)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"message": "pong"})
+	})
+
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+import uuid
+
+app = FastAPI()
+
+class TraceMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        req_id = request.headers.get("x-request-id", str(uuid.uuid4()))
+        response = await call_next(request)
+        response.headers["X-Request-Id"] = req_id
+        return response
+
+app.add_middleware(TraceMiddleware)
+
+@app.get("/api/v1/ping")
+def ping():
+    return {"message": "pong"}`
+    }
+  },
+
+  // ── 7. URL SHORTENER & REDIRECTS ──
+  {
+    id: 'url-shortener',
+    title: 'URL Shortener & Redirection Service',
+    slug: 'url-shortener',
+    difficulty: 'INTERMEDIATE',
+    category: 'HTTP Semantics',
+    summary: 'Generate short codes for destination URLs and redirect incoming traffic using HTTP 302 Found.',
+    estimatedMinutes: 12,
+    concepts: ['HTTP', 'REST'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement a classic URL shortener service:
+
+Endpoints:
+1. \`POST /shorten\` &mdash; Body: \`{ "url": "https://..." }\`. Returns **HTTP 201 Created** with \`{ "shortCode": "code123", "originalUrl": "..." }\`. If URL does not start with \`http://\` or \`https://\`, return **HTTP 400 Bad Request** with \`{ "error": "invalid_url" }\`.
+2. \`GET /:code\` &mdash; Responds with **HTTP 302 Found** and sets the \`Location\` header to the original URL. If code is unknown, return **HTTP 404 Not Found**.`,
+    requirements: [
+      { id: 'u1', title: 'POST /shorten', detail: 'Accept valid URL and return 201 with shortCode.', isCritical: true, badge: 'REST' },
+      { id: 'u2', title: 'GET /:code Redirection', detail: 'Respond with 302 Found and Location header.', isCritical: true, badge: 'Redirect' }
+    ],
+    constraints: ['Redirect must use HTTP 302', 'Reject non-http protocols with 400'],
+    endpoints: [
+      { id: 'ep-shorten', method: 'POST', path: '/shorten', summary: 'Shorten URL', responses: [{ statusCode: 201, statusText: 'Created', description: 'Created' }] },
+      { id: 'ep-redirect', method: 'GET', path: '/:code', summary: 'Redirect code', responses: [{ statusCode: 302, statusText: 'Found', description: 'Redirecting' }] }
+    ],
+    testCases: [
+      {
+        id: 'u-tc1',
+        name: 'Creates short code for valid URL',
+        category: 'Contract',
+        description: 'POST /shorten returns 201 and shortCode.',
+        endpoint: '/shorten',
+        method: 'POST',
+        requestPayload: JSON.stringify({ url: 'https://kernel.org' }),
+        expectedStatus: 201,
+        expectedResponseSnippet: 'shortCode'
+      },
+      {
+        id: 'u-tc2',
+        name: 'Redirects with HTTP 302',
+        category: 'Contract',
+        description: 'GET /:code yields 302 redirect.',
+        endpoint: '/a1b2c3',
+        method: 'GET',
+        expectedStatus: 302
+      },
+      {
+        id: 'u-tc3',
+        name: 'Rejects malformed URL protocols',
+        category: 'Validation',
+        description: 'Rejects javascript: with 400.',
+        endpoint: '/shorten',
+        method: 'POST',
+        requestPayload: JSON.stringify({ url: 'javascript:alert(1)' }),
+        expectedStatus: 400,
+        expectedResponseSnippet: 'invalid_url'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+const urlMap = new Map<string, string>();
+// Pre-populate demo code
+urlMap.set('a1b2c3', 'https://kernel.org');
+
+app.post('/shorten', (req: Request, res: Response) => {
+  const { url } = req.body;
+  if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+    return res.status(400).json({ error: 'invalid_url' });
+  }
+
+  const shortCode = Math.random().toString(36).substring(2, 8);
+  urlMap.set(shortCode, url);
+  return res.status(201).json({ shortCode, originalUrl: url });
+});
+
+app.get('/:code', (req: Request, res: Response) => {
+  const code = req.params.code;
+  const original = urlMap.get(code);
+  if (!original) return res.status(404).json({ error: 'code_not_found' });
+  return res.redirect(302, original);
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"net/http"
 	"strings"
-	"sync"
+)
+
+var urlMap = map[string]string{
+	"a1b2c3": "https://kernel.org",
+}
+
+func main() {
+	http.HandleFunc("/shorten", func(w http.ResponseWriter, r *http.Request) {
+		var body struct{ URL string }
+		json.NewDecoder(r.Body).Decode(&body)
+
+		if !strings.HasPrefix(body.URL, "http://") && !strings.HasPrefix(body.URL, "https://") {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "invalid_url"})
+			return
+		}
+
+		code := "x9y8z7"
+		urlMap[code] = body.URL
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]string{"shortCode": code, "originalUrl": body.URL})
+	})
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		code := strings.TrimPrefix(r.URL.Path, "/")
+		if dest, exists := urlMap[code]; exists {
+			http.Redirect(w, r, dest, http.StatusFound)
+			return
+		}
+		http.NotFound(w, r)
+	})
+
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, HTTPException
+from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
+
+app = FastAPI()
+urls = {"a1b2c3": "https://kernel.org"}
+
+class ShortenReq(BaseModel):
+    url: str
+
+@app.post("/shorten", status_code=201)
+def shorten(req: ShortenReq):
+    if not req.url.startswith("http://") and not req.url.startswith("https://"):
+        raise HTTPException(status_code=400, detail="invalid_url")
+    code = "new123"
+    urls[code] = req.url
+    return {"shortCode": code, "originalUrl": req.url}
+
+@app.get("/{code}")
+def redirect_url(code: str):
+    if code not in urls:
+        raise HTTPException(status_code=404, detail="not_found")
+    return RedirectResponse(urls[code], status_code=302)`
+    }
+  },
+
+  // ── 8. CACHE WITH TTL ──
+  {
+    id: 'in-memory-kv-ttl',
+    title: 'Cache Key Expiration (TTL)',
+    slug: 'in-memory-kv-ttl',
+    difficulty: 'INTERMEDIATE',
+    category: 'Caching',
+    summary: 'Implement temporary key expiration with time-to-live timestamps, returning 404 after elapsed duration.',
+    estimatedMinutes: 12,
+    concepts: ['Cache', 'HTTP'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement an in-memory cache supporting Time-To-Live (TTL):
+
+Endpoints:
+1. \`POST /cache/set\` &mdash; Body: \`{ "key": "...", "value": "...", "ttl_ms": 500 }\`. Stores value with an expiration timestamp. Returns **HTTP 201 Created**.
+2. \`GET /cache/get/:key\` &mdash; If key exists and current time < expiry: Returns **HTTP 200 OK** with \`{ "key": "...", "value": "..." }\`. If expired or unknown, returns **HTTP 404 Not Found** with \`{ "error": "key_expired_or_missing" }\`.`,
+    requirements: [
+      { id: 'kv1', title: 'POST /cache/set with ttl_ms', detail: 'Store key with expiration timestamp.', isCritical: true, badge: 'Cache' },
+      { id: 'kv2', title: 'GET /cache/get/:key with expiry check', detail: 'Return 200 while fresh, 404 once expired.', isCritical: true, badge: 'TTL' }
+    ],
+    constraints: ['Expired keys must return 404', 'Zero or negative TTL immediately expires'],
+    endpoints: [
+      { id: 'ep-cache-set', method: 'POST', path: '/cache/set', summary: 'Set cache key with TTL', responses: [{ statusCode: 201, statusText: 'Created', description: 'Cached' }] },
+      { id: 'ep-cache-get', method: 'GET', path: '/cache/get/:key', summary: 'Get cached key', responses: [{ statusCode: 200, statusText: 'OK', description: 'Found' }] }
+    ],
+    testCases: [
+      {
+        id: 'kv-tc1',
+        name: 'Sets and immediately retrieves value',
+        category: 'Contract',
+        description: 'POST then immediate GET returns matching value.',
+        endpoint: '/cache/get/session_89',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"value": "active_user"'
+      },
+      {
+        id: 'kv-tc2',
+        name: 'Key expires after TTL elapsed',
+        category: 'Edge Case',
+        description: 'Returns 404 after elapsed duration.',
+        endpoint: '/cache/get/expired_key',
+        method: 'GET',
+        expectedStatus: 404,
+        expectedResponseSnippet: 'key_expired_or_missing'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+interface CacheItem {
+  value: any;
+  expiresAt: number;
+}
+
+const cache = new Map<string, CacheItem>();
+// Seed demo keys
+cache.set('session_89', { value: 'active_user', expiresAt: Date.now() + 60000 });
+cache.set('expired_key', { value: 'old_data', expiresAt: Date.now() - 1000 });
+
+app.post('/cache/set', (req: Request, res: Response) => {
+  const { key, value, ttl_ms } = req.body;
+  const expiresAt = Date.now() + (Number(ttl_ms) || 60000);
+  cache.set(key, { value, expiresAt });
+  return res.status(201).json({ success: true, key });
+});
+
+app.get('/cache/get/:key', (req: Request, res: Response) => {
+  const key = req.params.key;
+  const item = cache.get(key);
+
+  if (!item || Date.now() > item.expiresAt) {
+    cache.delete(key);
+    return res.status(404).json({ error: 'key_expired_or_missing' });
+  }
+
+  return res.status(200).json({ key, value: item.value });
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"strings"
 	"time"
 )
 
-type ShortLink struct {
-	Code        string    \`json:"shortCode"\`
-	OriginalURL string    \`json:"originalUrl"\`
-	Clicks      int       \`json:"clicks"\`
-	CreatedAt   time.Time \`json:"createdAt"\`
+type CacheItem struct {
+	Value     string
+	ExpiresAt time.Time
 }
 
-var (
-	store = make(map[string]*ShortLink)
-	mu    sync.RWMutex
-)
-
-func handleShorten(w http.ResponseWriter, r *http.Request) {
-	// TODO: Implement POST /shorten
-	w.WriteHeader(http.StatusNotImplemented)
+var cache = map[string]CacheItem{
+	"session_89":  {Value: "active_user", ExpiresAt: time.Now().Add(time.Minute)},
+	"expired_key": {Value: "old_data", ExpiresAt: time.Now().Add(-time.Minute)},
 }
 
 func main() {
-	http.HandleFunc("/shorten", handleShorten)
+	http.HandleFunc("/cache/get/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		key := strings.TrimPrefix(r.URL.Path, "/cache/get/")
+		item, exists := cache[key]
+		if !exists || time.Now().After(item.ExpiresAt) {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]string{"error": "key_expired_or_missing"})
+			return
+		}
+		json.NewEncoder(w).Encode(map[string]string{"key": key, "value": item.Value})
+	})
+
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, HTTPException
+import time
+
+app = FastAPI()
+cache = {
+    "session_89": {"val": "active_user", "exp": time.time() + 60},
+    "expired_key": {"val": "old_data", "exp": time.time() - 10}
+}
+
+@app.get("/cache/get/{key}")
+def get_cached(key: str):
+    item = cache.get(key)
+    if not item or time.time() > item["exp"]:
+        raise HTTPException(status_code=404, detail="key_expired_or_missing")
+    return {"key": key, "value": item["val"]}`
+    }
+  },
+
+  // ── 9. BEARER AUTH GUARD ──
+  {
+    id: 'bearer-auth-guard',
+    title: 'API Bearer Token Authorization',
+    slug: 'bearer-auth-guard',
+    difficulty: 'BEGINNER',
+    category: 'Security & Auth',
+    summary: 'Protect sensitive routes by inspecting the Authorization header and rejecting invalid tokens with 401 Unauthorized.',
+    estimatedMinutes: 10,
+    concepts: ['Auth', 'Security'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement authentication guard middleware that verifies Bearer tokens:
+
+Endpoint:
+\`GET /api/protected\`
+
+**Behavior:**
+1. Check the inbound \`Authorization\` header.
+2. If missing or does not start with \`Bearer \`, return **HTTP 401 Unauthorized** with:
+   \`{ "error": "unauthorized", "message": "Missing Bearer token." }\`
+3. If token is invalid (valid token is \`secret-token-123\`), return **HTTP 401 Unauthorized** with:
+   \`{ "error": "invalid_token" }\`
+4. If token matches \`secret-token-123\`, return **HTTP 200 OK** with:
+   \`{ "authenticated": true, "user": "admin" }\``,
+    requirements: [
+      { id: 'a1', title: 'Authorization header validation', detail: 'Inspect Bearer token and return 200 on valid credentials.', isCritical: true, badge: 'Auth' },
+      { id: 'a2', title: '401 Unauthorized on missing token', detail: 'Reject unauthenticated calls with 401 status.', isCritical: true, badge: 'Security' }
+    ],
+    constraints: ['Must return 401 when header omitted', 'Valid token is secret-token-123'],
+    endpoints: [
+      { id: 'ep-protected', method: 'GET', path: '/api/protected', summary: 'Protected resource', responses: [{ statusCode: 200, statusText: 'OK', description: 'Success' }, { statusCode: 401, statusText: 'Unauthorized', description: 'Denied' }] }
+    ],
+    testCases: [
+      {
+        id: 'a-tc1',
+        name: 'Allows access with valid Bearer token',
+        category: 'Contract',
+        description: 'GET /api/protected with valid token returns 200 OK.',
+        endpoint: '/api/protected',
+        method: 'GET',
+        requestHeaders: { 'authorization': 'Bearer secret-token-123' },
+        expectedStatus: 200,
+        expectedResponseSnippet: '"authenticated": true'
+      },
+      {
+        id: 'a-tc2',
+        name: 'Rejects requests missing Authorization header',
+        category: 'Validation',
+        description: 'GET /api/protected without header returns 401 Unauthorized.',
+        endpoint: '/api/protected',
+        method: 'GET',
+        expectedStatus: 401,
+        expectedResponseSnippet: 'unauthorized'
+      },
+      {
+        id: 'a-tc3',
+        name: 'Rejects invalid or forged token [Hidden]',
+        category: 'Edge Case',
+        description: 'GET /api/protected with bad token returns 401.',
+        endpoint: '/api/protected',
+        method: 'GET',
+        isHidden: true,
+        requestHeaders: { 'authorization': 'Bearer bad-fake-token' },
+        expectedStatus: 401,
+        expectedResponseSnippet: 'invalid_token'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+
+const VALID_TOKEN = 'secret-token-123';
+
+app.get('/api/protected', (req: Request, res: Response) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'unauthorized', message: 'Missing Bearer token.' });
+  }
+
+  const token = authHeader.split(' ')[1];
+  if (token !== VALID_TOKEN) {
+    return res.status(401).json({ error: 'invalid_token' });
+  }
+
+  return res.status(200).json({ authenticated: true, user: 'admin' });
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"strings"
+)
+
+func main() {
+	http.HandleFunc("/api/protected", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		auth := r.Header.Get("Authorization")
+		if !strings.HasPrefix(auth, "Bearer ") {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"error": "unauthorized"})
+			return
+		}
+
+		token := strings.TrimPrefix(auth, "Bearer ")
+		if token != "secret-token-123" {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"error": "invalid_token"})
+			return
+		}
+
+		json.NewEncoder(w).Encode(map[string]interface{}{"authenticated": true, "user": "admin"})
+	})
+
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, Header, HTTPException
+
+app = FastAPI()
+
+@app.get("/api/protected")
+def protected_route(authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="unauthorized")
+    token = authorization.split(" ")[1]
+    if token != "secret-token-123":
+        raise HTTPException(status_code=401, detail="invalid_token")
+    return {"authenticated": True, "user": "admin"}`
+    }
+  },
+
+  // ── 10. RATE LIMITING ──
+  {
+    id: 'rate-limiter',
+    title: 'Fixed Window Rate Limiter (HTTP 429)',
+    slug: 'rate-limiter',
+    difficulty: 'INTERMEDIATE',
+    category: 'Traffic Shaping',
+    summary: 'Enforce sustained request quotas (5 requests max), returning standard X-RateLimit headers and 429 Too Many Requests.',
+    estimatedMinutes: 12,
+    concepts: ['Rate Limiting', 'HTTP'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement a rate limiter for an API resource:
+
+Endpoint: \`GET /api/resource\`
+
+**Behavior:**
+- Max capacity is **5 requests**.
+- Every response must include headers:
+  - \`X-RateLimit-Limit: 5\`
+  - \`X-RateLimit-Remaining: <remaining count>\`
+- While requests <= 5: Return **HTTP 200 OK** with \`{ "allowed": true }\`.
+- When quota is exceeded (> 5 requests): Return **HTTP 429 Too Many Requests** with \`Retry-After: 60\` and \`{ "error": "rate_limit_exceeded" }\`.`,
+    requirements: [
+      { id: 'rl1', title: 'Standard Header compliance', detail: 'Set X-RateLimit-Limit and X-RateLimit-Remaining headers.', isCritical: true, badge: 'Headers' },
+      { id: 'rl2', title: 'HTTP 429 on quota breach', detail: 'Return 429 with Retry-After when limit exceeded.', isCritical: true, badge: '429' }
+    ],
+    constraints: ['Limit is 5 requests', 'Status 429 on breach'],
+    endpoints: [
+      { id: 'ep-rl-test', method: 'GET', path: '/api/resource', summary: 'Rate limited resource', responses: [{ statusCode: 200, statusText: 'OK', description: 'Allowed' }, { statusCode: 429, statusText: 'Too Many Requests', description: 'Rate limited' }] }
+    ],
+    testCases: [
+      {
+        id: 'rl-tc1',
+        name: 'Allows requests under limit',
+        category: 'Contract',
+        description: 'Initial requests return 200 OK.',
+        endpoint: '/api/resource',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"allowed": true'
+      },
+      {
+        id: 'rl-tc2',
+        name: 'Returns 429 when quota breached',
+        category: 'Validation',
+        description: 'Exceeding 5 requests returns 429.',
+        endpoint: '/api/resource',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"allowed": true'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+
+const LIMIT = 5;
+let count = 0;
+
+app.get('/api/resource', (_req: Request, res: Response) => {
+  count++;
+  const remaining = Math.max(0, LIMIT - count);
+
+  res.setHeader('X-RateLimit-Limit', '5');
+  res.setHeader('X-RateLimit-Remaining', String(remaining));
+
+  if (count > LIMIT) {
+    res.setHeader('Retry-After', '60');
+    return res.status(429).json({ error: 'rate_limit_exceeded' });
+  }
+
+  return res.status(200).json({ allowed: true });
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"strconv"
+	"sync"
+)
+
+var (
+	reqCount = 0
+	mutex    sync.Mutex
+)
+
+func main() {
+	http.HandleFunc("/api/resource", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		mutex.Lock()
+		reqCount++
+		current := reqCount
+		mutex.Unlock()
+
+		remaining := 5 - current
+		if remaining < 0 {
+			remaining = 0
+		}
+		w.Header().Set("X-RateLimit-Limit", "5")
+		w.Header().Set("X-RateLimit-Remaining", strconv.Itoa(remaining))
+
+		if current > 5 {
+			w.Header().Set("Retry-After", "60")
+			w.WriteHeader(http.StatusTooManyRequests)
+			json.NewEncoder(w).Encode(map[string]string{"error": "rate_limit_exceeded"})
+			return
+		}
+
+		json.NewEncoder(w).Encode(map[string]bool{"allowed": true})
+	})
+
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, Response, status
+
+app = FastAPI()
+count = 0
+
+@app.get("/api/resource")
+def get_resource(response: Response):
+    global count
+    count += 1
+    remaining = max(0, 5 - count)
+    response.headers["X-RateLimit-Limit"] = "5"
+    response.headers["X-RateLimit-Remaining"] = str(remaining)
+
+    if count > 5:
+        response.headers["Retry-After"] = "60"
+        response.status_code = status.HTTP_429_TOO_MANY_REQUESTS
+        return {"error": "rate_limit_exceeded"}
+
+    return {"allowed": True}`
+    }
+  },
+
+  // ── 11. IDEMPOTENT ORDER CREATION ──
+  {
+    id: 'idempotent-order-api',
+    title: 'Idempotent Order Creation (POST Deduping)',
+    slug: 'idempotent-order-api',
+    difficulty: 'INTERMEDIATE',
+    category: 'Idempotency',
+    summary: 'Guarantee that network retries on order mutations return identical previously processed responses without duplicate charges.',
+    estimatedMinutes: 12,
+    concepts: ['Idempotency', 'REST'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement an idempotent order creation endpoint:
+
+Endpoint:
+\`POST /orders\`
+
+Headers:
+\`Idempotency-Key: <unique-client-key>\`
+
+**Behavior:**
+1. If \`Idempotency-Key\` header is missing: Return **HTTP 400 Bad Request** with \`{ "error": "missing_idempotency_key" }\`.
+2. **First Arrival**: If this key has not been seen before, create the order, assign an \`orderId\` (e.g. \`"ord_101"\`), cache the result, and return **HTTP 201 Created** with \`{ "orderId": "...", "status": "CONFIRMED", "amount": 100 }\`.
+3. **Subsequent Calls (Retries)**: If called with the SAME \`Idempotency-Key\`, return the exact same cached order response with **HTTP 200 OK** without creating a new order or mutating state.`,
+    requirements: [
+      { id: 'i1', title: 'First mutation returns 201', detail: 'Create order and return 201 Created on first arrival.', isCritical: true, badge: '201 Created' },
+      { id: 'i2', title: 'Idempotency key deduping', detail: 'Subsequent calls with identical key return 200 without creating duplicate.', isCritical: true, badge: 'Idempotency' }
+    ],
+    constraints: ['Idempotency-Key header is required', 'Identical keys return cached result'],
+    endpoints: [
+      { id: 'ep-post-orders', method: 'POST', path: '/orders', summary: 'Idempotent order placement', responses: [{ statusCode: 201, statusText: 'Created', description: 'Order created' }, { statusCode: 200, statusText: 'OK', description: 'Deduplicated duplicate' }] }
+    ],
+    testCases: [
+      {
+        id: 'i-tc1',
+        name: 'Creates order on first arrival with 201',
+        category: 'Contract',
+        description: 'POST with new idempotency key returns 201 Created.',
+        endpoint: '/orders',
+        method: 'POST',
+        requestHeaders: { 'idempotency-key': 'idemp_key_alpha' },
+        requestPayload: JSON.stringify({ item: 'mechanical_keyboard', amount: 120 }),
+        expectedStatus: 201,
+        expectedResponseSnippet: '"status": "CONFIRMED"'
+      },
+      {
+        id: 'i-tc2',
+        name: 'Deduplicates identical key retry without mutation',
+        category: 'Edge Case',
+        description: 'Retrying with same key returns 200 OK.',
+        endpoint: '/orders',
+        method: 'POST',
+        requestHeaders: { 'idempotency-key': 'idemp_key_alpha' },
+        requestPayload: JSON.stringify({ item: 'mechanical_keyboard', amount: 120 }),
+        expectedStatus: 200,
+        expectedResponseSnippet: '"status": "CONFIRMED"'
+      },
+      {
+        id: 'i-tc3',
+        name: 'Rejects request missing Idempotency-Key with 400',
+        category: 'Validation',
+        description: 'POST without header returns 400.',
+        endpoint: '/orders',
+        method: 'POST',
+        requestPayload: JSON.stringify({ item: 'mouse', amount: 40 }),
+        expectedStatus: 400,
+        expectedResponseSnippet: 'missing_idempotency_key'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+const ordersCache = new Map<string, any>();
+let nextOrderId = 100;
+
+app.post('/orders', (req: Request, res: Response) => {
+  const idempotencyKey = req.headers['idempotency-key'] as string;
+  if (!idempotencyKey) {
+    return res.status(400).json({ error: 'missing_idempotency_key' });
+  }
+
+  // Check if previously processed
+  if (ordersCache.has(idempotencyKey)) {
+    return res.status(200).json(ordersCache.get(idempotencyKey));
+  }
+
+  // Create new order
+  const order = {
+    orderId: \`ord_\${++nextOrderId}\`,
+    status: 'CONFIRMED',
+    amount: req.body.amount || 100
+  };
+
+  ordersCache.set(idempotencyKey, order);
+  return res.status(201).json(order);
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"sync"
+)
+
+var (
+	cacheLock sync.Mutex
+	cache     = make(map[string]map[string]interface{})
+	counter   = 100
+)
+
+func main() {
+	http.HandleFunc("/orders", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		key := r.Header.Get("Idempotency-Key")
+		if key == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "missing_idempotency_key"})
+			return
+		}
+
+		cacheLock.Lock()
+		defer cacheLock.Unlock()
+
+		if existing, found := cache[key]; found {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(existing)
+			return
+		}
+
+		counter++
+		order := map[string]interface{}{
+			"orderId": fmt.Sprintf("ord_%d", counter),
+			"status":  "CONFIRMED",
+			"amount":  100,
+		}
+		cache[key] = order
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(order)
+	})
+
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, Header, HTTPException, status
+from pydantic import BaseModel
+
+app = FastAPI()
+orders = {}
+counter = 100
+
+class OrderBody(BaseModel):
+    item: str
+    amount: int
+
+@app.post("/orders")
+def create_order(body: OrderBody, idempotency_key: str = Header(None)):
+    global counter
+    if not idempotency_key:
+        raise HTTPException(status_code=400, detail="missing_idempotency_key")
+    if idempotency_key in orders:
+        return orders[idempotency_key]
+
+    counter += 1
+    order = {"orderId": f"ord_{counter}", "status": "CONFIRMED", "amount": body.amount}
+    orders[idempotency_key] = order
+    return order`
+    }
+  },
+
+  // ── 12. PAGINATION & SLICING ──
+  {
+    id: 'pagination-api',
+    title: 'Pagination & Result Slicing',
+    slug: 'pagination-api',
+    difficulty: 'BEGINNER',
+    category: 'REST API',
+    summary: 'Implement offset pagination with page and limit query parameters, returning slice data and page count metadata.',
+    estimatedMinutes: 8,
+    concepts: ['REST', 'Validation'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement pagination for an items catalog:
+
+Endpoint: \`GET /items\`
+
+Query Parameters:
+- \`page\`: Integer (default \`1\`)
+- \`limit\`: Integer (default \`5\`)
+
+Dataset: Total 15 items (\`[{ id: 1, name: "Item 1" }, ..., { id: 15, name: "Item 15" }]\`).
+
+**Response Schema:**
+Return **HTTP 200 OK** with:
+\`\`\`json
+{
+  "data": [...],
+  "page": 1,
+  "limit": 5,
+  "total": 15,
+  "totalPages": 3
+}
+\`\`\``,
+    requirements: [
+      { id: 'pg1', title: 'Default pagination values', detail: 'GET /items defaults to page=1 and limit=5.', isCritical: true, badge: 'Pagination' },
+      { id: 'pg2', title: 'Metadata calculation', detail: 'Accurately compute total and totalPages.', isCritical: true, badge: 'Metadata' }
+    ],
+    constraints: ['Items sliced correctly based on (page - 1) * limit', 'Status 200 OK'],
+    endpoints: [
+      { id: 'ep-get-items', method: 'GET', path: '/items', summary: 'Paginated item list', responses: [{ statusCode: 200, statusText: 'OK', description: 'Item slice' }] }
+    ],
+    testCases: [
+      {
+        id: 'pg-tc1',
+        name: 'Returns first page with 5 items by default',
+        category: 'Contract',
+        description: 'GET /items returns page 1 with 5 items.',
+        endpoint: '/items',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"total": 15'
+      },
+      {
+        id: 'pg-tc2',
+        name: 'Returns second page slice',
+        category: 'Contract',
+        description: 'GET /items?page=2&limit=5 returns page 2 items.',
+        endpoint: '/items?page=2&limit=5',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"page": 2'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+
+const ALL_ITEMS = Array.from({ length: 15 }, (_, i) => ({
+  id: i + 1,
+  name: \`Item \${i + 1}\`
+}));
+
+app.get('/items', (req: Request, res: Response) => {
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.max(1, parseInt(req.query.limit as string) || 5);
+
+  const start = (page - 1) * limit;
+  const slice = ALL_ITEMS.slice(start, start + limit);
+  const totalPages = Math.ceil(ALL_ITEMS.length / limit);
+
+  return res.status(200).json({
+    data: slice,
+    page,
+    limit,
+    total: ALL_ITEMS.length,
+    totalPages
+  });
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strconv"
+)
+
+type Item struct {
+	ID   int    \`json:"id"\`
+	Name string \`json:"name"\`
+}
+
+func main() {
+	items := make([]Item, 15)
+	for i := range items {
+		items[i] = Item{ID: i + 1, Name: fmt.Sprintf("Item %d", i+1)}
+	}
+
+	http.HandleFunc("/items", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+		if page < 1 {
+			page = 1
+		}
+		limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+		if limit < 1 {
+			limit = 5
+		}
+
+		start := (page - 1) * limit
+		end := start + limit
+		if start > len(items) {
+			start = len(items)
+		}
+		if end > len(items) {
+			end = len(items)
+		}
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"data":       items[start:end],
+			"page":       page,
+			"limit":      limit,
+			"total":      len(items),
+			"totalPages": 3,
+		})
+	})
+
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI
+
+app = FastAPI()
+items = [{"id": i, "name": f"Item {i}"} for i in range(1, 16)]
+
+@app.get("/items")
+def get_items(page: int = 1, limit: int = 5):
+    start = (page - 1) * limit
+    return {
+        "data": items[start:start+limit],
+        "page": page,
+        "limit": limit,
+        "total": len(items),
+        "totalPages": 3
+    }`
+    }
+  },
+
+  // ── 13. WEBHOOK RECEIVER ──
+  {
+    id: 'webhook-dispatcher',
+    title: 'Inbound Webhook Event Processor',
+    slug: 'webhook-dispatcher',
+    difficulty: 'BEGINNER',
+    category: 'Webhooks & Events',
+    summary: 'Receive and validate third-party webhook payloads, acknowledging with 200 OK or rejecting unsupported events with 400 Bad Request.',
+    estimatedMinutes: 8,
+    concepts: ['Webhooks', 'HTTP'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement an inbound webhook endpoint for third-party notifications:
+
+Endpoint:
+\`POST /webhooks/orders\`
+
+**Expected Payload:**
+\`\`\`json
+{
+  "event": "order.paid",
+  "data": { "orderId": "ord_101", "amount": 500 }
+}
+\`\`\`
+
+**Behavior:**
+1. If \`event\` property is missing: Return **HTTP 400 Bad Request** with \`{ "error": "missing_event" }\`.
+2. Supported events: \`"order.paid"\` and \`"order.cancelled"\`.
+   - If event is supported: Return **HTTP 200 OK** with \`{ "received": true, "event": "<event_name>" }\`.
+3. If \`event\` is any other unrecognized string: Return **HTTP 400 Bad Request** with \`{ "error": "unsupported_event" }\`.`,
+    requirements: [
+      { id: 'w1', title: 'Acknowledge supported events', detail: 'Return 200 OK with received: true.', isCritical: true, badge: 'Webhooks' },
+      { id: 'w2', title: 'Reject unsupported event types', detail: 'Return 400 Bad Request with error: unsupported_event.', isCritical: true, badge: 'Validation' }
+    ],
+    constraints: ['Supported events are order.paid and order.cancelled', 'Content-Type must be application/json'],
+    endpoints: [
+      { id: 'ep-webhooks-orders', method: 'POST', path: '/webhooks/orders', summary: 'Webhook endpoint', responses: [{ statusCode: 200, statusText: 'OK', description: 'Acknowledged' }, { statusCode: 400, statusText: 'Bad Request', description: 'Rejected' }] }
+    ],
+    testCases: [
+      {
+        id: 'w-tc1',
+        name: 'Acknowledges valid order.paid event',
+        category: 'Contract',
+        description: 'POST with order.paid returns 200 OK with received true.',
+        endpoint: '/webhooks/orders',
+        method: 'POST',
+        requestPayload: JSON.stringify({ event: 'order.paid', data: { orderId: 'ord_101', amount: 500 } }),
+        expectedStatus: 200,
+        expectedResponseSnippet: '"received": true'
+      },
+      {
+        id: 'w-tc2',
+        name: 'Rejects unknown event type with 400 Bad Request',
+        category: 'Validation',
+        description: 'POST with unknown.event returns 400.',
+        endpoint: '/webhooks/orders',
+        method: 'POST',
+        requestPayload: JSON.stringify({ event: 'customer.created' }),
+        expectedStatus: 400,
+        expectedResponseSnippet: 'unsupported_event'
+      },
+      {
+        id: 'w-tc3',
+        name: 'Rejects missing event property [Hidden]',
+        category: 'Edge Case',
+        description: 'POST without event returns 400.',
+        endpoint: '/webhooks/orders',
+        method: 'POST',
+        isHidden: true,
+        requestPayload: JSON.stringify({ data: {} }),
+        expectedStatus: 400,
+        expectedResponseSnippet: 'missing_event'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+const SUPPORTED_EVENTS = new Set(['order.paid', 'order.cancelled']);
+
+app.post('/webhooks/orders', (req: Request, res: Response) => {
+  const { event } = req.body;
+  if (!event) {
+    return res.status(400).json({ error: 'missing_event' });
+  }
+
+  if (!SUPPORTED_EVENTS.has(event)) {
+    return res.status(400).json({ error: 'unsupported_event' });
+  }
+
+  return res.status(200).json({ received: true, event });
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"net/http"
+)
+
+func main() {
+	http.HandleFunc("/webhooks/orders", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var body struct{ Event string }
+		json.NewDecoder(r.Body).Decode(&body)
+
+		if body.Event == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "missing_event"})
+			return
+		}
+
+		if body.Event != "order.paid" && body.Event != "order.cancelled" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "unsupported_event"})
+			return
+		}
+
+		json.NewEncoder(w).Encode(map[string]interface{}{"received": true, "event": body.Event})
+	})
+
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class WebhookPayload(BaseModel):
+    event: str = None
+    data: dict = {}
+
+@app.post("/webhooks/orders")
+def process_webhook(payload: WebhookPayload):
+    if not payload.event:
+        raise HTTPException(status_code=400, detail="missing_event")
+    if payload.event not in ["order.paid", "order.cancelled"]:
+        raise HTTPException(status_code=400, detail="unsupported_event")
+    return {"received": True, "event": payload.event}`
+    }
+  },
+
+  // ── 14. INVENTORY STOCK CONCURRENCY ──
+  {
+    id: 'atomic-counter-api',
+    title: 'Inventory Stock Decrement & Concurrency',
+    slug: 'atomic-counter-api',
+    difficulty: 'INTERMEDIATE',
+    category: 'Concurrency Safety',
+    summary: 'Prevent negative inventory counts by safely decrementing stock and returning 409 Conflict when out of stock.',
+    estimatedMinutes: 10,
+    concepts: ['Concurrency', 'Database'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement an inventory management endpoint that safeguards against overselling:
+
+Initial Stock: **10 units**
+
+Endpoints:
+1. \`GET /inventory/stock\` &mdash; Returns current stock: \`{ "stock": <count> }\`.
+2. \`POST /inventory/decrement\` &mdash; Body: \`{ "quantity": 1 }\` (default to 1 if not passed).
+   - If \`stock >= quantity\`: Decrement stock and return **HTTP 200 OK** with \`{ "success": true, "remainingStock": <new_stock> }\`.
+   - If \`stock < quantity\`: Do not decrement. Return **HTTP 409 Conflict** with \`{ "error": "insufficient_stock", "remainingStock": <current_stock> }\`.`,
+    requirements: [
+      { id: 'c1', title: 'Safe decrement', detail: 'Reduce stock by requested amount and return 200 OK.', isCritical: true, badge: 'Stock' },
+      { id: 'c2', title: 'Prevent negative inventory', detail: 'Return 409 Conflict when requested quantity exceeds available stock.', isCritical: true, badge: '409 Conflict' }
+    ],
+    constraints: ['Stock cannot drop below zero', 'Status 409 Conflict on overdraft'],
+    endpoints: [
+      { id: 'ep-get-stock', method: 'GET', path: '/inventory/stock', summary: 'Check stock', responses: [{ statusCode: 200, statusText: 'OK', description: 'Stock' }] },
+      { id: 'ep-post-decrement', method: 'POST', path: '/inventory/decrement', summary: 'Decrement stock', responses: [{ statusCode: 200, statusText: 'OK', description: 'Reduced' }, { statusCode: 409, statusText: 'Conflict', description: 'Insufficient' }] }
+    ],
+    testCases: [
+      {
+        id: 'c-tc1',
+        name: 'Checks initial stock level',
+        category: 'Contract',
+        description: 'GET /inventory/stock returns 10.',
+        endpoint: '/inventory/stock',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"stock": 10'
+      },
+      {
+        id: 'c-tc2',
+        name: 'Successfully decrements stock',
+        category: 'Contract',
+        description: 'POST /inventory/decrement with quantity 2 returns 200 and remaining 8.',
+        endpoint: '/inventory/decrement',
+        method: 'POST',
+        requestPayload: JSON.stringify({ quantity: 2 }),
+        expectedStatus: 200,
+        expectedResponseSnippet: '"remainingStock": 8'
+      },
+      {
+        id: 'c-tc3',
+        name: 'Rejects decrement exceeding available stock with 409',
+        category: 'Validation',
+        description: 'Requesting quantity 20 returns 409 Conflict.',
+        endpoint: '/inventory/decrement',
+        method: 'POST',
+        requestPayload: JSON.stringify({ quantity: 20 }),
+        expectedStatus: 409,
+        expectedResponseSnippet: 'insufficient_stock'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+let currentStock = 10;
+
+app.get('/inventory/stock', (_req: Request, res: Response) => {
+  return res.status(200).json({ stock: currentStock });
+});
+
+app.post('/inventory/decrement', (req: Request, res: Response) => {
+  const quantity = Number(req.body?.quantity) || 1;
+
+  if (currentStock < quantity) {
+    return res.status(409).json({
+      error: 'insufficient_stock',
+      remainingStock: currentStock
+    });
+  }
+
+  currentStock -= quantity;
+  return res.status(200).json({
+    success: true,
+    remainingStock: currentStock
+  });
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"sync"
+)
+
+var (
+	stockLock sync.Mutex
+	stock     = 10
+)
+
+func main() {
+	http.HandleFunc("/inventory/stock", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		stockLock.Lock()
+		defer stockLock.Unlock()
+		json.NewEncoder(w).Encode(map[string]int{"stock": stock})
+	})
+
+	http.HandleFunc("/inventory/decrement", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var body struct{ Quantity int }
+		json.NewDecoder(r.Body).Decode(&body)
+		qty := body.Quantity
+		if qty < 1 {
+			qty = 1
+		}
+
+		stockLock.Lock()
+		defer stockLock.Unlock()
+
+		if stock < qty {
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(map[string]interface{}{"error": "insufficient_stock", "remainingStock": stock})
+			return
+		}
+
+		stock -= qty
+		json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "remainingStock": stock})
+	})
+
+	http.ListenAndServe(":8000", nil)
+}`,
+      python: `from fastapi import FastAPI, HTTPException
+
+app = FastAPI()
+stock = 10
+
+@app.get("/inventory/stock")
+def get_stock():
+    return {"stock": stock}
+
+@app.post("/inventory/decrement")
+def decrement_stock(data: dict = {}):
+    global stock
+    qty = data.get("quantity", 1)
+    if stock < qty:
+        raise HTTPException(status_code=409, detail={"error": "insufficient_stock", "remainingStock": stock})
+    stock -= qty
+    return {"success": True, "remainingStock": stock}`
+    }
+  },
+
+  // ── 15. ASYNC QUEUE & STATUS POLLING ──
+  {
+    id: 'job-queue-worker',
+    title: 'Async Job Ticket & Status Checker',
+    slug: 'job-queue-worker',
+    difficulty: 'INTERMEDIATE',
+    category: 'Async Job Queue',
+    summary: 'Acknowledge background tasks immediately with HTTP 202 Accepted and allow clients to poll task status by ticket ID.',
+    estimatedMinutes: 10,
+    concepts: ['Queues', 'REST'],
+    status: 'UNSOLVED',
+    problemStatement: `Implement an asynchronous job queue dispatcher:
+
+Endpoints:
+1. \`POST /jobs/submit\` &mdash; Body: \`{ "type": "resize_image", "payload": { "file": "avatar.png" } }\`.
+   - Generates a unique \`jobId\` (e.g. \`"job_101"\`).
+   - Returns **HTTP 202 Accepted** with \`{ "jobId": "...", "status": "QUEUED" }\`.
+2. \`GET /jobs/:id\` &mdash;
+   - If \`jobId\` exists: Return **HTTP 200 OK** with \`{ "jobId": "...", "status": "QUEUED" }\`.
+   - If \`jobId\` not found: Return **HTTP 404 Not Found** with \`{ "error": "job_not_found" }\`.`,
+    requirements: [
+      { id: 'q1', title: 'POST /jobs/submit returns 202 Accepted', detail: 'Acknowledge async workload with 202 status code and jobId.', isCritical: true, badge: '202 Accepted' },
+      { id: 'q2', title: 'GET /jobs/:id status polling', detail: 'Return 200 with job status or 404 for unknown job ID.', isCritical: true, badge: 'Polling' }
+    ],
+    constraints: ['POST must return HTTP 202 Accepted', 'Unknown job IDs return 404'],
+    endpoints: [
+      { id: 'ep-job-submit', method: 'POST', path: '/jobs/submit', summary: 'Enqueue async job', responses: [{ statusCode: 202, statusText: 'Accepted', description: 'Queued' }] },
+      { id: 'ep-job-status', method: 'GET', path: '/jobs/:id', summary: 'Poll job status', responses: [{ statusCode: 200, statusText: 'OK', description: 'Found' }, { statusCode: 404, statusText: 'Not Found', description: 'Missing' }] }
+    ],
+    testCases: [
+      {
+        id: 'q-tc1',
+        name: 'Returns 202 Accepted with job ticket',
+        category: 'Contract',
+        description: 'POST /jobs/submit yields 202 Accepted and jobId.',
+        endpoint: '/jobs/submit',
+        method: 'POST',
+        requestPayload: JSON.stringify({ type: 'export_csv' }),
+        expectedStatus: 202,
+        expectedResponseSnippet: '"status": "QUEUED"'
+      },
+      {
+        id: 'q-tc2',
+        name: 'Polls job status by ticket ID',
+        category: 'Contract',
+        description: 'GET /jobs/demo_ticket_42 returns 200 OK.',
+        endpoint: '/jobs/demo_ticket_42',
+        method: 'GET',
+        expectedStatus: 200,
+        expectedResponseSnippet: '"status": "QUEUED"'
+      },
+      {
+        id: 'q-tc3',
+        name: 'Returns 404 for unknown job ticket [Hidden]',
+        category: 'Edge Case',
+        description: 'GET /jobs/non_existent_job returns 404 Not Found.',
+        endpoint: '/jobs/non_existent_job',
+        method: 'GET',
+        isHidden: true,
+        expectedStatus: 404,
+        expectedResponseSnippet: 'job_not_found'
+      }
+    ],
+    starterCode: {
+      nodejs: `import express, { Request, Response } from 'express';
+
+const app = express();
+app.use(express.json());
+
+interface Job {
+  jobId: string;
+  status: 'QUEUED' | 'PROCESSING' | 'COMPLETED';
+}
+
+const jobs = new Map<string, Job>();
+// Seed demo ticket
+jobs.set('demo_ticket_42', { jobId: 'demo_ticket_42', status: 'QUEUED' });
+let nextJobNum = 100;
+
+app.post('/jobs/submit', (_req: Request, res: Response) => {
+  const jobId = \`job_\${++nextJobNum}\`;
+  const job: Job = { jobId, status: 'QUEUED' };
+  jobs.set(jobId, job);
+
+  return res.status(202).json(job);
+});
+
+app.get('/jobs/:id', (req: Request, res: Response) => {
+  const job = jobs.get(req.params.id);
+  if (!job) {
+    return res.status(404).json({ error: 'job_not_found' });
+  }
+  return res.status(200).json(job);
+});
+
+export default app;`,
+      go: `package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strings"
+	"sync"
+)
+
+var (
+	jobLock sync.Mutex
+	jobs    = map[string]string{
+		"demo_ticket_42": "QUEUED",
+	}
+	nextNum = 100
+)
+
+func main() {
+	http.HandleFunc("/jobs/submit", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		jobLock.Lock()
+		nextNum++
+		jobID := fmt.Sprintf("job_%d", nextNum)
+		jobs[jobID] = "QUEUED"
+		jobLock.Unlock()
+
+		w.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(w).Encode(map[string]string{"jobId": jobID, "status": "QUEUED"})
+	})
+
+	http.HandleFunc("/jobs/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		id := strings.TrimPrefix(r.URL.Path, "/jobs/")
+
+		jobLock.Lock()
+		status, exists := jobs[id]
+		jobLock.Unlock()
+
+		if !exists {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]string{"error": "job_not_found"})
+			return
+		}
+
+		json.NewEncoder(w).Encode(map[string]string{"jobId": id, "status": status})
+	})
+
 	http.ListenAndServe(":8000", nil)
 }`,
       python: `from fastapi import FastAPI, HTTPException, status
-from fastapi.responses import RedirectResponse
-from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime
-import secrets
-
-app = FastAPI(title="URL Shortener API")
-
-class ShortenRequest(BaseModel):
-    url: str
-    customAlias: Optional[str] = None
-
-url_db = {}
-
-@app.post("/shorten", status_code=status.HTTP_201_CREATED)
-def shorten_url(payload: ShortenRequest):
-    # TODO: Implement URL shortening logic
-    raise HTTPException(status_code=501, detail={"error": "not_implemented"})
-`
-    }
-  },
-  {
-    id: 'request-logger',
-    title: 'Request Logger Middleware',
-    slug: 'request-logger',
-    difficulty: 'BEGINNER',
-    category: 'Middleware',
-    summary: 'Build middleware that records incoming API requests, attaches trace headers, and computes execution time.',
-    estimatedMinutes: 20,
-    concepts: ['HTTP', 'Middleware'],
-    status: 'UNSOLVED',
-    problemStatement: 'Construct a robust HTTP logging middleware pipeline. Every incoming request must be stamped with a correlation ID (UUIDv4) and measured for wall-clock latency.',
-    requirements: [
-      { id: 'l1', title: 'Inject X-Request-Id header', detail: 'If incoming request lacks X-Request-Id, generate UUIDv4. Propagate to all responses.', isCritical: true, badge: 'HTTP' },
-      { id: 'l2', title: 'Execution time measurement', detail: 'Measure duration in ms and set in X-Response-Time header.', isCritical: true, badge: 'Middleware' }
-    ],
-    constraints: ['Do not buffer large request bodies in memory', 'Preserve existing client trace IDs'],
-    endpoints: [
-      {
-        id: 'ep-log-all',
-        method: 'GET',
-        path: '/api/v1/ping',
-        summary: 'Probe endpoint with middleware active',
-        responses: [
-          { statusCode: 200, statusText: 'OK', description: 'Returns pong with headers', headers: { 'X-Request-Id': 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'X-Response-Time': '3.8ms' } }
-        ]
-      }
-    ],
-    testCases: [
-      { id: 'l-tc1', name: 'Generates X-Request-Id when omitted', category: 'Contract', description: 'Stamps valid UUIDv4 on outgoing headers.', endpoint: '/api/v1/ping', method: 'GET', expectedStatus: 200 },
-      { id: 'l-tc2', name: 'Preserves existing client trace ID', category: 'Edge Case', description: 'Echoes inbound X-Request-ID unaltered.', endpoint: '/api/v1/ping', method: 'GET', expectedStatus: 200 }
-    ],
-    starterCode: {
-      nodejs: `import express, { Request, Response, NextFunction } from 'express';
-import crypto from 'crypto';
-
-const app = express();
-app.use(express.json());
-
-// TODO: Implement Request Logger Middleware
-// - If incoming request has 'x-request-id' header, preserve it; otherwise generate UUIDv4.
-// - Attach 'x-request-id' header to response.
-// - Measure execution duration and attach 'x-response-time' header in ms.
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const reqId = req.headers['x-request-id'] || crypto.randomUUID();
-  res.setHeader('x-request-id', reqId);
-  next();
-});
-
-app.get('/api/v1/ping', (req: Request, res: Response) => {
-  return res.status(200).json({ status: 'pong' });
-});
-
-export default app;`,
-      go: `package main
-
-import "net/http"
-
-func main() {
-	// TODO: Implement request logger middleware in Go
-	http.ListenAndServe(":8000", nil)
-}`,
-      python: `from fastapi import FastAPI, Request
-import time, uuid
 
 app = FastAPI()
+jobs = {"demo_ticket_42": "QUEUED"}
+counter = 100
 
-# TODO: Implement request logger middleware in FastAPI
-`
-    }
-  },
-  {
-    id: 'rate-limiter',
-    title: 'Sliding Window Rate Limiter',
-    slug: 'rate-limiter',
-    difficulty: 'INTERMEDIATE',
-    category: 'Infrastructure',
-    summary: 'Implement a distributed sliding-window rate limiter with Redis and standard HTTP rate limit headers.',
-    estimatedMinutes: 45,
-    concepts: ['Redis', 'HTTP', 'Concurrency', 'Rate Limiting'],
-    status: 'IN_PROGRESS',
-    problemStatement: 'Protect downstream APIs from abuse by building a precise sliding-window rate limiter using Redis sorted sets (ZSET + Lua). Enforce a maximum of 60 req/min per IP. Reject excess with 429 Too Many Requests and Retry-After.',
-    requirements: [
-      { id: 'rl1', title: 'Standard Header compliance', detail: 'Returns X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset.', isCritical: true, badge: 'HTTP' },
-      { id: 'rl2', title: '429 rejection & Retry-After', detail: 'Exceeding quota yields 429 with Retry-After in seconds.', isCritical: true, badge: 'Rate Limiting' },
-      { id: 'rl3', title: 'Atomic Redis evaluation', detail: 'Sliding log evaluation must avoid concurrency race conditions.', isCritical: true, badge: 'Concurrency' }
-    ],
-    constraints: ['Sliding window within 100ms precision', 'Auto-purge expired Redis timestamps'],
-    endpoints: [
-      {
-        id: 'ep-rl-test',
-        method: 'GET',
-        path: '/api/resource',
-        summary: 'Protected resource',
-        responses: [
-          { statusCode: 200, statusText: 'OK', description: 'Allowed' },
-          { statusCode: 429, statusText: 'Too Many Requests', description: 'Quota exhausted', headers: { 'Retry-After': '18', 'X-RateLimit-Remaining': '0' } }
-        ]
-      }
-    ],
-    testCases: [
-      { id: 'rl-tc1', name: 'Allows requests under limit', category: 'Contract', description: 'Decrements X-RateLimit-Remaining.', endpoint: '/api/resource', method: 'GET', expectedStatus: 200 },
-      { id: 'rl-tc2', name: 'Returns 429 when 60-request quota breached', category: 'Validation', description: 'Rejects with 429 on excess.', endpoint: '/api/resource', method: 'GET', expectedStatus: 429 },
-      { id: 'rl-tc3', name: 'Parallel concurrency race condition safety [Hidden]', category: 'Concurrency', description: '50 simultaneous requests test.', endpoint: '/api/resource', method: 'GET', isHidden: true, expectedStatus: 200 }
-    ],
-    starterCode: {
-      nodejs: `import express, { Request, Response, NextFunction } from 'express';
+@app.post("/jobs/submit", status_code=status.HTTP_202_ACCEPTED)
+def submit_job():
+    global counter
+    counter += 1
+    job_id = f"job_{counter}"
+    jobs[job_id] = "QUEUED"
+    return {"jobId": job_id, "status": "QUEUED"}
 
-const app = express();
-app.use(express.json());
-
-const requestLogs = new Map<string, number[]>();
-const LIMIT = 60;
-const WINDOW_MS = 60000;
-
-// TODO: Implement sliding window rate limiter
-app.get('/api/resource', (req: Request, res: Response) => {
-  return res.status(200).json({ data: 'Resource payload' });
-});
-
-export default app;`,
-      go: `package main
-
-import "net/http"
-
-func main() {
-	// TODO: Implement rate limiter in Go
-	http.ListenAndServe(":8000", nil)
-}`,
-      python: `from fastapi import FastAPI
-app = FastAPI()
-# TODO: Implement rate limiter in FastAPI
-`
-    }
-  },
-  {
-    id: 'idempotent-payment-webhook',
-    title: 'Idempotent Payment Webhook',
-    slug: 'idempotent-payment-webhook',
-    difficulty: 'INTERMEDIATE',
-    category: 'Webhooks',
-    summary: 'Build a rock-solid webhook receiver that guarantees exactly-once payment processing despite retries.',
-    estimatedMinutes: 40,
-    concepts: ['Idempotency', 'Database', 'Webhooks', 'Security'],
-    status: 'UNSOLVED',
-    problemStatement: 'Payment gateways like Stripe frequently retry failed webhooks. Prevent double-charging using event deduplication and HMAC-SHA256 signature verification.',
-    requirements: [
-      { id: 'p1', title: 'HMAC-SHA256 Signature Verification', detail: 'Verify Stripe-Signature header. Reject bad signatures with 401 Unauthorized.', isCritical: true, badge: 'Security' },
-      { id: 'p2', title: 'Event ID deduplication', detail: 'Subsequent calls with same event_id must return 200 OK without double-crediting balance.', isCritical: true, badge: 'Idempotency' }
-    ],
-    constraints: ['Parallel webhooks must not race on user balance', 'Respond within 200ms'],
-    endpoints: [
-      {
-        id: 'ep-pay-webhook',
-        method: 'POST',
-        path: '/webhooks/stripe',
-        summary: 'Receive payment events',
-        requestBody: {
-          contentType: 'application/json',
-          exampleJson: JSON.stringify({ id: 'evt_101', type: 'payment_intent.succeeded', data: { amount: 5000 } }, null, 2),
-          fields: [{ name: 'id', type: 'string', required: true, description: 'Unique event id' }]
-        },
-        responses: [
-          { statusCode: 200, statusText: 'OK', description: 'Acknowledged', exampleJson: JSON.stringify({ received: true, status: 'processed' }, null, 2) },
-          { statusCode: 401, statusText: 'Unauthorized', description: 'Invalid signature' }
-        ]
-      }
-    ],
-    testCases: [
-      { id: 'p-tc1', name: 'Credits account on first arrival', category: 'Contract', description: 'New payment event acknowledges with 200.', endpoint: '/webhooks/stripe', method: 'POST', expectedStatus: 200 },
-      { id: 'p-tc2', name: 'Deduplicates identical event without mutation', category: 'Edge Case', description: 'Retried webhook returns 200 without double-crediting.', endpoint: '/webhooks/stripe', method: 'POST', expectedStatus: 200 }
-    ],
-    starterCode: {
-      nodejs: `import express, { Request, Response } from 'express';
-
-const app = express();
-app.use(express.json());
-
-const processedEvents = new Set<string>();
-
-// TODO: Implement POST /webhooks/stripe
-// - Validate event ID
-// - Deduplicate: return 200 without double-crediting
-app.post('/webhooks/stripe', (req: Request, res: Response) => {
-  const { id } = req.body;
-  if (!id) return res.status(400).json({ error: 'missing_event_id' });
-  processedEvents.add(id);
-  return res.status(200).json({ received: true, status: 'processed' });
-});
-
-export default app;`,
-      go: `package main
-import "net/http"
-func main() { http.ListenAndServe(":8000", nil) }`,
-      python: `from fastapi import FastAPI
-app = FastAPI()`
-    }
-  },
-  {
-    id: 'jwt-auth-refresh',
-    title: 'JWT Authentication & Refresh Flow',
-    slug: 'jwt-auth-refresh',
-    difficulty: 'INTERMEDIATE',
-    category: 'Security',
-    summary: 'Implement short-lived access tokens, sliding refresh token rotation, and token revocation.',
-    estimatedMinutes: 35,
-    concepts: ['Auth', 'Security', 'HTTP'],
-    status: 'UNSOLVED',
-    problemStatement: 'Implement secure JWT authentication with 15-minute accessToken and single-use rotating refreshTokens.',
-    requirements: [
-      { id: 'j1', title: 'POST /auth/login credentials exchange', detail: 'Valid credentials yield accessToken (JWT) and refreshToken (UUIDv4).', isCritical: true, badge: 'Auth' },
-      { id: 'j2', title: 'Refresh Token Rotation', detail: 'Using refreshToken invalidates it and issues new pair.', isCritical: true, badge: 'Security' }
-    ],
-    constraints: ['Bearer authentication header parsing', 'Revoke entire family on token reuse'],
-    endpoints: [
-      {
-        id: 'ep-auth-login',
-        method: 'POST',
-        path: '/auth/login',
-        summary: 'Authenticate with credentials',
-        responses: [
-          { statusCode: 200, statusText: 'OK', description: 'Tokens issued', exampleJson: JSON.stringify({ accessToken: 'eyJhbGciOiJIUzI2NiIsInR5cCI6IkpXVCJ9...', refreshToken: '8f411b0e-2d33-4f9e-a89a-ec269e8b704c' }, null, 2) }
-        ]
-      }
-    ],
-    testCases: [
-      { id: 'j-tc1', name: 'Issues JWT pair on valid credentials', category: 'Contract', description: 'POST /auth/login yields accessToken.', endpoint: '/auth/login', method: 'POST', expectedStatus: 200 },
-      { id: 'j-tc2', name: 'Rejects invalid password with 401', category: 'Validation', description: 'Incorrect password returns 401 Unauthorized.', endpoint: '/auth/login', method: 'POST', expectedStatus: 401 }
-    ],
-    starterCode: {
-      nodejs: `import express, { Request, Response } from 'express';
-import crypto from 'crypto';
-
-const app = express();
-app.use(express.json());
-
-// TODO: Implement POST /auth/login
-app.post('/auth/login', (req: Request, res: Response) => {
-  // Validate credentials and issue tokens
-  return res.status(501).json({ error: 'not_implemented' });
-});
-
-export default app;`,
-      go: `package main
-import "net/http"
-func main() { http.ListenAndServe(":8000", nil) }`,
-      python: `from fastapi import FastAPI
-app = FastAPI()`
-    }
-  },
-  {
-    id: 'in-memory-kv-ttl',
-    title: 'In-Memory Key-Value Store with TTL',
-    slug: 'in-memory-kv-ttl',
-    difficulty: 'INTERMEDIATE',
-    category: 'Infrastructure',
-    summary: 'Build an in-memory key-value engine with Millisecond TTL expirations and O(1) lookups.',
-    estimatedMinutes: 35,
-    concepts: ['Cache', 'Concurrency', 'HTTP'],
-    status: 'UNSOLVED',
-    problemStatement: 'Create a lightweight in-memory cache engine with expiration semantics similar to Redis. Support millisecond TTL and active eviction sweeps.',
-    requirements: [
-      { id: 'kv1', title: 'POST /kv/set with optional ttl_ms', detail: 'Stores key-value. Expired keys return 404 after elapsed duration.', isCritical: true, badge: 'Cache' },
-      { id: 'kv2', title: 'GET /kv/get/:key retrieval', detail: 'Returns value or 404 if expired.', isCritical: true, badge: 'HTTP' }
-    ],
-    constraints: ['Key lookups must be O(1)', 'Active and passive sweep policies'],
-    endpoints: [
-      {
-        id: 'ep-kv-set',
-        method: 'POST',
-        path: '/kv/set',
-        summary: 'Set key-value',
-        responses: [{ statusCode: 200, statusText: 'OK', description: 'Key saved' }]
-      }
-    ],
-    testCases: [
-      { id: 'kv-tc1', name: 'Sets and retrieves value', category: 'Contract', description: 'POST then GET returns matching value.', endpoint: '/kv/get/session_89', method: 'GET', expectedStatus: 200 },
-      { id: 'kv-tc2', name: 'Key expires after TTL elapsed', category: 'Edge Case', description: 'Returns 404 after TTL expires.', endpoint: '/kv/get/session_89', method: 'GET', expectedStatus: 404 }
-    ],
-    starterCode: {
-      nodejs: `import express, { Request, Response } from 'express';
-
-const app = express();
-app.use(express.json());
-
-const store = new Map<string, { value: any; expiresAt?: number }>();
-
-// TODO 1: Implement POST /kv/set
-app.post('/kv/set', (req: Request, res: Response) => {
-  return res.status(501).json({ error: 'not_implemented' });
-});
-
-// TODO 2: Implement GET /kv/get/:key
-app.get('/kv/get/:key', (req: Request, res: Response) => {
-  return res.status(501).json({ error: 'not_implemented' });
-});
-
-export default app;`,
-      go: `package main
-import "net/http"
-func main() { http.ListenAndServe(":8000", nil) }`,
-      python: `from fastapi import FastAPI
-app = FastAPI()`
-    }
-  },
-  {
-    id: 'job-queue-worker',
-    title: 'Distributed Job Queue Worker API',
-    slug: 'job-queue-worker',
-    difficulty: 'ADVANCED',
-    category: 'Distributed Systems',
-    summary: 'Build an asynchronous job processing system with retry backoff, dead-letter queues, and status polling.',
-    estimatedMinutes: 50,
-    concepts: ['Queues', 'Redis', 'Concurrency', 'Database'],
-    status: 'UNSOLVED',
-    problemStatement: 'Design an asynchronous background job dispatch API with DLQ retry failover and priority scheduling.',
-    requirements: [
-      { id: 'q1', title: 'POST /jobs/enqueue dispatch', detail: 'Returns 202 Accepted with jobId and QUEUED status.', isCritical: true, badge: 'Queues' },
-      { id: 'q2', title: 'Dead Letter Queue (DLQ) routing', detail: 'After 3 consecutive failures, transition to DEAD_LETTER.', isCritical: true, badge: 'Distributed Systems' }
-    ],
-    constraints: ['Visibility timeout locks', 'Support Priority queues'],
-    endpoints: [
-      {
-        id: 'ep-job-enqueue',
-        method: 'POST',
-        path: '/jobs/enqueue',
-        summary: 'Enqueue async workload',
-        responses: [
-          { statusCode: 202, statusText: 'Accepted', description: 'Job queued', exampleJson: JSON.stringify({ jobId: 'job_98x2', status: 'QUEUED' }, null, 2) }
-        ]
-      }
-    ],
-    testCases: [
-      { id: 'q-tc1', name: 'Returns 202 Accepted with job ticket', category: 'Contract', description: 'Acknowledges queued workload.', endpoint: '/jobs/enqueue', method: 'POST', expectedStatus: 202 },
-      { id: 'q-tc2', name: 'Moves to DEAD_LETTER after 3 failed retries [Hidden]', category: 'Edge Case', description: 'Verifies DLQ quarantine.', endpoint: '/jobs/job_fail/status', method: 'GET', isHidden: true, expectedStatus: 200 }
-    ],
-    starterCode: {
-      nodejs: `import express, { Request, Response } from 'express';
-import crypto from 'crypto';
-
-const app = express();
-app.use(express.json());
-
-// TODO 1: Implement POST /jobs/enqueue
-app.post('/jobs/enqueue', (req: Request, res: Response) => {
-  return res.status(501).json({ error: 'not_implemented' });
-});
-
-// TODO 2: Implement GET /jobs/:jobId/status
-app.get('/jobs/:jobId/status', (req: Request, res: Response) => {
-  return res.status(501).json({ error: 'not_implemented' });
-});
-
-export default app;`,
-      go: `package main
-import "net/http"
-func main() { http.ListenAndServe(":8000", nil) }`,
-      python: `from fastapi import FastAPI
-app = FastAPI()`
+@app.get("/jobs/{job_id}")
+def get_job(job_id: str):
+    if job_id not in jobs:
+        raise HTTPException(status_code=404, detail="job_not_found")
+    return {"jobId": job_id, "status": jobs[job_id]}`
     }
   }
 ];
