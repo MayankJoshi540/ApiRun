@@ -17,13 +17,11 @@ import { DifficultyBadge } from './DifficultyBadge';
 import { 
   CheckCircle2, 
   BookOpen,
-  ListChecks,
-  FileCode2,
   Tag,
   Lightbulb,
   Unlock
 } from '@/components/ui/GoogleIcon';
-import { runChallengeTests } from '../utils/challengeRunner';
+import { runChallengeTests, RunTestOutput } from '../utils/challengeRunner';
 
 interface Props {
   challenge: Challenge;
@@ -43,7 +41,6 @@ export const ChallengeDetailView: React.FC<Props> = ({
   const router = useRouter();
   const { user } = useAuth();
   const [serverUrl, setServerUrl] = useState('http://localhost:8000');
-  const [leftTab, setLeftTab] = useState<'DESCRIPTION' | 'REQUIREMENTS' | 'SCAFFOLD'>('DESCRIPTION');
 
   // ── 2-Axis Resizable Layout State ──
   const [leftWidthPercent, setLeftWidthPercent] = useState<number>(() => {
@@ -67,7 +64,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
   });
 
   const [isConsoleCollapsed, setIsConsoleCollapsed] = useState(false);
-  const [activeConsoleTab, setActiveConsoleTab] = useState<'testcase' | 'result'>('testcase');
+  const [activeConsoleTab, setActiveConsoleTab] = useState<'testcase' | 'result' | 'playground'>('testcase');
 
   // Dragging active states
   const [isDraggingHorizontal, setIsDraggingHorizontal] = useState(false);
@@ -75,7 +72,6 @@ export const ChallengeDetailView: React.FC<Props> = ({
 
   const workbenchRef = useRef<HTMLDivElement>(null);
   const rightPaneRef = useRef<HTMLDivElement>(null);
-
 
   const [showHint, setShowHint] = useState(false);
 
@@ -186,6 +182,37 @@ export const ChallengeDetailView: React.FC<Props> = ({
     };
   })();
 
+  const executeTests = async (): Promise<RunTestOutput> => {
+    try {
+      const response = await fetch('/api/run-tests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          challengeId: challenge.id,
+          code: editorCodes[selectedEditorLang],
+          language: selectedEditorLang,
+          timeoutMs: 3000
+        })
+      });
+
+      if (!response.ok) {
+        const errorJson = await response.json().catch(() => ({}));
+        throw new Error(errorJson.error || `Server runner returned HTTP ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (apiError: any) {
+      console.warn('[APIRun] Server VM API unreachable, running fallback evaluation:', apiError);
+      return await runChallengeTests({
+        challenge,
+        code: editorCodes[selectedEditorLang],
+        language: selectedEditorLang,
+        serverUrl,
+        isLocalServerMode: false
+      });
+    }
+  };
+
   const handleRunTests = async () => {
     if (isRunning) return;
     setIsConsoleCollapsed(false);
@@ -195,13 +222,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
 
     setTestResults(prev => prev.map(t => ({ ...t, status: 'RUNNING' })));
 
-    const output = await runChallengeTests({
-      challenge,
-      code: editorCodes[selectedEditorLang],
-      language: selectedEditorLang,
-      serverUrl,
-      isLocalServerMode: false
-    });
+    const output = await executeTests();
 
     for (let i = 0; i < output.results.length; i++) {
       await new Promise(r => setTimeout(r, 40));
@@ -219,13 +240,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
 
     // Artificial evaluation delay for realistic backend grading feel
     const [output] = await Promise.all([
-      runChallengeTests({
-        challenge,
-        code: editorCodes[selectedEditorLang],
-        language: selectedEditorLang,
-        serverUrl,
-        isLocalServerMode: false
-      }),
+      executeTests(),
       new Promise(resolve => setTimeout(resolve, 1500))
     ]);
 
@@ -348,7 +363,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
   const isSolved = challenge.status === 'SOLVED';
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-[#050708] font-sans text-slate-200 overflow-hidden select-none">
+    <div className="h-screen w-screen flex flex-col bg-[#08090c] font-sans text-zinc-100 overflow-hidden select-none antialiased">
       {/* ── Drag Overlay to prevent mouse events from getting trapped in Monaco ── */}
       {(isDraggingHorizontal || isDraggingVertical) && (
         <div 
@@ -376,18 +391,18 @@ export const ChallengeDetailView: React.FC<Props> = ({
 
       {/* ── Free Demo Preview Banner (for guests on ping-health-api) ── */}
       {!user && challenge.slug === 'ping-health-api' && (
-        <div className="bg-[#1c1c1e]/85 backdrop-blur-2xl border-b border-white/[0.08] px-4 py-2 flex items-center justify-between text-xs text-[#30d158] shrink-0 select-none">
+        <div className="bg-[#12141a] border-b border-zinc-800 px-4 py-2 flex items-center justify-between text-xs text-emerald-400 shrink-0 select-none">
           <div className="flex items-center gap-2">
-            <Unlock className="w-3.5 h-3.5 text-[#30d158] shrink-0" />
-            <span className="text-[#d1d1d6]">
+            <Unlock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="text-zinc-300">
               <strong className="text-white">Free Demo Access:</strong> You can code and execute test suites for this challenge without signing in.
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline text-[#86868b]">Want to save your score and unlock all challenges?</span>
+            <span className="hidden sm:inline text-zinc-500">Want to save your score and unlock all challenges?</span>
             <Link
               href={`/sign-in?redirect=${encodeURIComponent('/challenges/ping-health-api')}`}
-              className="px-3 py-1 bg-[#30d158]/20 hover:bg-[#30d158]/30 active:scale-[0.97] border border-[#30d158]/40 rounded-lg text-white font-semibold transition-all shadow-xs"
+              className="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 active:scale-[0.97] border border-emerald-500/40 rounded-lg text-emerald-300 font-semibold transition-all shadow-xs"
             >
               Sign In / Sign Up
             </Link>
@@ -404,156 +419,63 @@ export const ChallengeDetailView: React.FC<Props> = ({
         <div 
           id="tour-workbench-specs"
           style={{ width: `${leftWidthPercent}%` }} 
-          className={`h-full flex flex-col bg-[#1c1c1e]/80 backdrop-blur-2xl rounded-2xl border border-white/[0.08] border-t-white/[0.14] shadow-[0_12px_40px_rgba(0,0,0,0.45)] overflow-hidden shrink-0 ${
+          className={`h-full flex flex-col bg-[#0e1015] rounded-2xl border border-zinc-800 shadow-[0_12px_40px_rgba(0,0,0,0.6)] overflow-hidden shrink-0 ${
             (isDraggingHorizontal || isDraggingVertical) ? 'transition-none pointer-events-none select-none' : 'transition-all duration-150 ease-out'
           }`}
         >
-          {/* Top Card Tabs (Apple Segmented Bar) */}
-          <div className="h-12 px-3.5 bg-[#161618]/70 border-b border-white/[0.06] flex items-center justify-between shrink-0 select-none">
-            <div className="flex items-center gap-1.5 text-xs">
-              <button
-                onClick={() => setLeftTab('DESCRIPTION')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.97] ${
-                  leftTab === 'DESCRIPTION'
-                    ? 'bg-white/[0.12] text-white font-semibold border border-white/[0.1] shadow-xs'
-                    : 'text-[#86868b] hover:text-[#f5f5f7] hover:bg-white/[0.06] font-medium'
-                }`}
-              >
-                <BookOpen className="w-3.5 h-3.5 text-[#30d158]" />
-                <span>Description</span>
-              </button>
-
-              <button
-                onClick={() => setLeftTab('REQUIREMENTS')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.97] ${
-                  leftTab === 'REQUIREMENTS'
-                    ? 'bg-white/[0.12] text-white font-semibold border border-white/[0.1] shadow-xs'
-                    : 'text-[#86868b] hover:text-[#f5f5f7] hover:bg-white/[0.06] font-medium'
-                }`}
-              >
-                <ListChecks className="w-3.5 h-3.5 text-[#0a84ff]" />
-                <span>Requirements ({challenge.requirements.length})</span>
-              </button>
-
-              <button
-                onClick={() => setLeftTab('SCAFFOLD')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.97] ${
-                  leftTab === 'SCAFFOLD'
-                    ? 'bg-white/[0.12] text-white font-semibold border border-white/[0.1] shadow-xs'
-                    : 'text-[#86868b] hover:text-[#f5f5f7] hover:bg-white/[0.06] font-medium'
-                }`}
-              >
-                <FileCode2 className="w-3.5 h-3.5 text-[#ff9f0a]" />
-                <span>Scaffold</span>
-              </button>
+          {/* Top Card Header */}
+          <div className="h-11 px-4 bg-[#13151b] border-b border-zinc-800/90 flex items-center justify-between shrink-0 select-none">
+            <div className="flex items-center gap-2 text-xs font-semibold text-zinc-300">
+              <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Description</span>
             </div>
           </div>
 
           {/* Left Card Body (Scrollable Problem Statement) */}
-          <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 select-text scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-            {leftTab === 'DESCRIPTION' && (
-              <div className="space-y-4">
-                {/* Title + Status Badges */}
-                <div>
-                  <div className="flex items-center justify-between gap-3">
-                    <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-[-0.015em]">
-                      {challenge.title}
-                    </h1>
-                    {isSolved && (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#30d158] bg-[#30d158]/15 border border-[#30d158]/30 px-2.5 py-0.5 rounded-full select-none shrink-0 shadow-xs">
-                        <span>Solved</span>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#30d158]" />
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Tag Badges Row */}
-                  <div className="flex items-center gap-2 mt-3 flex-wrap">
-                    <DifficultyBadge difficulty={challenge.difficulty} />
-
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.06] text-[#d1d1d6] text-xs font-medium border border-white/[0.08]">
-                      <Tag className="w-3 h-3 text-[#86868b]" />
-                      <span>{challenge.category}</span>
+          <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 select-text scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent text-zinc-200">
+            <div className="space-y-4">
+              {/* Title + Status Badges */}
+              <div className="space-y-3 pb-3.5 border-b border-zinc-800/80">
+                <div className="flex items-center justify-between gap-3">
+                  <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                    {challenge.title}
+                  </h1>
+                  {isSolved && (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full select-none shrink-0 shadow-xs">
+                      <span>Solved</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                     </span>
-
-                    <button 
-                      onClick={() => setShowHint(!showHint)}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.06] hover:bg-white/[0.10] active:scale-[0.97] text-[#d1d1d6] hover:text-white text-xs font-medium cursor-pointer transition-all border border-white/[0.08]"
-                    >
-                      <Lightbulb className="w-3 h-3 text-[#ff9f0a]" />
-                      <span>Hint</span>
-                    </button>
-                  </div>
-
-                  {showHint && (
-                    <div className="mt-3.5 p-4 rounded-xl bg-[#ff9f0a]/10 border border-[#ff9f0a]/20 text-xs sm:text-sm text-[#ffd60a] leading-relaxed shadow-sm">
-                      💡 Focus on handling concurrent edge cases and returning standard HTTP status codes as specified in contract assertions.
-                    </div>
                   )}
                 </div>
 
-                {/* Problem Specification Content */}
-                <ProblemSpecRenderer challenge={challenge} />
-              </div>
-            )}
+                {/* Tag Badges Row */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <DifficultyBadge difficulty={challenge.difficulty} size="md" />
 
-            {leftTab === 'REQUIREMENTS' && (
-              <div className="space-y-4">
-                <div className="pb-3 border-b border-white/[0.06] flex items-center justify-between">
-                  <div>
-                    <h2 className="text-sm font-semibold text-white tracking-tight">Contract Assertions</h2>
-                    <p className="text-xs text-[#86868b] mt-0.5">
-                      Verify HTTP status codes, headers, and payload boundary conditions.
-                    </p>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800/90 text-zinc-300 text-xs font-medium border border-zinc-700/60">
+                    <Tag className="w-3 h-3 text-zinc-400" />
+                    <span>{challenge.category}</span>
+                  </span>
+
+                  <button 
+                    onClick={() => setShowHint(!showHint)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800/90 hover:bg-zinc-700 active:scale-[0.97] text-zinc-300 hover:text-white text-xs font-medium cursor-pointer transition-all border border-zinc-700/60"
+                  >
+                    <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Hint</span>
+                  </button>
+                </div>
+
+                {showHint && (
+                  <div className="mt-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-sm text-amber-200 leading-relaxed shadow-sm">
+                    💡 Focus on handling incoming request parameters, returning valid JSON formats, and matching expected RFC status codes accurately.
                   </div>
-                  <span className="text-xs font-mono font-semibold text-[#30d158] bg-[#30d158]/15 px-2.5 py-0.5 rounded-full border border-[#30d158]/30">
-                    {challenge.requirements.length} CHECKS
-                  </span>
-                </div>
-
-                <div className="space-y-2.5">
-                  {challenge.requirements.map((req, idx) => (
-                    <div
-                      key={req.id}
-                      className="p-3.5 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:border-white/[0.12] transition-colors space-y-1.5 shadow-sm"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-white flex items-center gap-2">
-                          <span className="w-4.5 h-4.5 rounded-full bg-[#30d158]/15 border border-[#30d158]/30 text-[#30d158] flex items-center justify-center text-[10px] font-mono font-bold">
-                            {idx + 1}
-                          </span>
-                          <span>{req.title}</span>
-                        </span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.08] border border-white/[0.1] text-[#86868b] font-medium">
-                          {req.badge || 'ASSERTION'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#d1d1d6] leading-relaxed pl-6.5">
-                        {req.detail}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                )}
               </div>
-            )}
 
-            {leftTab === 'SCAFFOLD' && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between text-xs text-[#86868b] font-mono border-b border-white/[0.06] pb-2.5">
-                  <span className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#30d158]" />
-                    <span>Language Template:</span>
-                    <strong className="text-[#30d158] uppercase">{selectedEditorLang}</strong>
-                  </span>
-                  <span className="text-[11px] text-[#86868b]">Live Starter</span>
-                </div>
-                <CodeBlock
-                  code={challenge.starterCode?.[selectedEditorLang] || '// No starter code available'}
-                  language={selectedEditorLang === 'nodejs' ? 'typescript' : selectedEditorLang}
-                  showLineNumbers={true}
-                />
-              </div>
-            )}
+              {/* Problem Specification Content */}
+              <ProblemSpecRenderer challenge={challenge} />
+            </div>
           </div>
         </div>
 
@@ -566,12 +488,12 @@ export const ChallengeDetailView: React.FC<Props> = ({
             setIsDraggingHorizontal(true);
           }}
           className={`w-2.5 h-full cursor-col-resize flex items-center justify-center shrink-0 group select-none z-20 ${
-            isDraggingHorizontal ? 'bg-[#30d158]/20' : 'hover:bg-white/[0.06]'
+            isDraggingHorizontal ? 'bg-emerald-500/20' : 'hover:bg-white/[0.06]'
           }`}
           title="Drag to resize columns"
         >
           <div className={`w-1 h-8 rounded-full transition-all duration-150 ${
-            isDraggingHorizontal ? 'bg-[#30d158] scale-y-125 shadow-[0_0_8px_rgba(48,209,88,0.5)]' : 'bg-white/20 group-hover:bg-[#30d158]'
+            isDraggingHorizontal ? 'bg-emerald-400 scale-y-125 shadow-[0_0_8px_rgba(52,211,153,0.5)]' : 'bg-zinc-700 group-hover:bg-emerald-400'
           }`} />
         </div>
 
@@ -615,12 +537,12 @@ export const ChallengeDetailView: React.FC<Props> = ({
                 setIsDraggingVertical(true);
               }}
               className={`h-2.5 w-full cursor-row-resize flex items-center justify-center shrink-0 group select-none z-20 ${
-                isDraggingVertical ? 'bg-[#30d158]/20' : 'hover:bg-white/[0.06]'
+                isDraggingVertical ? 'bg-emerald-500/20' : 'hover:bg-white/[0.06]'
               }`}
               title="Drag to resize editor and console"
             >
               <div className={`h-1 w-8 rounded-full transition-all duration-150 ${
-                isDraggingVertical ? 'bg-[#30d158] scale-x-125 shadow-[0_0_8px_rgba(48,209,88,0.5)]' : 'bg-white/20 group-hover:bg-[#30d158]'
+                isDraggingVertical ? 'bg-emerald-400 scale-x-125 shadow-[0_0_8px_rgba(52,211,153,0.5)]' : 'bg-zinc-700 group-hover:bg-emerald-400'
               }`} />
             </div>
           )}
@@ -638,6 +560,9 @@ export const ChallengeDetailView: React.FC<Props> = ({
             }`}
           >
             <LeetCodeConsoleDock
+              challenge={challenge}
+              currentCode={editorCodes[selectedEditorLang]}
+              currentLanguage={selectedEditorLang}
               testCases={challenge.testCases}
               testResults={testResults}
               summary={summary}
