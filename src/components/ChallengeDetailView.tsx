@@ -64,7 +64,7 @@ export const ChallengeDetailView: React.FC<Props> = ({
   });
 
   const [isConsoleCollapsed, setIsConsoleCollapsed] = useState(false);
-  const [activeConsoleTab, setActiveConsoleTab] = useState<'testcase' | 'result'>('testcase');
+  const [activeConsoleTab, setActiveConsoleTab] = useState<'testcase' | 'result' | 'playground'>('testcase');
 
   // Dragging active states
   const [isDraggingHorizontal, setIsDraggingHorizontal] = useState(false);
@@ -560,6 +560,9 @@ export const ChallengeDetailView: React.FC<Props> = ({
             }`}
           >
             <LeetCodeConsoleDock
+              challenge={challenge}
+              currentCode={editorCodes[selectedEditorLang]}
+              currentLanguage={selectedEditorLang}
               testCases={challenge.testCases}
               testResults={testResults}
               summary={summary}
